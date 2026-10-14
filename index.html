@@ -176,6 +176,11 @@ button { cursor: pointer; }
 .menu button:hover { background: var(--chip-strong); }
 .menu button span { font-size: 12px; color: var(--muted); }
 .menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 2px; }
+.menu button:disabled { opacity: 0.45; cursor: default; background: transparent; }
+#marquee {
+  position: fixed; z-index: 11; pointer-events: none;
+  border: 1.5px dashed var(--accent); background: var(--accent-soft); border-radius: 3px;
+}
 
 /* ---------- Tool rail ---------- */
 #rail {
@@ -432,6 +437,19 @@ kbd {
       <div class="menu panel" id="menu-examples" hidden></div>
     </div>
     <div class="menu-wrap">
+      <button class="tbtn" id="btn-edit" aria-haspopup="true" aria-expanded="false" title="Copy, cut and paste"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg><span class="lbl-text">Edit ▾</span></button>
+      <div class="menu panel" id="menu-edit" hidden>
+        <button data-edit="copy">Copy<span>Ctrl+C · the selection, with its glue and wires</span></button>
+        <button data-edit="cut">Cut<span>Ctrl+X · copy, then delete</span></button>
+        <button data-edit="paste">Paste<span>Ctrl+V · at the pointer, or beside the original</span></button>
+        <button data-edit="duplicate">Duplicate<span>Ctrl+D · a copy right next to it</span></button>
+        <hr>
+        <button data-edit="all">Select all<span>Ctrl+A · every part and device</span></button>
+        <button data-edit="none">Select none<span>Esc</span></button>
+        <button data-edit="delete">Delete selection<span>Del</span></button>
+      </div>
+    </div>
+    <div class="menu-wrap">
       <button class="tbtn" id="btn-file" aria-haspopup="true" aria-expanded="false" title="Save, load and share"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2.2h7a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></svg><span class="lbl-text">File ▾</span></button>
       <div class="menu panel" id="menu-file" hidden>
         <button data-file="save">Save in this browser<span>Keeps one build on this device</span></button>
@@ -452,6 +470,7 @@ kbd {
 <aside id="inspector" class="panel" aria-label="Inspector"></aside>
 
 <div id="hint" class="panel"></div>
+<div id="marquee" hidden></div>
 <div id="toast" class="panel hide" role="status" aria-live="polite"></div>
 <div id="tip" class="panel" hidden></div>
 
@@ -519,10 +538,20 @@ kbd {
         <span class="combo"><kbd>Ctrl</kbd> <kbd>Z</kbd></span><span>Undo (Shift for redo)</span>
         <kbd>Del</kbd><span>Delete the selection</span>
       </div>
+      <div class="keys">
+        <span class="combo"><kbd>Ctrl</kbd> + click</span><span>Add to or remove from the selection</span>
+        <span class="combo"><kbd>Ctrl</kbd> + drag</span><span>Select everything in a box</span>
+        <span class="combo"><kbd>Ctrl</kbd> <kbd>A</kbd></span><span>Select all</span>
+        <span class="combo"><kbd>Ctrl</kbd> <kbd>C</kbd> / <kbd>X</kbd></span><span>Copy / cut the selection</span>
+        <span class="combo"><kbd>Ctrl</kbd> <kbd>V</kbd></span><span>Paste where the pointer is</span>
+        <span class="combo"><kbd>Ctrl</kbd> <kbd>D</kbd></span><span>Duplicate beside it</span>
+      </div>
     </div>
     <p style="margin-top:10px">In most browsers <kbd>Ctrl</kbd> + <kbd>W</kbd> closes the tab and a page cannot block it, so the sandbox asks before leaving while Ctrl is held. <kbd>Alt</kbd> works for turtle mode too.</p>
     <h3>Moving things</h3>
     <p>The <b>Grabber</b> pulls parts around while time runs, presses buttons and drags levers. While paused it moves whole assemblies. <b>Move</b>, <b>Rotate</b> and <b>Size</b> put a gizmo on the selected part. Drag an arrow, a ring or a box handle.</p>
+    <h3>Copy and paste</h3>
+    <p>Select several things with <kbd>Ctrl</kbd> + click or a <kbd>Ctrl</kbd> + drag box, or press <kbd>Ctrl</kbd> + <kbd>A</kbd> for everything. Copy takes the glue, springs, wires and pipes between them along, and a device copied without the part it sits on stands on its own. Paste drops the copy under the pointer, and the copy stays selected so <b>Move</b> and <b>Rotate</b> can put it in place. Copies go through the system clipboard, so you can paste into another Red Sandbox tab. The <b>Edit</b> menu has the same commands.</p>
     <div class="btn-row" style="margin-top:16px"><button class="btn primary" id="help-close">Start building</button></div>
   </div>
 </div>
@@ -1781,7 +1810,7 @@ function clearScene() {
   for (const s of S.springs.values()) disposeObject(s.mesh);
   for (const w of S.wires.values()) disposeObject(w.mesh);
   S.parts.clear(); S.mounts.clear(); S.glues.clear(); S.springs.clear(); S.wires.clear();
-  selection = null; springStart = null; wireStart = null; drag = null; move = null;
+  selection = null; multi = []; springStart = null; wireStart = null; drag = null; move = null;
   gasClear();
   needsRebuild = true;
 }
@@ -2322,7 +2351,7 @@ function cullFallen() {
 //  so pressure (in atmospheres) is simply energy / open volume.
 // =====================================================================
 const GH = 0.1, GAS_MAX = 9000, FMIN = 0.08;
-const T_IGN = 2.0, AFR = 14, HEAT = 95, BURN_K = 55, COOL = 2.2, KT = 16, KD = 9;
+const T_IGN = 2.0, AFR = 14, HEAT = 125, BURN_K = 55, COOL = 2.2, KT = 16, KD = 9;
 const P_UNIT = 140; // newtons per square metre of wall for each atmosphere above ambient (scaled to this sandbox's light parts)
 const DX = [1, -1, 0, 0, 0, 0], DY = [0, 0, 1, -1, 0, 0], DZ = [0, 0, 0, 0, 1, -1];
 const gas = {
@@ -2333,14 +2362,14 @@ const gas = {
   hash: new Map(), owners: [], hashStamp: -1,
   nbPhi: new Map(), nbOwn: new Map(), prevSolid: new Set(),
   released: 0, flashSum: V(), flashW: 0, flash: 0,
-  sparks: [], spray: [],
+  sparks: [], spray: [], puffs: [],
 };
 const gasKey = (i, j, k) => (i + 4096) * 67108864 + (j + 4096) * 8192 + (k + 4096);
 const bucketKey = (i, j, k) => (i + 512) * 1048576 + (j + 512) * 1024 + (k + 512);
 const gasTotal = (c) => gas.air[c] + gas.fuel[c] + gas.exh[c];
 function gasClear() {
   gas.map.clear(); gas.act.length = 0; gas.free.length = 0; gas.top = 0; gas.alive.fill(0);
-  gas.prevSolid.clear(); gas.sparks.length = 0; gas.spray.length = 0; gas.flash = 0;
+  gas.prevSolid.clear(); gas.sparks.length = 0; gas.spray.length = 0; gas.puffs.length = 0; gas.flash = 0;
 }
 function ensureGasHash(force = false) {
   if (!force && gas.hashStamp === stepCount) return;
@@ -2482,7 +2511,9 @@ function gasMove(src, dst, fr) {
 // implicitly each step. Each face lets gas through according to how open it is (cubed, so a
 // one-centimetre gap around a piston leaks slowly while an open face does not resist at all).
 const FACE_NB = new Int32Array(GAS_MAX * 6), FACE_C = new Float32Array(GAS_MAX * 6), FACE_A = new Float32Array(GAS_MAX * 6);
-const gasP = new Float32Array(GAS_MAX), gasE0 = new Float32Array(GAS_MAX), gasFprev = new Float32Array(GAS_MAX);
+const gasP = new Float32Array(GAS_MAX), gasE0 = new Float32Array(GAS_MAX), gasFprev = new Float32Array(GAS_MAX), gasDV = new Float32Array(GAS_MAX);
+const gasRoot = new Int32Array(GAS_MAX), gasCV = new Float32Array(GAS_MAX), gasCD = new Float32Array(GAS_MAX), gasCOpen = new Uint8Array(GAS_MAX);
+const gasFind = (c) => { while (gasRoot[c] !== c) { gasRoot[c] = gasRoot[gasRoot[c]]; c = gasRoot[c]; } return c; };
 const GAS_ITER = 14, K_FLOW = 30;
 const TR_MAX = GAS_MAX * 4 + 256; // gas transfers per step
 const TR_S = new Int32Array(TR_MAX), TR_D = new Int32Array(TR_MAX), TR_I = new Uint32Array(TR_MAX), TR_E = new Float32Array(TR_MAX), TR_P = new Float32Array(TR_MAX);
@@ -2550,7 +2581,8 @@ function gasBuildLinks(h) {
       if (kv < 1e-4) continue;
       const w = pipeAt(m, 'inlet');
       const end = w && pipeOther(w, m), other = end && S.mounts.get(end.m);
-      if (!other) addGasLink(nozzleNow(m), fluidPortNow(m, 'inlet'), kv, 1, m);
+      // Open to the air: it breathes straight from and into the atmosphere, and what blows out is drawn as puffs of smoke
+      if (!other) { addGasLink(nozzleNow(m), null, kv, 1, m); const L = gasLinks[gasLinks.length - 1]; if (L && L.valve === m) L.vent = fluidPortNow(m, 'inlet'); }
       else if (other.type === 'turbo' || other.type === 'intake') addGasLink(nozzleNow(m), null, series(kv, kc * TURBO_K, pipeK(w, kc)), 1 + (other.st.boost ?? 0), m, null, true); // a one-way door: air comes in, nothing goes back out
       else if (other.type === 'valve' && other.id > m.id) {
         const ko = kc * (other.st.open ?? 0) * other.params.size;
@@ -2561,6 +2593,23 @@ function gasBuildLinks(h) {
     }
   }
 }
+// Smoke puffs for gas a valve blows out into the open air
+const PUFF_MAX = 400;
+function ventPuffs(L, e) {
+  const c = L.a, n = gasTotal(c);
+  if (n <= 1e-9) return;
+  const smoke = (gas.exh[c] + gas.fuel[c] * 4) / n;
+  const st = L.valve.st;
+  st.puff = (st.puff ?? 0) + e * (0.15 + smoke);
+  if (st.puff < 1.5) return;
+  const from = nozzleNow(L.valve), dir = L.vent.clone().sub(from).normalize();
+  while (st.puff >= 1.5 && gas.puffs.length < PUFF_MAX) {
+    st.puff -= 1.5;
+    const v = dir.clone().multiplyScalar(1.2 + Math.random() * 1.5).add(V((Math.random() - 0.5) * 0.6, 0.3 + Math.random() * 0.4, (Math.random() - 0.5) * 0.6));
+    gas.puffs.push({ p: L.vent.clone(), v, life: 0.6 + Math.random() * 0.5, life0: 1.1, a: Math.min(0.5, 0.1 + smoke * 0.6), hot: (gas.en[c] / n) > 2 });
+  }
+  st.puff = Math.min(st.puff, 3);
+}
 function gasStep(h) {
   const act = gas.act;
   gasBuildLinks(h);
@@ -2569,14 +2618,15 @@ function gasStep(h) {
   gas.nbPhi.clear();
   gas.nbOwn.clear();
   gas.faceCache.clear();
-  // 1. Where are the walls now? Moving parts squeeze or open cells (and heat or cool the gas doing it).
+  // 1. Where are the walls now? Moving parts squeeze or open cells. Squeezing heats the gas, but the
+  //    heat belongs to the whole chamber (step 3b), not to the one cell a piston face is sweeping through.
   for (let a = 0; a < act.length; a++) {
     const c = act[a];
+    const fp = gasFprev[c];
     const phi = gasSolid((gas.ci[c] + 0.5) * GH, (gas.cj[c] + 0.5) * GH, (gas.ck[c] + 0.5) * GH);
     const f = Math.max(0, 1 - phi);
     gas.ph[c] = phi; gas.own[c] = _gOwn; gas.f[c] = f;
-    const fp = gasFprev[c];
-    if (fp >= FMIN && f >= FMIN && fp !== f) gas.en[c] *= Math.pow(clamp(fp / f, 0.7, 1.4), 0.4);
+    gasDV[c] = fp - f;
     gasFprev[c] = f;
   }
   // 2. Gas in a cell that a part has just filled is pushed into open neighbours.
@@ -2588,7 +2638,7 @@ function gasStep(h) {
       const n = gas.map.get(gasKey(gas.ci[c] + DX[d], gas.cj[c] + DY[d], gas.ck[c] + DZ[d]));
       if (n !== undefined && gas.f[n] >= FMIN) open.push(n);
     }
-    for (const n of open) gasMove(c, n, 1 / open.length);
+    for (const n of open) { gasMove(c, n, 1 / open.length); gasDV[n] += gasDV[c] / open.length; }
     gas.air[c] = gas.fuel[c] = gas.exh[c] = gas.en[c] = 0;
   }
   // 3. Grow into open neighbours where something is happening, then wire up the faces.
@@ -2602,8 +2652,9 @@ function gasStep(h) {
       const key = gasKey(ni, nj, nk);
       if (gas.map.has(key)) continue;
       if (1 - gasNeighbourPhi(key, ni, nj, nk) < FMIN || gasFaceOpen(i, j, k, d) < 0.05) continue;
-      const n = gasCreate(ni, nj, nk, gas.prevSolid.has(key) ? c : -1);
-      if (n >= 0) gasFprev[n] = gas.f[n];
+      const uncovered = gas.prevSolid.has(key);
+      const n = gasCreate(ni, nj, nk, uncovered ? c : -1);
+      if (n >= 0) { gasFprev[n] = gas.f[n]; gasDV[n] = uncovered ? -gas.f[n] : 0; } // space a part just left counts as the chamber growing
     }
   }
   const kc = K_FLOW * (h / BASE_DT);
@@ -2624,6 +2675,39 @@ function gasStep(h) {
       FACE_A[base + d] = open;
       FACE_C[base + d] = kc * open * open * open;
     }
+  }
+  // 3b. Compression heating, chamber by chamber. Cells joined by faces that are mostly open form one chamber;
+  //     a chamber that shrank heats up as a whole (and one that grew cools), as gas does when squeezed
+  //     quickly. A chamber open to the outside air keeps its temperature: the squeeze just pushes gas out.
+  for (let a = 0; a < act.length; a++) { const c = act[a]; gasRoot[c] = c; gasCV[c] = 0; gasCD[c] = 0; gasCOpen[c] = 0; }
+  for (let a = 0; a < act.length; a++) {
+    const c = act[a];
+    if (gas.f[c] < FMIN) continue;
+    const base = c * 6;
+    for (let d = 0; d < 6; d++) {
+      if (!FACE_C[base + d] || FACE_A[base + d] < 0.5) continue;
+      const n = FACE_NB[base + d];
+      if (n < 0) { gasCOpen[c] = 1; continue; }
+      const ra = gasFind(c), rb = gasFind(n);
+      if (ra !== rb) gasRoot[ra] = rb;
+    }
+  }
+  for (let a = 0; a < act.length; a++) {
+    const c = act[a];
+    if (gas.f[c] < FMIN) continue;
+    const r = gasFind(c);
+    gasCV[r] += gas.f[c]; gasCD[r] += gasDV[c];
+    if (gasCOpen[c]) gasCOpen[r] = 1;
+  }
+  for (let a = 0; a < act.length; a++) {
+    const c = act[a];
+    if (gas.f[c] < FMIN) continue;
+    const r = gasFind(c);
+    if (gasCOpen[r] || Math.abs(gasCD[r]) < 1e-5 * gasCV[r]) continue;
+    gas.en[c] *= Math.pow(clamp((gasCV[r] + gasCD[r]) / gasCV[r], 0.7, 1.4), 0.4);
+  }
+  for (let a = 0; a < act.length; a++) {
+    const c = act[a];
     gasE0[c] = gas.en[c];
     gasP[c] = gas.f[c] >= FMIN ? gas.en[c] / gas.f[c] : 1;
   }
@@ -2677,6 +2761,7 @@ function gasStep(h) {
     else if (e < -1e-9) addT(L.b, L.a, -e, pb); // from outside (ambient air or a turbo's fresh air) when L.b is -1
     if (L.valve) L.valve.st.flow = -e / h;
     if (L.valve2) L.valve2.st.flow = e / h;
+    if (L.vent && e > 1e-3) ventPuffs(L, e);
   }
   const order = TR_I.subarray(0, nt).sort((x, y) => TR_P[y] - TR_P[x]);
   for (let k = 0; k < nt; k++) {
@@ -2871,6 +2956,25 @@ function updateGasVisual(dt) {
     if (ns < GAS_DRAW) {
       sp[ns * 3] = s.p.x; sp[ns * 3 + 1] = s.p.y; sp[ns * 3 + 2] = s.p.z;
       sc[ns * 4] = 1; sc[ns * 4 + 1] = 0.7; sc[ns * 4 + 2] = 0.2; sc[ns * 4 + 3] = 0.7 * (s.life / 0.25);
+      ns++;
+    }
+  }
+  for (let i = gas.puffs.length - 1; i >= 0; i--) {
+    const s = gas.puffs[i];
+    s.life -= dt;
+    if (s.life <= 0) { gas.puffs.splice(i, 1); continue; }
+    s.v.multiplyScalar(Math.exp(-dt * 2.5));
+    s.v.y += dt * 0.6; // warm smoke drifts up
+    s.p.addScaledVector(s.v, dt);
+    const k = s.life / s.life0;
+    if (s.hot && k > 0.75 && nf < GAS_DRAW) {
+      fp[nf * 3] = s.p.x; fp[nf * 3 + 1] = s.p.y; fp[nf * 3 + 2] = s.p.z;
+      fc[nf * 4] = 1; fc[nf * 4 + 1] = 0.55; fc[nf * 4 + 2] = 0.15; fc[nf * 4 + 3] = (k - 0.75) * 2.4;
+      nf++;
+    }
+    if (ns < GAS_DRAW) {
+      sp[ns * 3] = s.p.x; sp[ns * 3 + 1] = s.p.y; sp[ns * 3 + 2] = s.p.z;
+      sc[ns * 4] = grey; sc[ns * 4 + 1] = grey; sc[ns * 4 + 2] = grey + 0.03; sc[ns * 4 + 3] = s.a * Math.min(1, k * 1.5);
       ns++;
     }
   }
@@ -3234,6 +3338,7 @@ function updateWireVisual(w) {
 function saveState(m) {
   if (m.type === 'button' && m.mode === 'toggle') return { on: !!m.st.on };
   if (m.type === 'lever') return { value: m.st.value ?? 0 };
+  if (m.type === 'logic' && m.mode === 'toggle') return { q: !!m.st.q }; // which turn of a four-stroke it is on
   return undefined;
 }
 function serialize() {
@@ -3658,7 +3763,7 @@ function absorbIntoGlues(newParts) {
 //  Tool actions
 // =====================================================================
 const TOOL_INFO = {
-  select: { label: 'Select', key: '1', desc: 'Click anything to see what it is connected to and change its settings.' },
+  select: { label: 'Select', key: '1', desc: 'Click anything to see what it is connected to and change its settings. Ctrl+click adds more things to the selection, Ctrl+drag draws a box around them. Then copy (Ctrl+C), cut (Ctrl+X), paste (Ctrl+V) or duplicate (Ctrl+D).' },
   grabber: { label: 'Grabber', key: '2', desc: 'While time runs, drag a part to pull it. Click buttons and drag levers. While paused, drag to move a whole assembly: Shift lifts it, Q / E turns it.' },
   move: { label: 'Move', key: '3', desc: 'Click a part to select it, then drag an arrow to slide its assembly along that axis, or a square to slide it in a plane.' },
   rotate: { label: 'Rotate', key: '4', desc: 'Click a part to select it, then drag a ring to turn its assembly. Snaps to 15° steps while Snap to grid is on.' },
@@ -3850,25 +3955,205 @@ function deleteSelection(sel) {
   markEdited();
   renderInspector();
 }
-function onToolClick() {
+
+// ----- Selecting several things at once, and copy / cut / paste -----
+// `selection` is the item the inspector shows; `multi` holds every selected item when there is more than one.
+let multi = [];
+const sameSel = (a, b) => !!a && !!b && a.kind === b.kind && a.id === b.id;
+function selectedList() {
+  multi = multi.filter(validSelection);
+  if (multi.length) return multi;
+  return validSelection(selection) ? [selection] : [];
+}
+function isSelected(sel) { return selectedList().some((x) => sameSel(x, sel)); }
+function setSelection(list) {
+  const uniq = [];
+  for (const x of list) if (validSelection(x) && !uniq.some((u) => sameSel(u, x))) uniq.push(x);
+  multi = uniq.length > 1 ? uniq : [];
+  selection = uniq.length ? uniq[uniq.length - 1] : null;
+  renderInspector();
+}
+function toggleInSelection(sel) {
+  if (!sel) return;
+  const list = selectedList().slice();
+  const i = list.findIndex((x) => sameSel(x, sel));
+  if (i >= 0) list.splice(i, 1); else list.push(sel);
+  setSelection(list);
+}
+function selectAll() {
+  const list = [];
+  for (const p of S.parts.values()) if (p.hubOf == null) list.push({ kind: 'part', id: p.id });
+  for (const m of S.mounts.values()) list.push({ kind: 'mount', id: m.id });
+  setSelection(list);
+  toast(list.length ? `Selected ${list.length} thing${list.length > 1 ? 's' : ''}.` : 'There is nothing to select.');
+}
+// Everything a world-space point that projects into the box on screen
+function boxSelect(x0, y0, x1, y1, add) {
+  const r = canvas.getBoundingClientRect();
+  const minX = Math.min(x0, x1) - r.left, maxX = Math.max(x0, x1) - r.left, minY = Math.min(y0, y1) - r.top, maxY = Math.max(y0, y1) - r.top;
+  const inside = (w) => {
+    const v = w.clone().project(camera);
+    if (v.z < -1 || v.z > 1) return false;
+    const sx = (v.x + 1) / 2 * r.width, sy = (1 - v.y) / 2 * r.height;
+    return sx >= minX && sx <= maxX && sy >= minY && sy <= maxY;
+  };
+  const list = add ? selectedList().slice() : [];
+  for (const p of S.parts.values()) if (p.hubOf == null && inside(p.pos)) list.push({ kind: 'part', id: p.id });
+  for (const m of S.mounts.values()) if (inside(gizmoPivot({ kind: 'mount', id: m.id }) || mountFrameWorld(m).pos)) list.push({ kind: 'mount', id: m.id });
+  setSelection(list);
+}
+// The parts and mounts that a list of selected items stands for. A mount brings its hub part along.
+function itemsToIds(list) {
+  const parts = new Set(), mounts = new Set();
+  const addMount = (m) => { if (!m) return; mounts.add(m.id); if (m.hub != null && S.parts.has(m.hub)) parts.add(m.hub); };
+  for (const sel of list) {
+    if (!validSelection(sel)) continue;
+    if (sel.kind === 'part') parts.add(sel.id);
+    else if (sel.kind === 'mount') addMount(S.mounts.get(sel.id));
+    else if (sel.kind === 'glue') { const g = S.glues.get(sel.id); for (const t of g.targets) if (t !== 'floor') parts.add(t); }
+    else if (sel.kind === 'spring') { const sp = S.springs.get(sel.id); for (const e of [sp.a, sp.b]) if (e.part != null) parts.add(e.part); }
+    else if (sel.kind === 'wire') { const w = S.wires.get(sel.id); addMount(S.mounts.get(w.from.m)); addMount(S.mounts.get(w.to.m)); }
+  }
+  // A hub part on its own means its mechanism; devices sitting on a copied part come along with it.
+  for (const id of [...parts]) { const p = S.parts.get(id); if (p && p.hubOf != null) addMount(S.mounts.get(p.hubOf)); }
+  for (let grew = true; grew;) { // mounts on hubs of mounts on parts...
+    grew = false;
+    for (const m of S.mounts.values()) if (!mounts.has(m.id) && m.parent != null && parts.has(m.parent)) { addMount(m); grew = true; }
+  }
+  return { parts, mounts };
+}
+const CLIP_APP = 'red-sandbox-clip';
+let clipboard = null;
+function copyItems(list) {
+  const { parts, mounts } = itemsToIds(list);
+  if (!parts.size && !mounts.size) return null;
+  const all = serialize();
+  const inSet = (t) => t === 'floor' || t == null || parts.has(t);
+  const data = {
+    app: CLIP_APP, version: 2,
+    parts: all.parts.filter((d) => parts.has(d.id)),
+    // A device copied without the part it sits on stands on its own in the copy
+    mounts: all.mounts.filter((d) => mounts.has(d.id)).map((d) => {
+      if (d.parent == null || parts.has(d.parent)) return d;
+      const F = mountFrameWorld(S.mounts.get(d.id));
+      return { ...d, parent: null, framePos: F.pos.toArray(), frameQuat: F.quat.toArray() };
+    }),
+    // Glue comes along when it still holds two things together inside the copy
+    glues: all.glues.filter((d) => (d.struct ? inSet(d.struct.a.part) && inSet(d.struct.b.part) : d.targets.filter((t) => t !== 'floor' && parts.has(t)).length + (d.targets.includes('floor') ? 1 : 0) >= 2))
+      .map((d) => ({ ...d, targets: d.targets.filter((t) => t === 'floor' || parts.has(t)) })),
+    springs: all.springs.filter((d) => inSet(d.a.part) && inSet(d.b.part) && (d.a.part != null || d.b.part != null)),
+    wires: all.wires.filter((d) => mounts.has(d.from.m) && mounts.has(d.to.m)),
+  };
+  // Where the copy sits: the middle of its footprint, on its lowest point
+  const box = new THREE.Box3();
+  for (const id of parts) box.expandByObject(S.parts.get(id).mesh);
+  for (const id of mounts) { const m = S.mounts.get(id); if (m.parent == null) box.expandByPoint(m.framePos); }
+  const c = box.getCenter(V());
+  data.base = [c.x, box.min.y, c.z];
+  data.width = Math.max(0.5, box.max.x - box.min.x);
+  return data;
+}
+function copySelection(cut = false) {
+  const list = selectedList();
+  const data = copyItems(list);
+  if (!data) { toast('Select something to copy first: click it with the Select tool (1).'); return null; }
+  clipboard = data;
+  const n = data.parts.filter((d) => d.hubOf == null).length + data.mounts.length;
+  if (cut) {
+    deleteItems(list);
+    toast(`Cut ${n} thing${n > 1 ? 's' : ''}. Paste with Ctrl+V.`);
+  } else toast(`Copied ${n} thing${n > 1 ? 's' : ''}. Paste with Ctrl+V where the pointer is.`);
+  return data;
+}
+function deleteItems(list) {
+  list = list.filter(validSelection);
+  if (!list.length) return;
+  if (list.length === 1) { deleteSelection(list[0]); return; }
+  pushUndo();
+  for (const sel of list) {
+    if (!validSelection(sel)) continue; // already gone with something deleted before it
+    if (sel.kind === 'part') deletePart(S.parts.get(sel.id));
+    else if (sel.kind === 'mount') deleteMount(S.mounts.get(sel.id));
+    else if (sel.kind === 'glue') deleteGlue(S.glues.get(sel.id));
+    else if (sel.kind === 'spring') deleteSpring(S.springs.get(sel.id));
+    else if (sel.kind === 'wire') deleteWire(S.wires.get(sel.id));
+  }
+  wiresDirty = true;
+  multi = []; selection = null;
+  markEdited();
+  renderInspector();
+}
+// Paste a copy under the pointer (or beside the original when the pointer is off the scene)
+function pasteClipboard(data = clipboard, atPointer = true) {
+  if (!data || data.app !== CLIP_APP || !Array.isArray(data.parts)) { toast('Nothing to paste yet. Select something and press Ctrl+C.'); return; }
+  const base = V().fromArray(data.base || [0, 0, 0]);
+  let target = null;
+  if (atPointer && pointer.inside) {
+    const hit = raycast(pointer.ndc, SURFACE);
+    if (hit) target = hit.point.clone();
+  }
+  if (!target) target = base.clone().add(V(data.width + 0.5, 0, 0));
+  if (settings.snap) { target.x = Math.round(target.x / 0.125) * 0.125; target.z = Math.round(target.z / 0.125) * 0.125; }
+  const off = target.sub(base).add(V(0, 0.002, 0));
+  pushUndo();
+  const ids = new Map();
+  const fresh = (old) => { if (old == null || old === 'floor') return old; if (!ids.has(old)) ids.set(old, newId()); return ids.get(old); };
+  const pasted = [];
+  for (const d of data.parts) {
+    if (!SHAPES.includes(d.shape)) continue;
+    const p = createPart({ ...d, id: fresh(d.id), hubOf: d.hubOf != null ? fresh(d.hubOf) : null, pos: V().fromArray(d.pos).add(off), quat: Qn().fromArray(d.quat).normalize(), linvel: V(), angvel: V() });
+    if (p.hubOf == null) pasted.push({ kind: 'part', id: p.id });
+  }
+  for (const d of data.mounts) {
+    if (!MOUNTS[d.type]) continue;
+    const fp = V().fromArray(d.framePos);
+    if (d.parent == null) fp.add(off);
+    createMountRaw({ ...d, id: fresh(d.id), parent: d.parent != null ? fresh(d.parent) : null, hub: d.hub != null ? fresh(d.hub) : null, framePos: fp, frameQuat: Qn().fromArray(d.frameQuat) });
+    pasted.push({ kind: 'mount', id: ids.get(d.id) });
+  }
+  const end = (e) => ({ part: e.part != null ? fresh(e.part) : null, local: e.part != null ? V().fromArray(e.local) : V().fromArray(e.local).add(off) });
+  for (const d of data.glues) {
+    createGlue({ id: fresh(d.id), radius: d.radius, targets: d.targets.map(fresh), anchor: d.anchor != null && d.anchor !== 'floor' ? fresh(d.anchor) : null,
+      local: d.anchor != null && d.anchor !== 'floor' ? V().fromArray(d.local) : V().fromArray(d.local).add(off), struct: d.struct ? { a: end(d.struct.a), b: end(d.struct.b) } : null });
+  }
+  for (const d of data.springs) createSpring({ ...d, id: fresh(d.id), a: end(d.a), b: end(d.b) });
+  for (const d of data.wires) createWire({ ...d, id: fresh(d.id), from: { m: fresh(d.from.m), port: d.from.port }, to: { m: fresh(d.to.m), port: d.to.port } });
+  wiresDirty = true;
+  applyLogicViewMaterials();
+  markEdited();
+  if (!GIZMO_TOOLS.has(currentTool) && currentTool !== 'select') setTool('select');
+  setSelection(pasted);
+  toast(`Pasted ${pasted.length} thing${pasted.length > 1 ? 's' : ''}. Move them with the Move tool (3).`);
+}
+function duplicateSelection() {
+  const data = copyItems(selectedList());
+  if (!data) { toast('Select something to duplicate first.'); return; }
+  pasteClipboard(data, false);
+}
+const MULTI_TOOLS = new Set(['select', 'move', 'rotate']); // Size works on one part at a time
+function onToolClick(additive = false) {
   const t = currentTool;
+  if (additive && MULTI_TOOLS.has(t)) {
+    const hit = raycast(pointer.ndc, ANY);
+    toggleInSelection(infoToSelection(hit && hit.info));
+    return;
+  }
   if (t === 'select' || GIZMO_TOOLS.has(t)) {
     const hit = raycast(pointer.ndc, ANY);
     let sel = infoToSelection(hit && hit.info);
     if (t === 'size' && sel && sel.kind !== 'part') { toast('Size works on parts. Mechanisms and devices change size in the inspector.'); sel = null; }
-    selection = sel;
-    renderInspector();
+    setSelection(sel ? [sel] : []);
     return;
   }
   if (t === 'delete') {
     const hit = raycast(pointer.ndc, ANY);
-    if (hit) deleteSelection(infoToSelection(hit.info));
+    if (hit) { const sel = infoToSelection(hit.info); if (multi.length && isSelected(sel)) deleteItems(multi); else deleteSelection(sel); }
     return;
   }
   if (t === 'grabber') return;
   if (t === 'wire' || t === 'pipe') {
     const hit = raycast(pointer.ndc, ANY);
-    if (hit && hit.info.kind === 'wire') { selection = { kind: 'wire', id: hit.info.wire.id }; renderInspector(); }
+    if (hit && hit.info.kind === 'wire') setSelection([{ kind: 'wire', id: hit.info.wire.id }]);
     else if (wireStart) { wireStart = null; refreshHint(); }
     return;
   }
@@ -3909,6 +4194,19 @@ function assemblyOf(start) {
 }
 function beginTransform(sel, pivot) {
   let parts = [], mounts = [];
+  if (multi.length > 1 && isSelected(sel)) {
+    const P = new Set(), M = new Set();
+    for (const x of multi) {
+      if (x.kind !== 'part' && x.kind !== 'mount') continue;
+      const one = transformSet(x);
+      one.parts.forEach((p) => P.add(p)); one.mounts.forEach((m) => M.add(m));
+    }
+    parts = [...P]; mounts = [...M];
+  } else ({ parts, mounts } = transformSet(sel));
+  startMove(parts, mounts, pivot);
+}
+function transformSet(sel) {
+  let parts = [], mounts = [];
   if (sel.kind === 'part') {
     const asm = assemblyOf(S.parts.get(sel.id));
     parts = asm.parts; mounts = asm.floorMounts;
@@ -3921,6 +4219,9 @@ function beginTransform(sel, pivot) {
       if (inner) { const asm = assemblyOf(inner); parts = asm.parts; mounts = [...new Set([m, ...asm.floorMounts])]; }
     }
   }
+  return { parts, mounts };
+}
+function startMove(parts, mounts, pivot) {
   let minY = Infinity;
   for (const p of parts) minY = Math.min(minY, new THREE.Box3().setFromObject(p.mesh).min.y);
   move = {
@@ -4062,6 +4363,14 @@ function buildGizmos() {
 }
 buildGizmos();
 function gizmoPivot(sel) {
+  if (multi.length > 1 && isSelected(sel)) {
+    const c = V(); let n = 0;
+    for (const x of multi) { if (x.kind !== 'part' && x.kind !== 'mount') continue; const q = singlePivot(x); if (q) { c.add(q); n++; } }
+    return n ? c.divideScalar(n) : null;
+  }
+  return singlePivot(sel);
+}
+function singlePivot(sel) {
   if (!validSelection(sel)) return null;
   if (sel.kind === 'part') return S.parts.get(sel.id).pos.clone();
   if (sel.kind === 'mount') {
@@ -4208,6 +4517,11 @@ let gesture = null;
 const touches = new Map();
 const heldMove = new Set();
 const mods = { shift: false, ctrl: false, alt: false };
+const marqueeEl = document.getElementById('marquee');
+function drawMarquee(x0, y0, x1, y1) {
+  marqueeEl.hidden = false;
+  Object.assign(marqueeEl.style, { left: `${Math.min(x0, x1)}px`, top: `${Math.min(y0, y1)}px`, width: `${Math.abs(x1 - x0)}px`, height: `${Math.abs(y1 - y0)}px` });
+}
 function setPointerFrom(e) {
   const r = canvas.getBoundingClientRect();
   pointer.x = e.clientX; pointer.y = e.clientY;
@@ -4242,11 +4556,12 @@ canvas.addEventListener('pointerdown', (e) => {
     const h = pickGizmo(pointer.ndc);
     if (h && startGizmo(h)) return;
   }
+  const additive = (e.ctrlKey || e.metaKey) && MULTI_TOOLS.has(currentTool);
   if (currentTool === 'grabber') {
     const hit = raycast(pointer.ndc, (i) => i.kind === 'part' || i.kind === 'mount');
     if (hit && startGrabber(hit)) return;
   }
-  gesture = { type: 'pending', x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY };
+  gesture = { type: 'pending', x0: e.clientX, y0: e.clientY, x: e.clientX, y: e.clientY, additive };
 });
 canvas.addEventListener('pointermove', (e) => {
   if (touches.has(e.pointerId)) touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -4262,8 +4577,9 @@ canvas.addEventListener('pointermove', (e) => {
     Object.assign(gesture, { d, mx, my });
     return;
   }
-  if (gesture.type === 'pending' && Math.hypot(e.clientX - gesture.x0, e.clientY - gesture.y0) > 5) gesture.type = 'orbit';
-  if (gesture.type === 'orbit') rig.orbit(e.clientX - gesture.x, e.clientY - gesture.y);
+  if (gesture.type === 'pending' && Math.hypot(e.clientX - gesture.x0, e.clientY - gesture.y0) > 5) gesture.type = gesture.additive ? 'box' : 'orbit';
+  if (gesture.type === 'box') drawMarquee(gesture.x0, gesture.y0, e.clientX, e.clientY);
+  else if (gesture.type === 'orbit') rig.orbit(e.clientX - gesture.x, e.clientY - gesture.y);
   else if (gesture.type === 'pan') rig.pan(e.clientX - gesture.x, e.clientY - gesture.y);
   else if (gesture.type === 'grab' && drag) updateGrab();
   else if (gesture.type === 'move' && move) updateGrabberMove();
@@ -4278,7 +4594,8 @@ function endGesture(click) {
   if (!gesture) return;
   const g = gesture;
   gesture = null;
-  if (click && g.type === 'pending') onToolClick();
+  if (click && g.type === 'pending') onToolClick(g.additive);
+  if (g.type === 'box') { marqueeEl.hidden = true; if (click) boxSelect(g.x0, g.y0, g.x, g.y, false); }
   if (g.type === 'grab') drag = null;
   if (g.type === 'move') { move = null; renderInspector(); }
   if (g.type === 'gizmo') endGizmo();
@@ -4319,6 +4636,11 @@ window.addEventListener('keydown', (e) => {
   if (tag === 'TEXTAREA' || tag === 'SELECT') return;
   if ((e.ctrlKey || e.metaKey) && k === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
   if ((e.ctrlKey || e.metaKey) && k === 'y') { e.preventDefault(); redo(); return; }
+  if ((e.ctrlKey || e.metaKey) && !e.altKey && helpEl.hidden) {
+    // Copy, cut and paste arrive as clipboard events (below) so they also work between tabs
+    if (k === 'a') { e.preventDefault(); selectAll(); return; }
+    if (k === 'd') { e.preventDefault(); duplicateSelection(); return; }
+  }
   if (!helpEl.hidden) { if (k === 'escape' || k === '?') showHelp(false); return; }
   if (k === 'alt') { e.preventDefault(); return; }
   if (!e.ctrlKey && !e.metaKey && !e.altKey) {
@@ -4342,11 +4664,11 @@ window.addEventListener('keydown', (e) => {
   if (k === 'escape') {
     if (wireStart) { wireStart = null; refreshHint(); return; }
     if (springStart) { springStart = null; refreshHint(); return; }
-    if (selection) { selection = null; renderInspector(); return; }
+    if (selection || multi.length) { setSelection([]); return; }
     setTool('select');
     return;
   }
-  if (k === 'delete' || k === 'backspace') { if (selection) { e.preventDefault(); deleteSelection(selection); } return; }
+  if (k === 'delete' || k === 'backspace') { if (selection || multi.length) { e.preventDefault(); deleteItems(selectedList()); } return; }
   if (k === 'q' || k === 'e') {
     const dir = k === 'q' ? 1 : -1;
     if (move && gesture && gesture.type === 'move') { move.yaw += dir * 15 * DEG; applyTransform(); } else placeRot += dir;
@@ -4357,6 +4679,27 @@ window.addEventListener('keydown', (e) => {
   if (k === 'l') { toggleLogicView(); return; }
   if (k === 't') { toggleAutoGlue(); return; }
   if (TOOL_KEYS[k]) setTool(TOOL_KEYS[k]);
+});
+// Copy, cut and paste: the build travels through the system clipboard as text, so it can go to another tab.
+const editableTarget = (t) => t && (t.isContentEditable || t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && !['range', 'checkbox', 'button'].includes(t.type)));
+document.addEventListener('copy', (e) => {
+  if (editableTarget(e.target) || !helpEl.hidden || !selectedList().length) return;
+  const data = copySelection(false);
+  if (data) { e.preventDefault(); e.clipboardData?.setData('text/plain', JSON.stringify(data)); }
+});
+document.addEventListener('cut', (e) => {
+  if (editableTarget(e.target) || !helpEl.hidden || !selectedList().length) return;
+  const data = copySelection(true);
+  if (data) { e.preventDefault(); e.clipboardData?.setData('text/plain', JSON.stringify(data)); }
+});
+document.addEventListener('paste', (e) => {
+  if (editableTarget(e.target) || !helpEl.hidden) return;
+  let data = null;
+  try { const j = JSON.parse(e.clipboardData?.getData('text/plain') || ''); if (j && j.app === CLIP_APP) data = j; } catch { /* not ours */ }
+  if (!data && !clipboard) return;
+  e.preventDefault();
+  if (data) clipboard = data;
+  pasteClipboard(clipboard);
 });
 window.addEventListener('keyup', (e) => {
   syncMods(e);
@@ -4410,7 +4753,7 @@ function selectionPosition(sel) {
   return null;
 }
 function focusSelection() {
-  const p = selectionPosition(selection) || (raycast(pointer.ndc, SURFACE)?.point ?? null);
+  const p = (multi.length ? gizmoPivot(selection) : selectionPosition(selection)) || (raycast(pointer.ndc, SURFACE)?.point ?? null);
   if (p) { rig.goal.target.copy(p); rig.goal.dist = Math.min(rig.goal.dist, 9); }
 }
 
@@ -4615,8 +4958,8 @@ function updateHover() {
 function baseHint() {
   const t = currentTool;
   if (t === 'grabber') return running ? 'Drag a part to pull it. Click buttons, drag levers. <kbd>Space</kbd> pauses so you can move assemblies.' : 'Drag to move an assembly · <kbd>Shift</kbd> lifts · <kbd>Q</kbd>/<kbd>E</kbd> turn';
-  if (t === 'select') return 'Click anything to inspect it and change its settings';
-  if (GIZMO_TOOLS.has(t)) return validSelection(selection) ? `Drag ${t === 'move' ? 'an arrow or a square' : t === 'rotate' ? 'a ring' : 'a box handle'} · click another part to switch` : 'Click a part to put the gizmo on it';
+  if (t === 'select') return multi.length ? `${multi.length} selected · <kbd>Ctrl</kbd>+<kbd>C</kbd> copy · <kbd>Ctrl</kbd>+<kbd>V</kbd> paste · <kbd>Ctrl</kbd>+<kbd>D</kbd> duplicate` : 'Click anything to inspect it · <kbd>Ctrl</kbd>+click or <kbd>Ctrl</kbd>+drag to select several';
+  if (GIZMO_TOOLS.has(t)) return validSelection(selection) ? `Drag ${t === 'move' ? 'an arrow or a square' : t === 'rotate' ? 'a ring' : 'a box handle'} · ${t === 'size' ? 'click another part to switch' : '<kbd>Ctrl</kbd>+click adds more'}` : 'Click a part to put the gizmo on it';
   if (t === 'delete') return 'Click a part, device, glue ball, spring or wire to remove it';
   return 'Point at the floor or a part · <kbd>WASD</kbd> moves the camera';
 }
@@ -4646,7 +4989,7 @@ function objectsFor(sel) {
 }
 function updateHighlights() {
   const next = new Map();
-  for (const o of objectsFor(selection)) lightObject(next, o, HL_SELECT, 0.55);
+  for (const sel of selectedList()) for (const o of objectsFor(sel)) lightObject(next, o, HL_SELECT, 0.55);
   if (selection && selection.kind === 'part' && S.parts.get(selection.id)?.bodyInfo) {
     for (const q of S.parts.get(selection.id).bodyInfo.parts) lightObject(next, q.mesh, HL_GROUP, 0.22);
   }
@@ -4658,7 +5001,7 @@ function updateHighlights() {
   for (const [o, v] of next) { const prev = litNow.get(o); if (!prev || prev.color !== v.color || prev.intensity !== v.intensity) applyEmissive(o, v.color, v.intensity); }
   litNow = next;
   for (const w of S.wires.values()) {
-    const on = (selection?.kind === 'wire' && selection.id === w.id) || (hover.info?.kind === 'wire' && hover.info.wire === w);
+    const on = isSelected({ kind: 'wire', id: w.id }) || (hover.info?.kind === 'wire' && hover.info.wire === w);
     w.mat.color.set(on ? (currentTool === 'delete' ? '#ff3b30' : w.type === 'fluid' ? '#ffd2a8' : '#ffffff') : w.type === 'fluid' ? PIPE_COLOR : w.type === 'bool' ? '#2fd27a' : '#4aa3ff');
   }
 }
@@ -4758,7 +5101,8 @@ function setTool(t) {
   currentTool = t;
   springStart = null;
   wireStart = null;
-  if (!['select', 'move', 'rotate', 'size', 'wire', 'pipe'].includes(t)) selection = null;
+  if (!['select', 'move', 'rotate', 'size', 'wire', 'pipe'].includes(t)) { selection = null; multi = []; }
+  if (t === 'size' || t === 'wire' || t === 'pipe') multi = []; // these work on one thing at a time
   if (t === 'size' && selection && selection.kind !== 'part') selection = null;
   for (const b of railEl.querySelectorAll('.tool:not(.toggle)')) b.setAttribute('aria-pressed', String(b.dataset.tool === t));
   ghost.key = '';
@@ -5013,7 +5357,10 @@ function inspectorLive() {
 function renderInspector() {
   const body = el('div', { class: 'insp-body' });
   if (selection && !validSelection(selection)) selection = null;
-  const header = selection ? renderSelection(selection, body) : renderTool(body);
+  multi = multi.filter(validSelection);
+  if (multi.length === 1) { selection = multi[0]; multi = []; }
+  if (multi.length && !multi.some((x) => sameSel(x, selection))) selection = multi[multi.length - 1];
+  const header = multi.length ? renderMulti(multi, body) : selection ? renderSelection(selection, body) : renderTool(body);
   const worldSec = el('div', { class: 'insp-body insp-world' },
     el('div', { class: 'section-label' }, 'World'),
     sliderField('w-gravity', 'Gravity', { min: 0, max: 25, step: 0.05, value: settings.gravity, fmt: (v) => `${v.toFixed(2)} m/s²`, onInput: (v) => { settings.gravity = v; if (world) { world.gravity = { x: 0, y: -v, z: 0 }; world.forEachRigidBody((b) => b.wakeUp()); } } }),
@@ -5080,6 +5427,39 @@ function renderTool(body) {
   ));
   return head('Tool', info.label, info.desc);
 }
+function clipRow() {
+  return el('div', { class: 'btn-row' },
+    el('button', { class: 'btn', title: 'Ctrl+C', onclick: () => copySelection(false) }, 'Copy'),
+    el('button', { class: 'btn', title: 'Ctrl+X', onclick: () => copySelection(true) }, 'Cut'),
+    el('button', { class: 'btn', title: 'Ctrl+D', onclick: () => duplicateSelection() }, 'Duplicate'),
+  );
+}
+function renderMulti(list, body) {
+  const { parts, mounts } = itemsToIds(list);
+  const nParts = [...parts].filter((id) => S.parts.get(id)?.hubOf == null).length;
+  const nDev = [...mounts].filter((id) => MOUNTS[S.mounts.get(id)?.type]?.cat === 'device').length;
+  const nMech = mounts.size - nDev;
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  body.append(
+    el('div', { class: 'chips' },
+      nParts ? el('span', { class: 'chip' }, plural(nParts, 'part')) : null,
+      nMech ? el('span', { class: 'chip' }, plural(nMech, 'mechanism')) : null,
+      nDev ? el('span', { class: 'chip' }, plural(nDev, 'device')) : null,
+    ),
+    el('div', { class: 'btn-row' },
+      el('button', { class: 'btn', title: 'Ctrl+C', onclick: () => copySelection(false) }, 'Copy'),
+      el('button', { class: 'btn', title: 'Ctrl+X', onclick: () => copySelection(true) }, 'Cut'),
+      el('button', { class: 'btn', title: 'Ctrl+D', onclick: () => duplicateSelection() }, 'Duplicate'),
+    ),
+    el('div', { class: 'btn-row' },
+      el('button', { class: 'btn', onclick: () => focusSelection() }, 'Focus (F)'),
+      el('button', { class: 'btn', onclick: () => setSelection([]) }, 'Deselect'),
+      el('button', { class: 'btn danger', onclick: () => deleteItems(list) }, 'Delete all'),
+    ),
+    el('div', { class: 'insp-desc' }, 'Ctrl+click adds or removes one thing, Ctrl+drag draws a box. The Move and Rotate tools (3, 4) move the whole selection. Glue, springs and wires between selected things are copied with them.'),
+  );
+  return head('Selection', `${plural(list.length, 'thing')} selected`, null);
+}
 function renderSelection(sel, body) {
   const del = el('button', { class: 'btn danger', onclick: () => deleteSelection(sel) }, 'Delete');
   const focus = el('button', { class: 'btn', onclick: () => focusSelection() }, 'Focus (F)');
@@ -5105,6 +5485,7 @@ function renderSelection(sel, body) {
         if (!live) renderInspector();
       }),
       el('div', { class: 'btn-row' }, focus, glued ? el('button', { class: 'btn', onclick: () => { pushUndo(); detachFromGlue(p); markEdited(); renderInspector(); toast('Unglued. It is a loose part now.'); } }, 'Unglue') : null, del),
+      clipRow(),
     );
     return head('Part', `${PART_TYPES[p.type]?.label || 'Part'} #${p.id}`, null);
   }
@@ -5141,7 +5522,7 @@ function renderSelection(sel, body) {
     const io = ioPanel(m);
     if (io) body.append(...io);
     if (m.type === 'button') body.append(el('div', { class: 'btn-row' }, el('button', { class: 'btn', onclick: () => { pressButton(m, true); if (m.mode === 'push') setTimeout(() => pressButton(m, false), 300); } }, 'Press it')));
-    body.append(el('div', { class: 'btn-row' }, focus, del));
+    body.append(el('div', { class: 'btn-row' }, focus, del), clipRow());
     return head(d.cat === 'device' ? 'Device' : d.cat === 'bearing' ? 'Drivetrain' : 'Mechanism', `${d.label}${m.type === 'logic' || m.type === 'gate' ? ` · ${d.modeLabels[m.mode]}` : ''}`, null);
   }
   if (sel.kind === 'glue') {
@@ -5277,6 +5658,24 @@ function buildTopbar() {
   for (const ex of EXAMPLES) exMenu.append(el('button', { onclick: () => { closeMenus(); loadExample(ex); } }, ex.name, el('span', {}, ex.desc)));
   $('btn-examples').addEventListener('click', (e) => { e.stopPropagation(); toggleMenu($('btn-examples'), exMenu); });
   $('btn-file').addEventListener('click', (e) => { e.stopPropagation(); toggleMenu($('btn-file'), $('menu-file')); });
+  $('btn-edit').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const has = selectedList().length > 0;
+    for (const b of document.querySelectorAll('[data-edit]')) b.disabled = ['copy', 'cut', 'duplicate', 'none', 'delete'].includes(b.dataset.edit) ? !has : b.dataset.edit === 'paste' ? !clipboard : false;
+    toggleMenu($('btn-edit'), $('menu-edit'));
+  });
+  for (const b of document.querySelectorAll('[data-edit]')) b.addEventListener('click', () => {
+    closeMenus();
+    const a = b.dataset.edit;
+    if (a === 'copy' || a === 'cut') {
+      const data = copySelection(a === 'cut');
+      try { if (data) navigator.clipboard?.writeText(JSON.stringify(data)).catch(() => {}); } catch { /* clipboard blocked: the copy still works inside this tab */ }
+    } else if (a === 'paste') pasteClipboard(clipboard, false);
+    else if (a === 'duplicate') duplicateSelection();
+    else if (a === 'all') selectAll();
+    else if (a === 'none') setSelection([]);
+    else if (a === 'delete') deleteItems(selectedList());
+  });
   document.addEventListener('click', (e) => { if (!e.target.closest('.menu-wrap')) closeMenus(); });
   for (const b of document.querySelectorAll('[data-file]')) b.addEventListener('click', () => { closeMenus(); fileAction(b.dataset.file); });
   $('file-input').addEventListener('change', (e) => {
@@ -5624,13 +6023,23 @@ function buildSignals(o) {
 }
 function buildEngine(o, tune = {}) {
   // A horizontal engine: crank in two pillow blocks, a connecting rod on hinges, a crosshead slider and a piston in a sealed bore.
-  // Angle sensors on the crankshaft time the injector and the igniter. Sensor angle 90 is bottom dead centre, 270 top dead centre.
+  // Angle sensors on the flywheel time the valves, the injector and the igniter. Sensor angle 90 is bottom dead centre, 270 top dead centre.
+  // Combustion here is almost instant, so the spark always comes just after top dead centre: any earlier and it kicks the crank backwards.
   // The injector only sprays fuel, so every engine also needs a way to breathe:
-  //   stroke 2, air 'intake'  an exhaust port in the floor plus a one-way intake on the head: the engine sucks its own air in
-  //   stroke 2, air 'turbo'   the same, but a turbo (spun by the crank) blows the air in and scavenges the exhaust out
-  //   stroke 4, air 'turbo'   a sealed bore with a turbo-fed intake valve and an exhaust valve, both timed from the crank
-  const T = { bore: 0.36, head: 2.05, port: [1.25, 1.6], flyD: 1.4, flyT: 0.18, inj: [200, 250], spark: [255, 280], rate: 1, stroke: 2, air: 'intake', gain: 2, ...tune };
-  const four = T.stroke === 4;
+  //   kind 'lenoir'  two-stroke with no compression: it sucks in a charge for the first part of the stroke through an intake, fires it,
+  //                  and pushes the exhaust out of a valve on the way back. One power stroke every turn and nothing to stall on.
+  //   kind 'port'    two-stroke with an exhaust port in the floor that the piston uncovers near the bottom of its stroke. A turbo spun by
+  //                  the crank blows fresh air in through the head and flushes the exhaust out of the port into a muffler box.
+  //   kind 'four'    four-stroke: turbo-fed intake valve and exhaust valve, timed over two turns with a Toggle that counts them.
+  // Every engine has a throttle lever (I / K) wired to the injector's Rate.
+  const T = {
+    kind: 'four', bore: 0.36, head: 2.05, port: [1.25, 1.6], flyD: 1.4, flyT: 0.36, rate: 3, throttle: 0.8, gain: 2, muffler: 12, inletSize: 1.5,
+    inj: [200, 250], spark: [266, 292],                                                  // 'port' two-stroke
+    lIntake: [268, 358], lInj: [325, 352], lSpark: [0, 35], lExhaust: [80, 266],         // 'lenoir' two-stroke: fuel late, once fresh air has cooled what is left of the last bang
+    intake: [262, 100], inj4: [300, 60], spark4: [268, 300], exhaust: [100, 272], flip: 100, // four-stroke
+    ...tune,
+  };
+  const four = T.kind === 'four', port = T.kind === 'port', lenoir = T.kind === 'lenoir';
   const P = (x, y, z) => at(o, x, y, z);
   const steel = { color: '#4a5059', material: 'metal' };
   const base = ex.part('block', P(0.4, 0.1, 0), { size: [4.6, 0.2, 2.0], ...steel });
@@ -5642,7 +6051,7 @@ function buildEngine(o, tune = {}) {
   }
   const toZ = Qn().setFromUnitVectors(UP, V(0, 0, 1));
   const axle = ex.part('axle', P(-1.0, 1.0, 0.1), { size: [0.12, 2.0, 0.12], quat: toZ });
-  // The flywheel sits outboard of the pillow blocks so its rim clears them
+  // A heavy flywheel outboard of the pillow blocks carries the crank through the strokes that do not push
   const flyZ = 0.88 + T.flyT / 2;
   const fly = ex.part('wheel', P(-1.0, 1.0, flyZ), { size: [T.flyD, T.flyT, T.flyD], quat: toZ, color: '#8a94a6', material: 'metal' });
   ex.glue2(fly, axle, P(-0.94, 1.0, 0.88));
@@ -5666,14 +6075,14 @@ function buildEngine(o, tune = {}) {
   const rod = ex.part('beam', P(mid.x, mid.y, mid.z), { size: [1.4, 0.16, 0.12], color: '#f08a24', quat: qAxis(AXES[2], Math.atan2(-0.3, xPin + 1.0)) });
   ex.glue2(rod, ex.hub(pinA), P(-1.0, 1.3, 0.3));
   ex.glue2(rod, ex.hub(pinB), P(xPin, 1.0, 0.3));
-  // The bore: walls around the piston, a head at the far end and an exhaust port in the floor that the piston uncovers near the bottom of its stroke
+  // The bore: walls around the piston and a head at the far end. Only the port engine has a gap (its exhaust port) in the floor.
   const X0 = 0.8, X1 = T.head, PORT = T.port;
   const cx = (X0 + X1) / 2, len = X1 - X0, W = 2 * inner + 0.3, zS = inner + 0.075;
   const wall = { color: '#9aa3ad', material: 'metal' };
   const top = ex.part('plank', P(cx, 1.0 + inner + 0.075, 0), { size: [len, 0.15, W], ...wall });
-  // A two-stroke has a gap in the floor (the exhaust port); a four-stroke has a solid floor and breathes through valves in the head
-  const botA = four ? ex.part('plank', P(cx, 1.0 - inner - 0.075, 0), { size: [len, 0.15, W], ...wall }) : ex.part('plank', P((X0 + PORT[0]) / 2, 1.0 - inner - 0.075, 0), { size: [PORT[0] - X0, 0.15, W], ...wall });
-  const botB = four ? botA : ex.part('plank', P((PORT[1] + X1) / 2, 1.0 - inner - 0.075, 0), { size: [X1 - PORT[1], 0.15, W], ...wall });
+  const yBot = 1.0 - inner - 0.075;
+  const botA = !port ? ex.part('plank', P(cx, yBot, 0), { size: [len, 0.15, W], ...wall }) : ex.part('plank', P((X0 + PORT[0]) / 2, yBot, 0), { size: [PORT[0] - X0, 0.15, W], ...wall });
+  const botB = !port ? botA : ex.part('plank', P((PORT[1] + X1) / 2, yBot, 0), { size: [X1 - PORT[1], 0.15, W], ...wall });
   const sides = [-1, 1].map((sz) => ex.part('plank', P(cx, 1.0, sz * zS), { size: [len, 2 * inner, 0.15], ...wall }));
   const head = ex.part('block', P(X1 + 0.075, 1.0, 0), { size: [0.15, W, W], ...steel });
   sides.forEach((sd, i) => {
@@ -5686,10 +6095,23 @@ function buildEngine(o, tune = {}) {
   ex.glue2(head, top, P(X1, 1.0 + inner + 0.075, 0));
   ex.glue2(head, botB, P(X1, 1.0 - inner - 0.075, 0));
   const hS = 1.0 - inner - 0.35; // supports from the base up to the underside of the bore
-  for (const [x, bot] of four ? [[X0 + 0.3, botA], [X1 - 0.3, botA]] : [[(X0 + PORT[0]) / 2, botA], [(PORT[1] + X1) / 2, botB]]) {
+  const supX = port ? [(X0 + PORT[0]) / 2, (PORT[1] + X1) / 2] : [X0 + 0.3, X1 - 0.3];
+  supX.forEach((x, i) => {
     const sp = ex.part('block', P(x, 0.2 + hS / 2, 0), { size: [0.3, hS, W], ...steel });
     ex.glue2(sp, base, P(x + 0.15, 0.2, 0));
-    ex.glue2(sp, bot, P(x, 0.2 + hS, W / 2));
+    ex.glue2(sp, i ? botB : botA, P(x, 0.2 + hS, W / 2));
+  });
+  if (port) {
+    // A muffler box under the port: the two supports are its ends, two planks close its sides, and a valve on one side lets the exhaust out
+    const x0 = supX[0] + 0.15, x1 = supX[1] - 0.15, bx = (x0 + x1) / 2, bl = x1 - x0 + 0.3;
+    const box = [-1, 1].map((sz) => {
+      // tall enough to reach the top of the bore's floor planks, so the box has no slot along its top edge
+      const pl = ex.part('plank', P(bx, 0.2 + (hS + 0.15) / 2, sz * (W / 2 + 0.075)), { size: [bl, hS + 0.15, 0.15], ...steel });
+      ex.glue2(pl, base, P(bx, 0.2, sz * (W / 2 + 0.075)));
+      for (const x of [x0 - 0.075, x1 + 0.075]) ex.glue2(pl, x < bx ? botA : botB, P(x, 0.2 + hS + 0.075, sz * W / 2));
+      return pl;
+    });
+    box.forEach((pl, i) => { const sz = i ? 1 : -1; ex.mount('valve', 'wall', pl, P(bx, 0.2 + hS / 2, sz * (W / 2 + 0.15)), ZQ(sz), { open: 1, size: T.muffler }); });
   }
   const yTop = 1.0 + inner + 0.15;
   const inj = ex.mount('injector', 'wall', top, P(X1 - 0.08, yTop, -inner / 2), UPQ(), { rate: T.rate });
@@ -5697,38 +6119,202 @@ function buildEngine(o, tune = {}) {
   const up = frameQuat(V(0, 0, 1), V(0, 1, 0));
   // Air supply: a valve through the head, piped to a turbo or to a plain intake
   const hx = X1 + 0.15; // outer face of the head
-  const inlet = ex.mount('valve', 'wall', head, P(hx, 1.0, four ? -0.17 : 0), XQ(), { open: 1, size: four ? 1.5 : T.air === 'turbo' ? 1.5 : 3 });
-  const supply = T.air === 'turbo'
+  const inlet = ex.mount('valve', 'wall', head, P(hx, 1.0, port ? 0 : -0.17), XQ(), { open: 1, size: T.inletSize });
+  const supply = port || four
     ? ex.mount('turbo', 'pad', null, P(X1 + 1.3, 0, -0.9), UPQ(V(-1, 0, 0)), { rpm: 0, gain: T.gain })
     : ex.mount('intake', 'pad', null, P(X1 + 1.3, 0, -0.9), UPQ(V(-1, 0, 0)));
   ex.pipe(supply, 'out', inlet, 'inlet');
+  const outlet = port ? null : ex.mount('valve', 'wall', head, P(hx, 1.0, 0.17), XQ(), { open: 1, size: 1.5 });
+  // Timing sensors sit in a ring on the flywheel's outer face
+  const ring = (a) => [0.42 * Math.sin(a * DEG), 0.42 * Math.cos(a * DEG)];
+  const sense = (k, from, to) => { const [dz, dy] = ring(k * 72); return ex.mount('angle', 'dial', fly, P(-1.0 + dz, 1.0 + dy, 0.88 + T.flyT), up, { from, to }); };
+  // The throttle: a lever that sets how much fuel each shot gets
+  const desk = ex.part('block', P(0.3, 0.3, -0.75), { size: [0.5, 0.2, 0.4], ...steel });
+  ex.glue2(desk, base, P(0.3, 0.2, -0.75));
+  const throttle = ex.mount('lever', 'stay', desk, P(0.3, 0.4, -0.75), UPQ(V(0, 0, 1)), { keyUp: 'i', keyDown: 'k', min: 0 });
+  throttle.st.value = T.throttle;
+  ex.wire(throttle, 'value', inj, 'rate');
   if (four) {
-    // Four-stroke: one cycle takes two turns of the crank. Five sensors on the flywheel pick out the angles; a Toggle counts the turns.
-    const ring = (a) => [0.42 * Math.sin(a * DEG), 0.42 * Math.cos(a * DEG)];
-    const sense = (k, from, to) => { const [dz, dy] = ring(k * 72); return ex.mount('angle', 'dial', fly, P(-1.0 + dz, 1.0 + dy, 0.88 + T.flyT), up, { from, to }); };
-    const sIn = sense(0, 270, 120), sInj = sense(1, 330, 60), sSpk = sense(2, 232, 262), sExh = sense(3, 60, 285), sTdc = sense(4, 265, 300);
-    const outlet = ex.mount('valve', 'wall', head, P(hx, 1.0, 0.17), XQ(), { open: 1, size: 1.5 });
+    // One cycle takes two turns of the crank. The toggle flips just after bottom dead centre, where nothing else is switching,
+    // so every window below sits inside one turn:
+    //   turn A (toggle off): exhaust up-stroke, then intake down-stroke with the fuel
+    //   turn B (toggle on):  compression up-stroke, spark just after top dead centre, power down-stroke
+    const sIn = sense(0, T.intake[0], T.intake[1]), sInj = sense(1, T.inj4[0], T.inj4[1]), sSpk = sense(2, T.spark4[0], T.spark4[1]);
+    const sExh = sense(3, T.exhaust[0], T.exhaust[1]), sFlip = sense(4, T.flip, T.flip + 40);
     const row = (i) => P(0.55 + i * 0.42, 0.2, 0.72);
     const turn = ex.mount('logic', 'toggle', base, row(0), UPQ());
-    const first = ex.mount('logic', 'not', base, row(1), UPQ());
+    const breathe = ex.mount('logic', 'not', base, row(1), UPQ());
     const gIn = ex.mount('gate', 'and', base, row(2), UPQ()), gInj = ex.mount('gate', 'and', base, row(3), UPQ());
     const gSpk = ex.mount('gate', 'and', base, row(4), UPQ()), gExh = ex.mount('gate', 'and', base, row(5), UPQ());
-    ex.wire(sTdc, 'window', turn, 'a');      // flips once every turn, just before top dead centre
-    ex.wire(turn, 'out', first, 'a');        // On during the intake and compression turn
-    ex.wire(sIn, 'window', gIn, 'a'); ex.wire(first, 'out', gIn, 'b'); ex.wire(gIn, 'out', inlet, 'trigger');         // intake valve: down-stroke of the first turn
-    ex.wire(sInj, 'window', gInj, 'a'); ex.wire(first, 'out', gInj, 'b'); ex.wire(gInj, 'out', inj, 'inject');        // fuel while the air rushes in
-    ex.wire(sSpk, 'window', gSpk, 'a'); ex.wire(first, 'out', gSpk, 'b'); ex.wire(gSpk, 'out', ign, 'spark');         // spark at the top of compression
-    ex.wire(sExh, 'window', gExh, 'a'); ex.wire(turn, 'out', gExh, 'b'); ex.wire(gExh, 'out', outlet, 'trigger');     // exhaust valve: up-stroke of the second turn
-    if (T.air === 'turbo') ex.wire(sIn, 'rpm', supply, 'rpm');
+    ex.wire(sFlip, 'window', turn, 'a');     // flips once every turn, just after bottom dead centre
+    ex.wire(turn, 'out', breathe, 'a');      // On during the exhaust and intake turn
+    ex.wire(sIn, 'window', gIn, 'a'); ex.wire(breathe, 'out', gIn, 'b'); ex.wire(gIn, 'out', inlet, 'trigger');     // intake valve: down-stroke of turn A
+    ex.wire(sInj, 'window', gInj, 'a'); ex.wire(breathe, 'out', gInj, 'b'); ex.wire(gInj, 'out', inj, 'inject');    // fuel while the air rushes in
+    ex.wire(sExh, 'window', gExh, 'a'); ex.wire(breathe, 'out', gExh, 'b'); ex.wire(gExh, 'out', outlet, 'trigger'); // exhaust valve: up-stroke of turn A
+    ex.wire(sSpk, 'window', gSpk, 'a'); ex.wire(turn, 'out', gSpk, 'b'); ex.wire(gSpk, 'out', ign, 'spark');        // spark at the top of compression in turn B
+    ex.wire(sIn, 'rpm', supply, 'rpm'); // the faster the crank turns, the harder the turbo blows
+  } else if (lenoir) {
+    const sIn = sense(0, T.lIntake[0], T.lIntake[1]), sInj = sense(1, T.lInj[0], T.lInj[1]);
+    const sSpk = sense(2, T.lSpark[0], T.lSpark[1]), sExh = sense(3, T.lExhaust[0], T.lExhaust[1]);
+    ex.wire(sIn, 'window', inlet, 'trigger');   // suck in a charge for the first part of the stroke
+    ex.wire(sInj, 'window', inj, 'inject');     // with fuel in it
+    ex.wire(sSpk, 'window', ign, 'spark');      // shut the intake and fire it
+    ex.wire(sExh, 'window', outlet, 'trigger'); // push the exhaust out on the way back
   } else {
-    const fuelTiming = ex.mount('angle', 'dial', axle, P(-1.0, 1.0, 1.1), up, { from: T.inj[0], to: T.inj[1] });
-    const sparkTiming = ex.mount('angle', 'dial', fly, P(-1.0, 1.42, 0.88 + T.flyT), up, { from: T.spark[0], to: T.spark[1] });
-    ex.wire(fuelTiming, 'window', inj, 'inject');
-    ex.wire(sparkTiming, 'window', ign, 'spark');
-    if (T.air === 'turbo') ex.wire(fuelTiming, 'rpm', supply, 'rpm'); // the faster the crank turns, the harder the turbo blows
+    const sInj = sense(0, T.inj[0], T.inj[1]), sSpk = sense(1, T.spark[0], T.spark[1]);
+    ex.wire(sInj, 'window', inj, 'inject');
+    ex.wire(sSpk, 'window', ign, 'spark');
+    ex.wire(sInj, 'rpm', supply, 'rpm'); // the faster the crank turns, the harder the turbo blows
   }
   // With the crank pin straight up, the rod and crosshead both move at the pin's speed, so the start is consistent
   return { spin: [axle, fly, crank], centre: P(-1.0, 1.0, 0), slide: [rod, ex.hub(pinA), ex.hub(pinB), cross, piston, ex.hub(slide)], slideVel: V(-0.3, 0, 0) };
+}
+// A 90° V-twin four-stroke, laid out like a motorcycle L-twin: one cylinder lies flat, the other stands upright,
+// and both connecting rods share the single crank pin. With the pin straight up the upright cylinder is at the
+// top of its stroke and the flat one is halfway down. They fire 270° and then 450° of crank apart.
+function buildVTwin(o, tune = {}) {
+  const T = {
+    bore: 0.36, head: 2.05, flyD: 1.4, flyT: 0.36, rate: 3, throttle: 0.8, air: 'intake', gain: 2, valve: 3,
+    intake: [262, 100], inj: [300, 60], spark: [268, 300], exhaust: [100, 272], flip: 100, // flat cylinder; the upright one runs 90° later
+    ...tune,
+  };
+  const P = (x, y, z) => at(o, x, y, z);
+  const Z = V(0, 0, 1), X = V(1, 0, 0), Y = V(0, 1, 0);
+  const steel = { color: '#4a5059', material: 'metal' }, wall = { color: '#9aa3ad', material: 'metal' };
+  const R = 0.3, ROD = 1.2, XL = 1.05; // crank throw, rod length between pins, crosshead length
+  const base = ex.part('block', P(0.4, 0.1, 0), { size: [4.6, 0.2, 2.0], ...steel });
+  ex.anchor(base, P(2.7, 0, 0));
+  for (const z of [-0.68, 0.68]) {
+    const b = ex.part('block', P(-1.0, 0.44, z), { size: [0.5, 0.48, 0.3], ...steel });
+    ex.glue2(b, base, P(-0.75, 0.2, z));
+    ex.mount('bearing', 'pillow', b, P(-1.0, 0.68, z), UPQ(V(0, 0, 1)), { damping: 1 });
+  }
+  const toZ = Qn().setFromUnitVectors(UP, Z);
+  const axle = ex.part('axle', P(-1.0, 1.0, 0.05), { size: [0.12, 2.1, 0.12], quat: toZ });
+  const fly = ex.part('wheel', P(-1.0, 1.0, 0.88 + T.flyT / 2), { size: [T.flyD, T.flyT, T.flyD], quat: toZ, color: '#8a94a6', material: 'metal' });
+  ex.glue2(fly, axle, P(-0.94, 1.0, 0.88));
+  // A timing disc on the other end of the crankshaft carries the upright cylinder's sensors
+  const disc = ex.part('cylinder', P(-1.0, 1.0, -0.95), { size: [1.0, 0.08, 1.0], quat: toZ, color: '#c9a227', material: 'metal' });
+  ex.glue2(disc, axle, P(-0.94, 1.0, -0.91));
+  const crank = ex.part('beam', P(-1.0, 1.15, 0), { size: [0.16, 0.5, 0.12], color: '#d4382a' });
+  ex.glue2(crank, axle, P(-0.94, 1.0, 0.06));
+  // Two pillars hold the upright cylinder; they stand clear of both connecting rods
+  const pillars = [-1, 1].map((sz) => {
+    const pl = ex.part('block', P(-0.44, 0.2 + 1.8, sz * 0.66), { size: [0.3, 3.6, 0.3], ...steel });
+    ex.glue2(pl, base, P(-0.44, 0.2, sz * 0.66));
+    return pl;
+  });
+  // One cylinder, drawn as the flat one and turned by `ang` around the crank; `mz` mirrors it to the other side of the crank.
+  // `du` slides the moving parts along the bore: the upright cylinder starts at the top of its stroke.
+  function cylinder(ang, mz, du, holdTo) {
+    const c = Math.cos(ang), sn = Math.sin(ang);
+    const Pt = (x, y, z) => { const dx = x + 1, dy = y - 1; return P(-1 + dx * c - dy * sn, 1 + dx * sn + dy * c, z * mz); };
+    const Vc = (v) => V(v.x * c - v.y * sn, v.x * sn + v.y * c, v.z * mz);
+    const Qp = (q = Qn()) => qAxis(Z, ang).multiply(q);
+    const Qm = (n, xd) => frameQuat(Vc(n), Vc(xd));
+    const part = (type, pos, o2) => ex.part(type, pos, { ...o2, quat: Qp(o2.quat) });
+    const xPin = -1.0 + Math.sqrt(ROD * ROD - R * R) + du;
+    const cross = part('beam', Pt(xPin - 0.08 + XL / 2, 1.0, 0), { size: [XL, 0.16, 0.12], color: '#9aa3ad' });
+    const pinB = ex.mount('hinge', 'axle', cross, Pt(xPin, 1.0, 0.06), Qm(Z, X));
+    const face = xPin - 0.08 + XL;
+    const B = T.bore, inner = B / 2 + 0.01;
+    const piston = part('block', Pt(face + 0.2, 1.0, 0), { size: [0.4, B, B], color: '#c9a227', material: 'metal' });
+    ex.glue2(cross, piston, Pt(face, 1.08, 0.06));
+    const rail = part('block', Pt(0.12, 0.44, 0), { size: [1.2, 0.48, 0.4], ...steel });
+    holdTo(rail, Pt(0.12, 0.2, 0));
+    const slide = ex.mount('slider', 'flat', rail, Pt(0.12, 0.68, 0), Qm(Y, X), { length: 1.2 });
+    const carriage = ex.hub(slide);
+    carriage.pos.add(Vc(X).multiplyScalar(du)); // the carriage rides with the crosshead
+    ex.glue2(carriage, cross, Pt(0.25 + du, 0.92, 0));
+    const X0 = 0.8, X1 = T.head, cx = (X0 + X1) / 2, len = X1 - X0, W = 2 * inner + 0.3, zS = inner + 0.075;
+    const top = part('plank', Pt(cx, 1.0 + inner + 0.075, 0), { size: [len, 0.15, W], ...wall });
+    const bot = part('plank', Pt(cx, 1.0 - inner - 0.075, 0), { size: [len, 0.15, W], ...wall });
+    const sides = [-1, 1].map((sz) => part('plank', Pt(cx, 1.0, sz * zS), { size: [len, 2 * inner, 0.15], ...wall }));
+    const head = part('block', Pt(X1 + 0.075, 1.0, 0), { size: [0.15, W, W], ...steel });
+    sides.forEach((sd, i) => {
+      const z = (i ? 1 : -1) * zS;
+      for (const x of [X0 + 0.3, X1 - 0.3]) { ex.glue2(sd, top, Pt(x, 1.0 + inner, z)); ex.glue2(sd, bot, Pt(x, 1.0 - inner, z)); }
+      ex.glue2(sd, head, Pt(X1, 1.0, z));
+    });
+    ex.glue2(head, top, Pt(X1, 1.0 + inner + 0.075, 0));
+    ex.glue2(head, bot, Pt(X1, 1.0 - inner - 0.075, 0));
+    holdTo(bot, Pt(X0 + 0.3, 0.2, 0), sides);
+    const inj = ex.mount('injector', 'wall', top, Pt(X1 - 0.08, 1.0 + inner + 0.15, -inner / 2), Qm(Y, X), { rate: T.rate });
+    const ign = ex.mount('igniter', 'wall', top, Pt(X1 - 0.08, 1.0 + inner + 0.15, inner / 2), Qm(Y, X));
+    const inlet = ex.mount('valve', 'wall', head, Pt(X1 + 0.15, 1.0, -0.17), Qm(X, Z), { open: 1, size: T.valve });
+    const outlet = ex.mount('valve', 'wall', head, Pt(X1 + 0.15, 1.0, 0.17), Qm(X, Z), { open: 1, size: T.valve });
+    return { cross, pinB, piston, carriage, inj, ign, inlet, outlet, pinWorld: Pt(xPin, 1.0, 0) };
+  }
+  // The flat cylinder stands on supports from the base; the upright one hangs between the pillars
+  const flat = cylinder(0, 1, 0, (p, pos) => {
+    ex.glue2(p, base, pos);
+    if (p.type === 'plank') for (const x of [1.1, 1.75]) {
+      const hS = 1.0 - T.bore / 2 - 0.01 - 0.35;
+      const sp = ex.part('block', P(x, 0.2 + hS / 2, 0), { size: [0.3, hS, 2 * (T.bore / 2 + 0.01) + 0.3], ...steel });
+      ex.glue2(sp, base, P(x + 0.15, 0.2, 0));
+      ex.glue2(sp, p, P(x, 0.2 + hS, 0.3));
+    }
+  });
+  const upright = cylinder(Math.PI / 2, -1, R + ROD - Math.sqrt(ROD * ROD - R * R), (p, pos, sides) => {
+    for (const pl of pillars) ex.glue2(p, pl, V(pl.pos.x, p.pos.y, pl.pos.z * 0.6));
+    if (sides) sides.forEach((sd, i) => ex.glue2(sd, pillars[i ? 0 : 1], V(-0.44, sd.pos.y, sd.pos.z * 1.3)));
+  });
+  // Both connecting rods share the crank pin, one on each face of the crank
+  const pin = P(-1.0, 1.0 + R, 0);
+  const rods = [[flat, 1], [upright, -1]].map(([cyl, sz]) => {
+    const pinA = ex.mount('hinge', 'axle', crank, P(-1.0, 1.0 + R, 0.06 * sz), ZQ(sz));
+    const d = cyl.pinWorld.clone().sub(pin);
+    const mid = pin.clone().add(cyl.pinWorld).multiplyScalar(0.5).setZ(o.z + 0.36 * sz);
+    const rod = ex.part('beam', mid, { size: [ROD + 0.2, 0.16, 0.12], color: '#f08a24', quat: qAxis(Z, Math.atan2(d.y, d.x)) });
+    ex.glue2(rod, ex.hub(pinA), pin.clone().setZ(o.z + 0.3 * sz));
+    ex.glue2(rod, ex.hub(cyl.pinB), cyl.pinWorld.clone().setZ(o.z + 0.3 * sz));
+    return { rod, hub: ex.hub(pinA) };
+  });
+  // Air: each inlet valve is piped to its own intake (or turbo); the exhaust valves blow straight out
+  const supply = (pos, quat) => (T.air === 'turbo' ? ex.mount('turbo', 'pad', null, pos, quat, { rpm: 0, gain: T.gain }) : ex.mount('intake', 'pad', null, pos, quat));
+  const supA = supply(P(T.head + 1.3, 0, -0.9), UPQ(V(-1, 0, 0)));
+  const supB = ex.mount(T.air === 'turbo' ? 'turbo' : 'intake', 'pad', pillars[1], P(-0.44, 3.8, 0.66), UPQ(V(-1, 0, 0)), T.air === 'turbo' ? { rpm: 0, gain: T.gain } : {});
+  ex.pipe(supA, 'out', flat.inlet, 'inlet');
+  ex.pipe(supB, 'out', upright.inlet, 'inlet');
+  // Throttle: one lever feeds both injectors
+  const desk = ex.part('block', P(-1.65, 0.3, -0.5), { size: [0.4, 0.2, 0.4], ...steel });
+  ex.glue2(desk, base, P(-1.65, 0.2, -0.5));
+  const throttle = ex.mount('lever', 'stay', desk, P(-1.65, 0.4, -0.5), UPQ(V(0, 0, 1)), { keyUp: 'i', keyDown: 'k', min: 0 });
+  throttle.st.value = T.throttle;
+  // Timing. The flat cylinder reads the flywheel; the upright one reads the timing disc, which faces the other way, so its
+  // angles run backwards: crank angle a reads as 360 - a there. Each cylinder counts its own turns with a toggle.
+  const ring = (k, r) => [r * Math.sin(k * 72 * DEG), r * Math.cos(k * 72 * DEG)];
+  const onFly = (k, w) => { const [dz, dy] = ring(k, 0.42); return ex.mount('angle', 'dial', fly, P(-1.0 + dz, 1.0 + dy, 0.88 + T.flyT), frameQuat(Z, Y), { from: w[0], to: w[1] }); };
+  const back = (w) => [(360 - w[1]) % 360, (360 - w[0]) % 360];
+  const onDisc = (k, w) => { const [dz, dy] = ring(k, 0.32); const b = back(w); return ex.mount('angle', 'dial', disc, P(-1.0 + dz, 1.0 + dy, -0.99), frameQuat(V(0, 0, -1), Y), { from: b[0], to: b[1] }); };
+  const later = (w) => [(w[0] + 90) % 360, (w[1] + 90) % 360];
+  const rowAt = (z) => (i) => P(0.55 + i * 0.42, 0.2, z);
+  const wireUp = (cyl, sense, row, startOnPower) => {
+    const sIn = sense(0, cyl === flat ? T.intake : later(T.intake)), sInj = sense(1, cyl === flat ? T.inj : later(T.inj));
+    const sSpk = sense(2, cyl === flat ? T.spark : later(T.spark)), sExh = sense(3, cyl === flat ? T.exhaust : later(T.exhaust));
+    const f = cyl === flat ? T.flip : T.flip + 90, sFlip = sense(4, [f, f + 40]);
+    const turn = ex.mount('logic', 'toggle', base, row(0), UPQ());
+    turn.st.q = startOnPower;
+    const breathe = ex.mount('logic', 'not', base, row(1), UPQ());
+    const g = [2, 3, 4, 5].map((i) => ex.mount('gate', 'and', base, row(i), UPQ()));
+    ex.wire(sFlip, 'window', turn, 'a');
+    ex.wire(turn, 'out', breathe, 'a');
+    ex.wire(sIn, 'window', g[0], 'a'); ex.wire(breathe, 'out', g[0], 'b'); ex.wire(g[0], 'out', cyl.inlet, 'trigger');
+    ex.wire(sInj, 'window', g[1], 'a'); ex.wire(breathe, 'out', g[1], 'b'); ex.wire(g[1], 'out', cyl.inj, 'inject');
+    ex.wire(sExh, 'window', g[2], 'a'); ex.wire(breathe, 'out', g[2], 'b'); ex.wire(g[2], 'out', cyl.outlet, 'trigger');
+    ex.wire(sSpk, 'window', g[3], 'a'); ex.wire(turn, 'out', g[3], 'b'); ex.wire(g[3], 'out', cyl.ign, 'spark');
+    ex.wire(throttle, 'value', cyl.inj, 'rate');
+    return sIn;
+  };
+  // The flat cylinder starts halfway down its intake stroke. The upright one starts at the top of its power stroke with
+  // nothing in it, which puts its first bang 450° after the flat cylinder's: the 270° / 450° beat of a 90° twin.
+  const sA = wireUp(flat, onFly, rowAt(0.72), false);
+  const sB = wireUp(upright, onDisc, rowAt(-0.72), true);
+  if (T.air === 'turbo') { ex.wire(sA, 'rpm', supA, 'rpm'); ex.wire(sB, 'rpm', supB, 'rpm'); }
+  return {
+    spin: [axle, fly, disc, crank, ...rods.map((r) => r.hub)], centre: P(-1.0, 1.0, 0),
+    slide: [rods[0].rod, flat.cross, flat.piston, flat.carriage, ex.hub(flat.pinB)], slideVel: V(-0.3, 0, 0),
+  };
 }
 const EXAMPLES = [
   { name: 'Workshop tour', desc: 'A cam on an axle, a double pendulum, a trampoline, a seesaw and dominoes', build() {
@@ -5736,9 +6322,10 @@ const EXAMPLES = [
   }, cam: [V(-0.5, 1, -0.5), 19, 0.32, 0.46] },
   { name: 'Gas cannon', desc: 'Hold N to fill the breech with fuel, press B to fire', build() { buildCannon(V()); }, cam: [V(0, 1, 0.4), 7.5, 0.75, 0.32], note: 'Hold N for about half a second to load fuel, then press B to fire. Slow time down with [ to watch the explosion.' },
   { name: 'Thumper', desc: 'Two clocks time the fuel and the spark under a heavy piston', build() { buildThumper(V()); }, cam: [V(0.3, 1.4, 0), 8, 0.9, 0.3], note: 'One clock sprays fuel into the air already under the piston, the other fires the igniter a moment later. Logic view (L) shows the wiring.' },
-  { name: 'Two-stroke engine', desc: 'Breathes through its own suction: a port in the floor and an intake on the head', build(tune) { return buildEngine(V(), { stroke: 2, air: 'intake', ...tune }); }, spin: 9, cam: [V(0.45, 0.8, 0.3), 7.5, 0.55, 0.42], note: 'The flywheel gets a push to start. The injector only sprays fuel, so the air comes in through the intake on the head and the floor port. The crank sensors time the fuel, then the spark near the top of the stroke.' },
-  { name: 'Turbo two-stroke', desc: 'A crank-driven turbo blows air in through the head and flushes the exhaust out of the floor port', build(tune) { return buildEngine(V(), { stroke: 2, air: 'turbo', ...tune }); }, spin: 9, cam: [V(0.45, 0.8, 0.3), 7.5, 0.55, 0.42], note: 'The turbo spins with the crank (angle sensor Speed into its RPM), so it blows harder as the engine revs up. It only blows in while the cylinder pressure is below its boost.' },
-  { name: 'Turbo four-stroke v2', desc: 'Intake, compression, power, exhaust: timed valves, a toggle that counts turns, and a turbo', build(tune) { return buildEngine(V(), { stroke: 4, air: 'turbo', ...tune }); }, spin: 11, cam: [V(0.7, 0.8, 0.45), 8.5, 0.6, 0.42], note: 'A Toggle on the bottom row flips every turn, so the valves, fuel and spark know which of the two turns they are in. Turn 1: intake and compression, with fuel and spark. Turn 2: power and exhaust. Logic view (L) shows the wiring.' },
+  { name: 'Two-stroke engine', desc: 'No compression, nothing to stall on: it sucks in a charge, fires it and blows the exhaust out, every turn', build(tune) { return buildEngine(V(), { kind: 'lenoir', rate: 2.5, ...tune }); }, spin: 9, cam: [V(0.45, 0.8, 0.3), 7.5, 0.55, 0.42], note: 'For the first part of each stroke the intake valve is open and the piston sucks in air with fuel, then the valve shuts and the spark fires it. On the way back the exhaust valve pushes the smoke out. Throttle with I / K.' },
+  { name: 'Turbo two-stroke', desc: 'A crank-driven turbo blows air in through the head and flushes the exhaust out of a port in the floor', build(tune) { return buildEngine(V(), { kind: 'port', gain: 3, ...tune }); }, spin: 9, cam: [V(0.45, 0.8, 0.3), 7.5, 0.55, 0.42], note: 'Near the bottom of each stroke the piston uncovers a port in the floor; the turbo (spun by the crank) blows fresh air in through the head and the exhaust out of the port into the muffler box underneath. Throttle with I / K.' },
+  { name: 'V2 four-stroke (V-twin)', desc: 'A 90° motorcycle twin: one cylinder flat, one upright, both rods on one crank pin, firing 270° and 450° apart', build(tune) { return buildVTwin(V(), tune); }, spin: 11, cam: [V(0.2, 1.9, 0), 11, 0.75, 0.32], note: 'Like a motorcycle L-twin: the flat and the upright cylinder share one crank pin and fire 270° then 450° apart, which gives the lumpy V-twin beat. The flat cylinder is timed from sensors on the flywheel, the upright one from the gold timing disc. Throttle with I / K, Logic view (L) shows the wiring.' },
+  { name: 'Turbo four-stroke single', desc: 'One cylinder: intake, compression, power, exhaust over two turns, with timed valves, a turn-counting toggle and a turbo', build(tune) { return buildEngine(V(), { kind: 'four', ...tune }); }, spin: 11, cam: [V(0.7, 0.8, 0.45), 8.5, 0.6, 0.42], note: 'A Toggle on the bottom row flips just after bottom dead centre every turn, so the valves, fuel and spark know which of the two turns they are in. Turn A: exhaust, then intake with fuel. Turn B: compression, spark just after the top, power. Throttle with I / K, Logic view (L) shows the wiring.' },
   { name: 'Air lift', desc: 'A turbo pumps air through a valve under a piston', build() { buildAirLift(V()); }, cam: [V(0.6, 1.1, 0.5), 8, 0.7, 0.3], note: 'Hold I to open the intake valve and lift the piston with turbo air; K closes it. U opens the vent to let it down, J closes it.' },
   { name: 'Gear train', desc: 'A motor drives three meshing gears; a lamp blinks every turn', build() { buildGearTrain(V()); }, cam: [V(0.2, 0.5, 0), 7, 0.25, 0.85] },
   { name: 'Rack and pinion', desc: 'Drive a toothed rack with a lever on I and K', build() { buildRackPinion(V()); }, cam: [V(0, 0.6, 0), 7, 0.55, 0.32], note: 'Hold I or K to turn the pinion. The lever springs back to zero when you let go.' },
@@ -5827,8 +6414,8 @@ updateUndoButtons();
 updateTimeUI();
 loadingEl.hidden = true;
 let seenHelp = false;
-try { seenHelp = localStorage.getItem('red-sandbox-seen-help') === '2'; localStorage.setItem('red-sandbox-seen-help', '2'); } catch { /* storage blocked */ }
-if (!seenHelp) toast('New: gears, bearings, axles, gas engines and wired signals. Press ? for the guide.');
+try { seenHelp = localStorage.getItem('red-sandbox-seen-help') === '3'; localStorage.setItem('red-sandbox-seen-help', '3'); } catch { /* storage blocked */ }
+if (!seenHelp) toast('New: select several things and copy, cut, paste or duplicate them (Ctrl+C, X, V, D), and rebuilt engines that run. Press ? for the guide.');
 if (new URLSearchParams(location.search).has('debug')) {
   // Handles for automated tests: open the page with ?debug to use them from the console.
   window.__sandbox = {
@@ -5838,6 +6425,8 @@ if (new URLSearchParams(location.search).has('debug')) {
     rebuild() { needsRebuild = true; ensureWorld(); },
     glueTargets: (p, r) => { ensureWorld(); return glueTargets(p, r); },
     pressButton,
+    setSelection, selectedList, selectAll, boxSelect, copySelection, pasteClipboard, duplicateSelection, deleteItems, undo, redo,
+    get clipboard() { return clipboard; }, get selection() { return selection; }, get multi() { return multi; },
   };
 }
 requestAnimationFrame(frame);
