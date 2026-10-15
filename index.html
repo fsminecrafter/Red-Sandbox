@@ -512,10 +512,11 @@ kbd {
       <li><b>Pause</b> with <kbd>Space</kbd> so nothing moves while you build.</li>
       <li><b>Place parts</b> by clicking the floor or another part. Turn on <b>Auto glue</b> (<kbd>T</kbd>) and each new part sticks to the part you placed it on.</li>
       <li><b>Glue</b> by dropping a glue ball where parts touch. Every part it touches becomes one rigid piece. Glue that also touches the floor anchors it.</li>
-      <li><b>Drivetrains:</b> put a bearing or motor down, then point the Axle tool at it and the axle snaps in. Gears, cams and wheels snap onto axles and glue themselves on. Gears of the same tooth size mesh when their edges meet. A <b>Clutch</b> joins the shaft it sits on to what is glued to its hub, gripping as hard as its Engage signal says; a <b>Gearbox</b> on a frame turns an axle through it at the ratio of its gear (wire buttons to Shift up and Shift down); a <b>UV joint</b> carries a shaft's turning round a corner. A <b>Pulley</b> snaps onto an axle like a gear; with the <b>Belt</b> tool, click two or more pulleys in order and then the first again to loop a belt round them. Gears mesh with real teeth that push on each other; <b>Performance mode</b> in Settings locks their speeds together by rule instead, which is lighter and steadier. The <i>Quad</i> and <i>Inline twin</i> examples put them all together.</li>
+      <li><b>Drivetrains:</b> put a bearing or motor down, then point the Axle tool at it and the axle snaps in. Gears, cams and wheels snap onto axles and glue themselves on. Gears of the same tooth size mesh when their edges meet. A <b>Clutch</b> joins the shaft it sits on to what is glued to its hub, gripping as hard as its Engage signal says (made <i>one-way</i> in its settings, it drives the hub but lets it run ahead freely, like a starter's freewheel); a <b>Gearbox</b> on a frame turns an axle through it at the ratio of its gear (wire buttons to Shift up and Shift down); a <b>UV joint</b> carries a shaft's turning round a corner. A <b>Pulley</b> snaps onto an axle like a gear; with the <b>Belt</b> tool, click two or more pulleys in order and then the first again to loop a belt round them. Gears mesh with real teeth that push on each other; <b>Performance mode</b> in Settings locks their speeds together by rule instead, which is lighter and steadier. The <i>Quad</i> and <i>Inline twin</i> examples put them all together.</li>
       <li><b>Signals:</b> buttons, levers and sensors have outputs; motors, injectors, igniters, solenoids and lamps have inputs. With the Wire tool (<kbd>C</kbd>), click an output dot, then an input dot of the same colour. Green dots carry On/Off, blue dots carry an Analog number.</li>
       <li><b>Gas:</b> an injector sprays <i>only fuel</i> into the space on the other side of the surface it is mounted on. Fuel needs air to burn, so an engine has to breathe: a Turbo pushes air in, an Intake lets the engine suck it in by itself. An igniter sparks there. Fuel mixed with air explodes, pushes on the walls, and leaves exhaust.</li>
-      <li><b>Liquids:</b> water, motor oil and gasoline pour, pool and float things, and cannot be squeezed. An <b>Outlet</b> with nothing piped in is a tap. An <b>Inlet</b> takes gas or liquid from behind the surface it sits on (inside a tank, say) into its pipe; a <b>Fluid pump</b> or <b>Oil pump</b> moves liquid from what is piped to its In to what is piped to its Out: an outlet, a valve or a <b>Sprayer</b>. Water boils into steam on hot gas, gasoline evaporates into fuel that burns, oil burns when hot and makes parts slippery. To lead exhaust somewhere, pipe the exhaust valve to an outlet. The <b>Mech. pump</b>, <b>Mech. oil pump</b> and <b>Mech. turbo</b> have no motor of their own: turn their hub with an axle, a gear or a belt and they work as fast as it really turns, and drag on it while they do.</li>
+      <li><b>Liquids:</b> water, motor oil and gasoline pour, pool and float things, and cannot be squeezed. An <b>Outlet</b> with nothing piped in is a tap. An <b>Inlet</b> takes gas or liquid from behind the surface it sits on (inside a tank, say) into its pipe; a <b>Fluid pump</b> or <b>Oil pump</b> moves liquid from what is piped to its In to what is piped to its Out: an outlet, a valve or a <b>Sprayer</b>. Water boils into steam on hot gas, gasoline evaporates into fuel that burns, oil burns when hot and makes parts slippery. To lead exhaust somewhere, pipe the exhaust valve to an outlet. A tap outlet standing in a box that can hold liquid (a roof is not needed) can instead <i>fill</i> it: set how many litres in its settings and they appear in the box when you press Play, and go again when you rewind. Burning oil makes white smoke. The <b>Mech. pump</b>, <b>Mech. oil pump</b> and <b>Mech. turbo</b> have no motor of their own: turn their hub with an axle, a gear or a belt and they work as fast as it really turns, and drag on it while they do.</li>
+      <li><b>Tubes:</b> a Cylinder can be <i>solid</i>, <i>hollow</i> (closed at both ends), <i>open</i> at one end like a cup, or a <i>tube</i> open at both ends; set it and its wall thickness in the part's settings. <b>Bend 90°</b> and <b>Bend 45°</b> are tube elbows. All of them hold gas and liquid, so you can build pipes, tanks and engine blocks out of them (walls of about 15 cm keep liquid in). A <b>Tube pump</b> pushes liquid along the tube it sits in, from its back end to the end its arrow points to. The <b>Exhaust turbo</b> is a real turbocharger: pipe exhaust valves into it and its boost out to the inlet valves, and it spins up from the exhaust.</li>
       <li><b>Play</b> and watch. Slow time down, speed it up, or rewind to the moment you pressed Play.</li>
     </ol>
     <h3>Controls</h3>
@@ -530,7 +531,7 @@ kbd {
         <span class="combo"><kbd>Ctrl</kbd> / <kbd>Alt</kbd> + move</span><span>Turtle mode (slow)</span>
         <kbd>F</kbd><span>Focus on the selection (twice: follow it)</span>
         <span class="combo"><kbd>Q</kbd> / <kbd>E</kbd></span><span>Rotate what you are placing</span>
-        <kbd>R</kbd><span>Tip a part over, or switch a mount's mode</span>
+        <kbd>R</kbd><span>Reset: rewind to where you pressed Play (while placing: tip a part over or switch a mount's mode)</span>
       </div>
       <div class="keys">
         <kbd>Space</kbd><span>Play / pause</span>
@@ -597,6 +598,16 @@ try {
   setLoading('The 3D or physics engine did not load. Check your internet connection, then reload the page.');
   throw err;
 }
+// The heavy number crunching of the gas simulation runs as WebAssembly, compiled from C (the source is in
+// wasm/sim.c; wasm/build.sh rebuilds it). Without WebAssembly (or with ?nowasm in the address) the same sums run in JavaScript.
+const SIM_WASM_B64 = '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';
+let SIM_WASM = null;
+if (typeof WebAssembly === 'object' && !/[?&]nowasm\b/.test(location.search)) {
+  try {
+    const bytes = Uint8Array.from(atob(SIM_WASM_B64), (ch) => ch.charCodeAt(0));
+    SIM_WASM = (await WebAssembly.instantiate(bytes)).instance.exports;
+  } catch (e) { console.warn('WebAssembly solver unavailable, using JavaScript', e); SIM_WASM = null; }
+}
 
 // =====================================================================
 //  Small helpers
@@ -656,10 +667,13 @@ const PART_TYPES = {
   beam:     { label: 'Beam',     shape: 'box',      size: [2, 0.2, 0.2],    color: '#8a94a6', material: 'metal',   desc: 'A thin rod for levers, cranks, pendulums and frames.' },
   domino:   { label: 'Domino',   shape: 'box',      size: [0.5, 1, 0.1],    color: '#f1efe8', material: 'plastic', desc: 'Tall and thin. Line them up and knock the first one over.' },
   ball:     { label: 'Ball',     shape: 'sphere',   size: [0.6, 0.6, 0.6],  color: '#3478d4', material: 'rubber',  desc: 'Rolls and bounces. Rubber balls bounce the most.' },
-  cylinder: { label: 'Cylinder', shape: 'cylinder', size: [0.6, 1, 0.6],    color: '#2f9c8f', material: 'plastic', desc: 'A drum or a pillar, depending on which way you tip it (R).' },
+  cylinder: { label: 'Cylinder', shape: 'cylinder', size: [0.6, 1, 0.6],    color: '#2f9c8f', material: 'plastic', params: { form: 'solid', wall: 0.15 }, desc: 'A drum or a pillar, depending on which way you tip it (R). Make it hollow (a closed can), open (a cup or a tank) or a tube to hold gas or liquid.' },
   wheel:    { label: 'Wheel',    shape: 'cylinder', size: [0.8, 0.22, 0.8], color: '#2b2f37', material: 'rubber',  desc: 'Point it at an axle or a motor hub and it snaps on and glues itself.' },
   ramp:     { label: 'Ramp',     shape: 'wedge',    size: [2.4, 1, 1.2],    color: '#f2b538', material: 'wood',    desc: 'A wedge. Press Q / E to point the slope where you need it.' },
   pulley:   { label: 'Pulley',   shape: 'cylinder', size: [0.6, 0.18, 0.6],  color: '#9aa3ad', material: 'metal',   desc: 'A grooved wheel for a belt. Point it at an axle or a hub and it snaps on. Then use the Belt tool to loop a belt round two or more of them.' },
+  bend90:   { label: 'Bend 90°', shape: 'bend',     size: [0, 0, 0],        color: '#9aa3ad', material: 'metal',   params: { angle: 90, bend: 0.7, d: 0.6, wall: 0.15 }, desc: 'A tube bent through a right angle. It carries gas and liquid round a corner: line its ends up with tubes or hollow cylinders.' },
+  bend45:   { label: 'Bend 45°', shape: 'bend',     size: [0, 0, 0],        color: '#9aa3ad', material: 'metal',   params: { angle: 45, bend: 0.7, d: 0.6, wall: 0.15 }, desc: 'A tube bent through 45°, for gas and liquid.' },
+  tubepump: { label: 'Tube pump', shape: 'cylinder', size: [0.6, 0.5, 0.6],  color: '#3478d4', material: 'metal',   params: { form: 'tube', wall: 0.1, rate: 10 }, desc: 'A short tube with an impeller inside. Put it in line with tubes: it pushes the liquid inside it out of its top end (the end the arrow points to) at the rate you set.' },
   axle:     { label: 'Axle',     shape: 'cylinder', size: [0.12, 2, 0.12],  color: '#b9c0c9', material: 'metal',   desc: 'A shaft. Point it at a bearing or a motor hub and it snaps in. Gears, cams and wheels snap onto it.' },
   gear:     { label: 'Gear',     shape: 'gear',     size: [0, 0.16, 0],     color: '#d9a52c', material: 'metal',   params: { teeth: 16, module: 1 / 16 }, desc: 'A spur gear. Gears of the same tooth size mesh when their pitch circles touch. Snaps onto axles.' },
   rack:     { label: 'Rack',     shape: 'rack',     size: [2, 0, 0.16],     color: '#c9a227', material: 'metal',   params: { module: 1 / 16 }, desc: 'A straight toothed bar. A gear of the same tooth size resting on its teeth drives it.' },
@@ -706,7 +720,32 @@ function deriveSize(p) {
   if (p.shape === 'gear') { const g = gearDims(p.params); p.size[0] = p.size[2] = 2 * g.ra; }
   else if (p.shape === 'rack') p.size[1] = rackDims(p).h;
   else if (p.shape === 'cam') p.size[0] = p.size[2] = 2 * (p.params.size + p.params.lift);
+  else if (p.shape === 'bend') {
+    const b = p.params, A = (b.angle * Math.PI) / 360, r = b.d / 2;
+    p.size[0] = b.bend + r - (b.bend * Math.cos(A) - r * Math.cos(A)); p.size[1] = b.d; p.size[2] = 2 * (b.bend * Math.sin(A) + r * Math.cos(A));
+  }
   return p;
+}
+// Hollow cylinders: 'hollow' is a closed can, 'cup' is open at its top (+y) end, 'tube' at both
+const cylForm = (p) => (p.shape === 'cylinder' && p.params?.form && p.params.form !== 'solid' && p.params.wall < p.size[0] / 2 - 0.01 ? p.params.form : 'solid');
+function sdShell(x, y, z, R, hh, w, form) {
+  const outer = sdCyl(x, y, z, R, hh);
+  let inner;
+  if (form === 'tube') inner = sdCyl(x, y, z, R - w, hh + 1);
+  else if (form === 'cup') inner = sdCyl(x, y - (w + 1) / 2, z, R - w, (2 * hh + 1 - w) / 2);
+  else inner = sdCyl(x, y, z, R - w, Math.max(0.001, hh - w));
+  return Math.max(outer, -inner);
+}
+// A tube bent round a circle: the centre of the bend is at (-bend, 0, 0) and the tube runs through the origin
+// along z, turning through 'angle' in the x-z plane. Open at both ends.
+function sdBend(x, y, z, b) {
+  const R = b.bend, r = b.d / 2, w = Math.min(b.wall, r - 0.02), A = (b.angle * Math.PI) / 360;
+  const px = x + R, phi = Math.atan2(z, px);
+  if (Math.abs(phi) <= A) { const q = Math.hypot(px, z) - R; return Math.abs(Math.hypot(q, y) - (r - w / 2)) - w / 2; }
+  const sg = Math.sign(phi), pe = sg * A, ex = Math.cos(pe), ez = Math.sin(pe), tx = -sg * ez, tz = sg * ex;
+  const along = px * tx + z * tz, rho = px * ex + z * ez - R;
+  const ds = Math.max(Math.abs(Math.hypot(rho, y) - (r - w / 2)) - w / 2, 0);
+  return Math.hypot(Math.max(along, 0), ds);
 }
 
 // ---------------------------------------------------------------------
@@ -787,7 +826,7 @@ const MOUNTS = {
     },
   },
   clutch: {
-    label: 'Clutch', cat: 'joint', modes: ['axle', 'bracket'], modeLabels: { axle: 'Axle', bracket: 'Bracket' }, params: { torque: 60, engage: 1 },
+    label: 'Clutch', cat: 'joint', modes: ['axle', 'bracket'], modeLabels: { axle: 'Axle', bracket: 'Bracket' }, params: { torque: 60, engage: 1, oneWay: false },
     io: { in: [N('engage', 'Engage')], out: [] },
     desc: 'Couples two turning things with friction. Mount it on a shaft (or anything that turns) and glue the next shaft or gear to its plate. Engage 1 grips with full force, 0 lets go completely, anything between lets it slip, the way a car pulls away. Without a wire it uses the setting below.',
     layout: (mode) => {
@@ -836,8 +875,8 @@ const MOUNTS = {
   },
   solenoid: {
     label: 'Solenoid', cat: 'joint', modes: ['out'], modeLabels: { out: 'Push rod' }, params: { stroke: 0.4, force: 60 },
-    io: { in: [B('extend', 'Extend'), N('position', 'Position')], out: [] },
-    desc: 'An electric push rod. It shoots out while its Extend input is on, or follows an Analog Position from 0 to 1. Glue things to the tip.',
+    io: { in: [B('extend', 'Extend'), N('position', 'Position')], out: [B('ext', 'Extended'), N('pos', 'Position')] },
+    desc: 'An electric push rod. It shoots out while its Extend input is on, or follows an Analog Position from 0 to 1. Glue things to the tip. Extended comes on once the rod has reached the end of its stroke (a starter\'s solenoid switches its motor on like that, once the pinion is in mesh).',
     layout(mode, P) {
       const k = kit();
       k.box(0.3, 0.36, 0.3, 0, 0.18, 0, JCOL.dark);
@@ -911,9 +950,9 @@ const MOUNTS = {
     },
   },
   intake: {
-    label: 'Intake', cat: 'device', modes: ['pad'], modeLabels: { pad: 'Stand' }, params: {}, nozzle: false,
-    io: { in: [], out: [], fl: [FL('out', 'Outlet', V(0.42, 0.3, 0))] },
-    desc: 'An air filter with no compressor: the lazy cousin of the Turbo. Pipe its outlet to a valve and the engine sucks in fresh air by itself, whenever the pressure inside drops below the air outside. It is a one-way door, so nothing blows back out of it.',
+    label: 'Intake', cat: 'device', modes: ['pad'], modeLabels: { pad: 'Stand' }, params: { idle: 0.15 }, nozzle: false,
+    io: { in: [N('throttle', 'Throttle')], out: [], fl: [FL('out', 'Outlet', V(0.42, 0.3, 0))] },
+    desc: 'An air filter with no compressor: the lazy cousin of the Turbo. Pipe its outlet to a valve and the engine sucks in fresh air by itself, whenever the pressure inside drops below the air outside. It is a one-way door, so nothing blows back out of it. Wire a lever to Throttle and it works like a throttle body: closed down to its idle opening, it lets the engine breathe less air (with nothing wired it is wide open).',
     layout() {
       const k = kit();
       k.box(0.34, 0.08, 0.34, 0, 0.04, 0, JCOL.dark);
@@ -936,7 +975,7 @@ const MOUNTS = {
     },
   },
   outlet: {
-    label: 'Outlet', cat: 'device', modes: ['wall'], modeLabels: { wall: 'Through wall' }, params: { size: 1.5, tap: 'none', tapRate: 1 }, nozzle: true,
+    label: 'Outlet', cat: 'device', modes: ['wall'], modeLabels: { wall: 'Through wall' }, params: { size: 1.5, tap: 'none', tapRate: 1, fill: 0 }, nozzle: true,
     io: { in: [B('open', 'Open')], out: [N('flow', 'Flow')], fl: [FL('pipe', 'Pipe', V(0, 0.34, 0))] },
     desc: 'Lets out whatever comes down its pipe, gas or liquid, into the space on the other side of the surface it sits on (or above it, on the floor). Pipe an exhaust valve to one at the end of an exhaust pipe. With nothing piped in it can be a tap that pours water, motor oil or gasoline.',
     layout(mode, P) {
@@ -1039,6 +1078,23 @@ const MOUNTS = {
       k.box(0.3, 0.04, 0.012, 0, 0.3, 0.096, JCOL.red, false, Q_ID, 'fan');
       k.box(0.04, 0.3, 0.012, 0, 0.3, 0.097, JCOL.red, false, Q_ID, 'fan2');
       return { base: k.base, nodes: { y: 0.04, w: 0.34 } };
+    },
+  },
+  exhturbo: {
+    label: 'Exhaust turbo', cat: 'device', modes: ['pad'], modeLabels: { pad: 'Stand' }, params: { gain: 1, inertia: 1, wastegate: 1 }, nozzle: false,
+    io: { in: [], out: [N('rpm', 'RPM'), N('boost', 'Boost')], fl: [FL('ex1', 'Exhaust in', V(-0.5, 0.3, -0.12)), FL('ex2', 'Exhaust in 2', V(-0.5, 0.3, 0.12)), FL('out1', 'Boost out', V(0.5, 0.3, -0.12)), FL('out2', 'Boost out 2', V(0.5, 0.3, 0.12))] },
+    desc: 'A real turbocharger. Pipe exhaust valves to its Exhaust in ports: the hot, high-pressure exhaust rushing through spins the turbine (and leaves through the downpipe on top). The turbine turns the compressor on the same shaft, which pushes fresh air out of Boost out into the inlet valves. The harder the engine works the faster it spins, so the boost builds up after you open the throttle (turbo lag). 100 000 rpm gives about 1 atm of boost. Its wastegate lets the exhaust bypass the turbine once the boost reaches its limit, as on a real one.',
+    layout() {
+      const k = kit();
+      k.box(0.6, 0.08, 0.4, 0, 0.04, 0, JCOL.dark);
+      k.box(0.12, 0.16, 0.12, 0, 0.16, 0, '#6d7684');
+      k.cyl(0.2, 0.2, -0.24, 0.3, 0, '#8a4a2a', true, Q_X2Y);  // turbine housing, hot
+      k.cyl(0.21, 0.2, 0.24, 0.3, 0, '#c7ccd3', true, Q_X2Y);  // compressor housing
+      k.cyl(0.05, 0.3, 0, 0.3, 0, JCOL.pin, false, Q_X2Y);
+      k.cyl(0.07, 0.3, -0.24, 0.55, 0, PIPE_COLOR, false);     // downpipe
+      k.box(0.012, 0.3, 0.06, 0.36, 0.3, 0, JCOL.red, false, Q_ID, 'fan');
+      k.box(0.012, 0.06, 0.3, 0.36, 0.3, 0, JCOL.red, false, Q_ID, 'fan2');
+      return { base: k.base, nodes: { y: 0.04, w: 0.5 } };
     },
   },
   pressure: {
@@ -1448,12 +1504,47 @@ function pulleyGeometry(s) {
   geo.computeVertexNormals();
   return geo;
 }
+function shellGeometry(p) {
+  const R = p.size[0] / 2, t = p.size[1] / 2, w = p.params.wall, f = cylForm(p);
+  const pts = f === 'tube' ? [[R - w, t], [R, t], [R, -t], [R - w, -t], [R - w, t]]
+    : f === 'cup' ? [[0, -t + w], [R - w, -t + w], [R - w, t], [R, t], [R, -t], [0, -t]]
+    : [[0, t], [R, t], [R, -t], [0, -t]];
+  const geo = new THREE.LatheGeometry(pts.map(([x, y]) => new THREE.Vector2(x, y)), 40);
+  geo.computeVertexNormals();
+  return geo;
+}
+// A swept tube shell for bends: outer and inner skins plus the two end rings
+function bendGeometry(b) {
+  const R = b.bend, r = b.d / 2, w = Math.min(b.wall, r - 0.02), A = (b.angle * Math.PI) / 180;
+  const K = Math.max(6, Math.round(b.angle / 6)), M = 24, pos = [], idx = [];
+  const at = (i, j, rho) => { const phi = -A / 2 + (A * i) / K, psi = (TAU * j) / M, rr = R + rho * Math.cos(psi); return [rr * Math.cos(phi) - R, rho * Math.sin(psi), rr * Math.sin(phi)]; };
+  const skin = (rho, flip) => {
+    const o = pos.length / 3;
+    for (let i = 0; i <= K; i++) for (let j = 0; j <= M; j++) pos.push(...at(i, j, rho));
+    for (let i = 0; i < K; i++) for (let j = 0; j < M; j++) {
+      const a = o + i * (M + 1) + j, b2 = a + M + 1;
+      if (flip) idx.push(a, a + 1, b2, a + 1, b2 + 1, b2); else idx.push(a, b2, a + 1, a + 1, b2, b2 + 1);
+    }
+  };
+  skin(r, false); skin(r - w, true);
+  for (const i of [0, K]) {
+    const o = pos.length / 3;
+    for (let j = 0; j <= M; j++) { pos.push(...at(i, j, r)); pos.push(...at(i, j, r - w)); }
+    for (let j = 0; j < M; j++) { const a = o + 2 * j; if (i) idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); else idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); }
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return geo;
+}
 function partGeometry(p) {
   const s = p.size;
   switch (p.shape) {
     case 'box': return new THREE.BoxGeometry(s[0], s[1], s[2]);
     case 'sphere': return new THREE.SphereGeometry(s[0] / 2, 36, 20);
-    case 'cylinder': return p.type === 'pulley' ? pulleyGeometry(s) : new THREE.CylinderGeometry(s[0] / 2, s[0] / 2, s[1], p.type === 'axle' ? 20 : 40);
+    case 'cylinder': return p.type === 'pulley' ? pulleyGeometry(s) : cylForm(p) !== 'solid' ? shellGeometry(p) : new THREE.CylinderGeometry(s[0] / 2, s[0] / 2, s[1], p.type === 'axle' ? 20 : 40);
+    case 'bend': return bendGeometry(p.params);
     case 'wedge': return wedgeGeometry(s);
     case 'gear': return gearGeometry(p);
     case 'rack': return rackGeometry(p);
@@ -1466,7 +1557,31 @@ function partColliderSpecs(p) {
   switch (p.shape) {
     case 'box': return [{ kind: 'box', size: s }];
     case 'sphere': return [{ kind: 'ball', r: s[0] / 2 }];
-    case 'cylinder': return [{ kind: 'cyl', r: s[0] / 2, h: s[1] }];
+    case 'cylinder': {
+      const f = cylForm(p);
+      if (f === 'solid') return [{ kind: 'cyl', r: s[0] / 2, h: s[1] }];
+      // a ring of wall pieces, plus the ends it has
+      const R = s[0] / 2, t = s[1] / 2, w = p.params.wall, K = 16, out = [];
+      for (let k = 0; k < K; k++) {
+        const a0 = (TAU * k) / K, a1 = (TAU * (k + 1)) / K, pts = [];
+        for (const a of [a0, a1]) for (const r of [R - w, R]) pts.push(r * Math.cos(a), t, r * Math.sin(a), r * Math.cos(a), -t, r * Math.sin(a));
+        out.push({ kind: 'hull', pts });
+      }
+      if (f === 'cup' || f === 'hollow') out.push({ kind: 'cyl', r: R - w * 0.5, h: w, pos: V(0, -t + w / 2, 0) });
+      if (f === 'hollow') out.push({ kind: 'cyl', r: R - w * 0.5, h: w, pos: V(0, t - w / 2, 0) });
+      return out;
+    }
+    case 'bend': {
+      const b = p.params, R = b.bend, r = b.d / 2, w = Math.min(b.wall, r - 0.02), A = (b.angle * Math.PI) / 180;
+      const K = Math.max(3, Math.round(b.angle / 10)), M = 10, out = [];
+      const at = (phi, psi, rho) => { const rr = R + rho * Math.cos(psi); return [rr * Math.cos(phi) - R, rho * Math.sin(psi), rr * Math.sin(phi)]; };
+      for (let i = 0; i < K; i++) for (let j = 0; j < M; j++) {
+        const pts = [];
+        for (const phi of [-A / 2 + (A * i) / K, -A / 2 + (A * (i + 1)) / K]) for (const psi of [(TAU * j) / M, (TAU * (j + 1)) / M]) for (const rho of [r - w, r]) pts.push(...at(phi, psi, rho));
+        out.push({ kind: 'hull', pts });
+      }
+      return out;
+    }
     case 'wedge': return [{ kind: 'hull', pts: wedgePoints(s) }];
     case 'gear': {
       const { g, teeth } = gearTeeth(p.params);
@@ -1524,9 +1639,11 @@ const NODE_MATS = {
   num: new THREE.MeshBasicMaterial({ color: '#4aa3ff', transparent: true }),
   fluid: new THREE.MeshStandardMaterial({ color: '#d9893b', roughness: 0.35, metalness: 0.7 }),
 };
+// Signal and pipe nodes are drawn in batches (see updateNodeBatch); each node's own mesh is unseen and only there to be clicked
+const NODE_PICK_MAT = new THREE.MeshBasicMaterial({ visible: false });
 const PIPE_COLOR = '#c8783a';
 const SHARED_GEOS = new Set([GLUE_GEO, CAP_GEO, NODE_GEO]);
-const SHARED_MATS = new Set([EDGE_MAT, MARK_MAT, NODE_MATS.bool, NODE_MATS.num, NODE_MATS.fluid]);
+const SHARED_MATS = new Set([EDGE_MAT, MARK_MAT, NODE_MATS.bool, NODE_MATS.num, NODE_MATS.fluid, NODE_PICK_MAT]);
 
 function ghostMaterial(color) {
   return new THREE.MeshStandardMaterial({ color, transparent: true, opacity: 0.45, depthWrite: false, roughness: 0.6, emissive: new THREE.Color(color), emissiveIntensity: 0.25 });
@@ -1536,6 +1653,7 @@ function makePartMaterials(p) {
   const base = { color: new THREE.Color(p.color), roughness: M.rough, metalness: p.hubOf != null ? 0.25 : M.metal };
   if (M.opacity) Object.assign(base, { transparent: true, opacity: M.opacity });
   if (p.shape === 'sphere') return [new THREE.MeshStandardMaterial({ ...base, map: TEX.stripes })];
+  if (p.shape === 'bend' || cylForm(p) !== 'solid') return [new THREE.MeshStandardMaterial({ ...base, side: THREE.DoubleSide })];
   if (p.shape === 'cylinder' && p.type !== 'axle' && p.type !== 'pulley') return [new THREE.MeshStandardMaterial({ ...base, map: TEX.stripes }), new THREE.MeshStandardMaterial({ ...base, map: TEX.spokes })];
   return [new THREE.MeshStandardMaterial(base)];
 }
@@ -1551,6 +1669,20 @@ function buildPartObject(p, ghost = false) {
     const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), EDGE_MAT);
     e.raycast = noRaycast;
     root.add(e);
+  }
+  if (p.type === 'tubepump' && !ghost) {
+    // an impeller in the bore and an arrow on the side showing which way it pushes
+    const R = p.size[0] / 2 - p.params.wall, fanMat = new THREE.MeshStandardMaterial({ color: '#f2b538', roughness: 0.5, metalness: 0.3 });
+    for (let k = 0; k < 3; k++) {
+      const b = new THREE.Mesh(new THREE.BoxGeometry(R * 1.8, 0.02, 0.1), fanMat);
+      b.rotation.set(0.5, (k * TAU) / 3, 0);
+      b.raycast = noRaycast;
+      root.add(b);
+    }
+    const arrow = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.14, 12), fanMat);
+    arrow.position.set(p.size[0] / 2 + 0.01, p.size[1] * 0.2, 0);
+    arrow.raycast = noRaycast;
+    root.add(arrow);
   }
   if ((p.hubOf != null && p.shape === 'cylinder') || p.type === 'axle') {
     // White ticks so you can see hubs and axles turn.
@@ -1643,7 +1775,7 @@ function buildMountObject(m, layout, ghost = false) {
     if (io) {
       for (const dir of ['in', 'out', 'fl']) {
         (io[dir] || []).forEach((port, i) => {
-          const node = new THREE.Mesh(NODE_GEO, NODE_MATS[port.type]);
+          const node = new THREE.Mesh(NODE_GEO, ghost ? NODE_MATS[port.type] : NODE_PICK_MAT);
           node.position.copy(nodeLocalPos(layout, dir, i, io[dir].length, port));
           node.renderOrder = 30;
           node.userData.pick = { kind: 'node', mount: m, port: port.id, dir, type: port.type };
@@ -1748,6 +1880,73 @@ function createGlue(d) {
   S.glues.set(g.id, g);
   refreshGlueLook(g);
   return g;
+}
+// Glue balls are drawn all together: one instanced mesh for joined glue and one for loose glue, two draw calls
+// (and two shadow draws) instead of two for every ball. Each ball keeps its own mesh, unseen but still there to
+// be clicked; it is shown instead while it lights up (hovered or selected). Bars (structures) are drawn as they are.
+const glueBatch = [
+  { color: '#ffc93c', emissive: '#ff9d00', mesh: null, cap: 0 },
+  { color: '#ff8a1f', emissive: '#ff5a00', mesh: null, cap: 0 },
+];
+function glueBatchMesh(b, need) {
+  if (b.mesh && b.cap >= need) return b.mesh;
+  if (b.mesh) { scene.remove(b.mesh); b.mesh.material.dispose(); b.mesh.dispose(); }
+  b.cap = Math.max(64, need * 2);
+  b.mesh = new THREE.InstancedMesh(GLUE_GEO, new THREE.MeshStandardMaterial({ color: b.color, emissive: b.emissive, emissiveIntensity: 0.3, roughness: 0.22, metalness: 0 }), b.cap);
+  b.mesh.castShadow = true;
+  b.mesh.frustumCulled = false;
+  b.mesh.count = 0;
+  scene.add(b.mesh);
+  return b.mesh;
+}
+// (world matrices must be up to date: the frame updates them once before drawing)
+function updateGlueBatch() {
+  const n = [0, 0];
+  for (const g of S.glues.values()) {
+    const solo = !!g.struct || litNow.has(g.mesh) || !g.mesh.visible;
+    g.mesh.material.visible = solo;
+    if (solo) continue;
+    const k = g.targets.size >= 2 ? 0 : 1, m = glueBatchMesh(glueBatch[k], n[k] + 1);
+    m.setMatrixAt(n[k]++, g.mesh.matrixWorld);
+  }
+  for (let k = 0; k < 2; k++) {
+    const m = glueBatch[k].mesh;
+    if (!m) continue;
+    m.count = n[k];
+    m.instanceMatrix.needsUpdate = true;
+  }
+}
+// The nodes on devices, the same way: one batch per kind of node, drawn with the node materials
+const nodeBatch = { bool: { mesh: null, cap: 0 }, num: { mesh: null, cap: 0 }, fluid: { mesh: null, cap: 0 } };
+function nodeBatchMesh(type, need) {
+  const b = nodeBatch[type];
+  if (b.mesh && b.cap >= need) return b.mesh;
+  if (b.mesh) { scene.remove(b.mesh); b.mesh.dispose(); }
+  b.cap = Math.max(64, need * 2);
+  b.mesh = new THREE.InstancedMesh(NODE_GEO, NODE_MATS[type], b.cap);
+  b.mesh.renderOrder = 30;
+  b.mesh.frustumCulled = false;
+  b.mesh.count = 0;
+  scene.add(b.mesh);
+  return b.mesh;
+}
+const shownInWorld = (o) => { for (let q = o; q && q !== worldGroup; q = q.parent) if (!q.visible) return false; return true; };
+function updateNodeBatch() {
+  const n = { bool: 0, num: 0, fluid: 0 };
+  for (const m of S.mounts.values()) {
+    if (!m.nodes || !m.nodes.length || !shownInWorld(m.base)) continue;
+    for (const node of m.nodes) {
+      if (!node.visible) continue;
+      const t = node.userData.pick.type, b = nodeBatchMesh(t, n[t] + 1);
+      b.setMatrixAt(n[t]++, node.matrixWorld);
+    }
+  }
+  for (const t in nodeBatch) {
+    const b = nodeBatch[t].mesh;
+    if (!b) continue;
+    b.count = n[t];
+    b.instanceMatrix.needsUpdate = true;
+  }
 }
 function refreshGlueLook(g) {
   if (g.struct) {
@@ -1993,6 +2192,18 @@ function beltPath(b) {
   return { n, o, e1, e2, pts, ok: true };
 }
 function updateBeltVisual(b) {
+  // the belt's shape depends only on where the pulleys are and which way their axles point, not on how far
+  // they have turned: skip rebuilding it while that stays the same
+  let key = b.width + ':';
+  for (const id of b.parts) {
+    const p = S.parts.get(id);
+    if (!p) { key = null; break; }
+    const q = partNow(p), ax = V(0, 1, 0).applyQuaternion(q.quat);
+    const mm = (v) => Math.round(v * 1000); // to the millimetre
+    key += `${mm(q.pos.x)},${mm(q.pos.y)},${mm(q.pos.z)},${mm(ax.x)},${mm(ax.y)},${mm(ax.z)},${p.size[0]};`;
+  }
+  if (key !== null && key === b.shapeKey) return;
+  b.shapeKey = key;
   const path = beltPath(b);
   const geo = b.mesh.geometry, arr = geo.attributes.position.array;
   if (!path) { b.mesh.visible = false; return; }
@@ -2124,7 +2335,12 @@ function partVolume(p) {
   switch (p.shape) {
     case 'box': return s[0] * s[1] * s[2];
     case 'sphere': return (Math.PI / 6) * s[0] ** 3;
-    case 'cylinder': return Math.PI * (s[0] / 2) ** 2 * s[1];
+    case 'cylinder': {
+      const f = cylForm(p), R = s[0] / 2, w = p.params?.wall ?? 0;
+      if (f === 'solid') return Math.PI * R ** 2 * s[1];
+      return Math.PI * (R ** 2 - (R - w) ** 2) * s[1] + (f === 'tube' ? 0 : f === 'cup' ? 1 : 2) * Math.PI * (R - w) ** 2 * w;
+    }
+    case 'bend': { const b = p.params, r = b.d / 2, w = Math.min(b.wall, r - 0.02); return Math.PI * (r * r - (r - w) ** 2) * b.bend * (b.angle * Math.PI) / 180; }
     case 'wedge': return (s[0] * s[1] * s[2]) / 2;
     case 'gear': return Math.PI * gearDims(p.params).rp ** 2 * s[1];
     case 'rack': return s[0] * s[1] * s[2] * 0.75;
@@ -2330,7 +2546,7 @@ function applyJointDrive(m) {
     m.motorOn = true;
   } else if (t === 'clutch') {
     // a friction plate: holds the hub to the shaft (no slip) up to its grip, and slips beyond it
-    const grip = (m.st.engage ?? m.params.engage) * m.params.torque;
+    const grip = m.st.free ? 0 : (m.st.engage ?? m.params.engage) * m.params.torque;
     rj.configureMotorModel(RAPIER.MotorModel.ForceBased);
     rj.configureMotorVelocity(0, 1e5);
     rj.setMotorMaxForce(m.solverClutch ? 1e-6 : Math.max(1e-6, grip)); // (or solved with a gearbox, see findShaftCouplings)
@@ -2819,6 +3035,7 @@ function physicsStep(h) {
   // couplings (gearboxes, clutches feeding them, meshes in performance mode) are solved before every physics
   // substep, so they keep up with real gear teeth that are pushing back on the same shafts
   for (let i = 0; i < sub; i++) { solveAllCouplings(h / sub); world.step(); }
+  if (oilRefresh.length) { for (const col of oilRefresh) if (world.getCollider(col.handle)) col.setEnabled(true); oilRefresh.length = 0; }
   simTime += h;
   stepCount++;
 }
@@ -2909,6 +3126,8 @@ const gas = {
   map: new Map(), top: 0, free: [], act: [],
   ci: new Int32Array(GAS_MAX), cj: new Int32Array(GAS_MAX), ck: new Int32Array(GAS_MAX),
   air: new Float32Array(GAS_MAX), fuel: new Float32Array(GAS_MAX), exh: new Float32Array(GAS_MAX), en: new Float32Array(GAS_MAX), stm: new Float32Array(GAS_MAX),
+  // how much of the fuel is oil vapour, and how much of the exhaust is oil smoke (burnt oil: thick and white)
+  ofu: new Float32Array(GAS_MAX), osm: new Float32Array(GAS_MAX),
   lw: new Float32Array(GAS_MAX), lo: new Float32Array(GAS_MAX), lg: new Float32Array(GAS_MAX), pl: new Float32Array(GAS_MAX), po: new Float32Array(GAS_MAX), // liquids, the weight of liquid above, and the push of squeezed liquid
   fs: new Float32Array(GAS_MAX), // room left by the parts; the gas gets f = fs minus the liquid
   f: new Float32Array(GAS_MAX), ph: new Float32Array(GAS_MAX), burn: new Float32Array(GAS_MAX), ign: new Float32Array(GAS_MAX), flame: new Uint8Array(GAS_MAX), flameNext: new Uint8Array(GAS_MAX), own: new Int32Array(GAS_MAX), alive: new Uint8Array(GAS_MAX),
@@ -2936,10 +3155,52 @@ function gasClear() {
 // a part that is moving is "live": the cells in it measure their walls again every step. Everywhere
 // else the walls stand still, so the cells keep the numbers they measured.
 const _gm = new THREE.Matrix4(), _gv = V();
+// With WebAssembly the buckets live in its memory (wasm/sim.c) and the parts are copied there as numbers:
+// their shape, where they are and the shape's own sizes. gas.wgeo says whether this step's buckets are there.
+const geoW = SIM_WASM && SIM_WASM.omax ? SIM_WASM : null;
+const geoOwn = geoW && new Float64Array(geoW.memory.buffer, geoW.owners(), geoW.omax() * geoW.ofields());
+const GEO_OF = geoW ? geoW.ofields() : 0;
+function geoShape(p, o) {
+  const s = p.size;
+  o.fill(0, 12, 20);
+  switch (p.shape) {
+    case 'box': case 'rack': o[0] = 0; o[12] = s[0] / 2; o[13] = s[1] / 2; o[14] = s[2] / 2; return;
+    case 'sphere': o[0] = 1; o[12] = s[0] / 2; return;
+    case 'cylinder': {
+      const f = p.type === 'tubepump' ? 'solid' : cylForm(p);
+      if (f === 'solid') { o[0] = 2; o[12] = s[0] / 2; o[13] = s[1] / 2; return; }
+      o[0] = 3; o[12] = s[0] / 2; o[13] = s[1] / 2; o[14] = p.params.wall; o[15] = f === 'tube' ? 0 : f === 'cup' ? 1 : 2; return;
+    }
+    case 'bend': {
+      const b = p.params, r = b.d / 2, A = (b.angle * Math.PI) / 360;
+      o[0] = 4; o[12] = b.bend; o[13] = r; o[14] = Math.min(b.wall, r - 0.02); o[15] = Math.cos(A); o[16] = Math.sin(A); return;
+    }
+    case 'gear': o[0] = 2; o[12] = gearDims(p.params).rp; o[13] = s[1] / 2; return;
+    case 'cam': o[0] = 2; o[12] = p.params.size + p.params.lift * 0.5; o[13] = s[1] / 2; return;
+    case 'wedge': o[0] = 5; o[12] = s[0]; o[13] = s[1]; o[14] = s[2] / 2; return;
+  }
+  o[0] = 6;
+}
+function jsBuckets() {
+  gas.hash.clear();
+  gas.owners.forEach((p, idx) => {
+    const ex = p._ge.x + GH, ey = p._ge.y + GH, ez = p._ge.z + GH;
+    const x0 = bk(p._gp.x - ex), x1 = bk(p._gp.x + ex);
+    const y0 = bk(p._gp.y - ey), y1 = bk(p._gp.y + ey);
+    const z0 = bk(p._gp.z - ez), z1 = bk(p._gp.z + ez);
+    if ((x1 - x0 + 1) * (y1 - y0 + 1) * (z1 - z0 + 1) > 4000) return;
+    for (let i = x0; i <= x1; i++) for (let j = y0; j <= y1; j++) for (let k = z0; k <= z1; k++) {
+      const key = bucketKey(i, j, k);
+      let list = gas.hash.get(key);
+      if (!list) { gas.hash.set(key, (list = [])); list.live = false; }
+      list.push(idx);
+      if (p._gmoving) list.live = true;
+    }
+  });
+}
 function ensureGasHash(force = false) {
   if (!force && gas.hashStamp === stepCount) return;
   gas.hashStamp = stepCount;
-  gas.hash.clear();
   gas.owners.length = 0;
   for (const p of S.parts.values()) {
     if (!p._gp) { p._gp = V(); p._gq = Qn(); }
@@ -2953,23 +3214,20 @@ function ensureGasHash(force = false) {
       p._ge.set(Math.abs(e[0]) * hx + Math.abs(e[4]) * hy + Math.abs(e[8]) * hz, Math.abs(e[1]) * hx + Math.abs(e[5]) * hy + Math.abs(e[9]) * hz, Math.abs(e[2]) * hx + Math.abs(e[6]) * hy + Math.abs(e[10]) * hz);
       p._ge.min(_gv.setScalar(p._gr));
     }
-    const moving = !!p.body && !p.body.isFixed() && !p.body.isSleeping();
+    p._gmoving = !!p.body && !p.body.isFixed() && !p.body.isSleeping();
     const idx = gas.owners.push(p) - 1;
-    const ex = p._ge.x + GH, ey = p._ge.y + GH, ez = p._ge.z + GH;
-    const x0 = bk(p._gp.x - ex), x1 = bk(p._gp.x + ex);
-    const y0 = bk(p._gp.y - ey), y1 = bk(p._gp.y + ey);
-    const z0 = bk(p._gp.z - ez), z1 = bk(p._gp.z + ez);
-    if ((x1 - x0 + 1) * (y1 - y0 + 1) * (z1 - z0 + 1) > 4000) continue;
-    for (let i = x0; i <= x1; i++) for (let j = y0; j <= y1; j++) for (let k = z0; k <= z1; k++) {
-      const key = bucketKey(i, j, k);
-      let list = gas.hash.get(key);
-      if (!list) { gas.hash.set(key, (list = [])); list.live = false; }
-      list.push(idx);
-      if (moving) list.live = true;
+    if (geoW && idx < geoW.omax()) {
+      const o = geoOwn.subarray(idx * GEO_OF, idx * GEO_OF + GEO_OF);
+      geoShape(p, o);
+      o[1] = p._gp.x; o[2] = p._gp.y; o[3] = p._gp.z;
+      o[4] = p._gq.x; o[5] = p._gq.y; o[6] = p._gq.z; o[7] = p._gq.w;
+      o[8] = p._ge.x; o[9] = p._ge.y; o[10] = p._ge.z; o[11] = p._gmoving ? 1 : 0;
     }
   }
+  gas.wgeo = !!geoW && geoW.hashBuild(gas.owners.length) === 1;
+  if (!gas.wgeo) jsBuckets();
 }
-const bucketLive = (x, y, z) => { const l = gas.hash.get(bucketKey(bk(x), bk(y), bk(z))); return !!l && l.live; };
+const bucketLive = (x, y, z) => { if (gas.wgeo) return geoW.bucketLive(x, y, z) === 1; const l = gas.hash.get(bucketKey(bk(x), bk(y), bk(z))); return !!l && l.live; };
 // Does anything near this cell move? Its walls, and its faces, may then have changed.
 function gasCellLive(c) {
   const i = gas.ci[c], j = gas.cj[c], k = gas.ck[c];
@@ -2999,7 +3257,8 @@ function sdfPart(p, x, y, z) {
   switch (p.shape) {
     case 'box': case 'rack': return sdBox(x, y, z, s[0] / 2, s[1] / 2, s[2] / 2);
     case 'sphere': return Math.hypot(x, y, z) - s[0] / 2;
-    case 'cylinder': return sdCyl(x, y, z, s[0] / 2, s[1] / 2);
+    case 'cylinder': { const f = p.type === 'tubepump' ? 'solid' : cylForm(p); return f === 'solid' ? sdCyl(x, y, z, s[0] / 2, s[1] / 2) : sdShell(x, y, z, s[0] / 2, s[1] / 2, p.params.wall, f); }
+    case 'bend': return sdBend(x, y, z, p.params);
     case 'gear': return sdCyl(x, y, z, gearDims(p.params).rp, s[1] / 2);
     case 'cam': return sdCyl(x, y, z, p.params.size + p.params.lift * 0.5, s[1] / 2);
     case 'wedge': {
@@ -3011,6 +3270,7 @@ function sdfPart(p, x, y, z) {
 }
 let _gOwn = -1;
 function gasSolid(x, y, z) {
+  if (gas.wgeo) { const v = geoW.solid(x, y, z); _gOwn = geoW.lastOwner(); return v; }
   let phi = clamp(0.5 - y / GH, 0, 1);
   let best = 0;
   _gOwn = -1;
@@ -3044,6 +3304,32 @@ function gasMeasure(c) {
   gas.epoch[c] = gas.geoEpoch;
   gas.nphOk.fill(0, base, base + 6);
 }
+// The same for every active cell at once, in WebAssembly: those whose walls may have moved are measured again
+const geoM = geoW && {
+  i: new Int32Array(geoW.memory.buffer, geoW.mi(), GAS_MAX), j: new Int32Array(geoW.memory.buffer, geoW.mj(), GAS_MAX),
+  k: new Int32Array(geoW.memory.buffer, geoW.mk(), GAS_MAX), flag: new Int32Array(geoW.memory.buffer, geoW.mflag(), GAS_MAX),
+  own: new Int32Array(geoW.memory.buffer, geoW.mown(), GAS_MAX), ph: new Float64Array(geoW.memory.buffer, geoW.mph(), GAS_MAX),
+  fo: new Float64Array(geoW.memory.buffer, geoW.mfo(), GAS_MAX * 6), nb: new Int32Array(geoW.memory.buffer, geoW.mnb(), GAS_MAX * 6),
+  at: new Int32Array(GAS_MAX), // a cell's place in the batch
+};
+function gasMeasureAll(act) {
+  const n = act.length, M = geoM;
+  for (let a = 0; a < n; a++) { const c = act[a]; M.at[c] = a; M.i[a] = gas.ci[c]; M.j[a] = gas.cj[c]; M.k[a] = gas.ck[c]; M.flag[a] = gas.epoch[c] !== gas.geoEpoch ? 1 : 0; }
+  for (let a = 0, k = 0; a < n; a++) { const base = act[a] * 6; for (let d = 0; d < 6; d++, k++) { const nb = gas.nb[base + d]; M.nb[k] = nb >= 0 ? M.at[nb] : -1; } }
+  geoW.measure(n);
+  for (let a = 0; a < n; a++) {
+    const c = act[a];
+    gas.live[c] = 0;
+    if (!M.flag[a]) continue;
+    const phi = M.ph[a];
+    gas.ph[c] = phi; gas.own[c] = M.own[a]; gas.fs[c] = Math.max(0, 1 - phi); gas.f[c] = Math.max(0, gas.fs[c] - liqTotal(c));
+    const base = c * 6;
+    for (let d = 0; d < 6; d++) gas.fo[base + d] = M.fo[a * 6 + d];
+    gas.epoch[c] = gas.geoEpoch;
+    gas.nphOk.fill(0, base, base + 6);
+    gas.live[c] = 1;
+  }
+}
 function gasLink(c) {
   const i = gas.ci[c], j = gas.cj[c], k = gas.ck[c], base = c * 6;
   for (let d = 0; d < 6; d++) {
@@ -3076,12 +3362,12 @@ function gasCreate(i, j, k, from = -1) {
   gasFprev[idx] = gas.f[idx];
   if (from >= 0) {
     // Space a moving part just uncovered: the neighbouring gas expands into it.
-    gas.air[idx] = gas.fuel[idx] = gas.exh[idx] = gas.en[idx] = gas.stm[idx] = 0; gas.burn[idx] = 0;
+    gas.air[idx] = gas.fuel[idx] = gas.exh[idx] = gas.en[idx] = gas.stm[idx] = gas.ofu[idx] = gas.osm[idx] = 0; gas.burn[idx] = 0;
     const share = gas.f[idx] / Math.max(1e-6, gas.f[from] + gas.f[idx]);
     gasMove(from, idx, share);
   } else {
     const a = gas.f[idx];
-    gas.air[idx] = a; gas.fuel[idx] = 0; gas.exh[idx] = 0; gas.en[idx] = a; gas.burn[idx] = 0;
+    gas.air[idx] = a; gas.fuel[idx] = 0; gas.exh[idx] = 0; gas.en[idx] = a; gas.burn[idx] = 0; gas.ofu[idx] = gas.osm[idx] = 0;
   }
   return idx;
 }
@@ -3126,6 +3412,15 @@ function gasMove(src, dst, fr) {
   v = gas.exh[src] * fr; gas.exh[src] -= v; gas.exh[dst] += v;
   v = gas.stm[src] * fr; gas.stm[src] -= v; gas.stm[dst] += v;
   v = gas.en[src] * fr; gas.en[src] -= v; gas.en[dst] += v;
+  if (gas.ofu[src] > 0) { v = gas.ofu[src] * fr; gas.ofu[src] -= v; gas.ofu[dst] += v; }
+  if (gas.osm[src] > 0) { v = gas.osm[src] * fr; gas.osm[src] -= v; gas.osm[dst] += v; }
+}
+// the oily share goes along with fuel or exhaust that moves from a to b
+function oilShare(arr, of, a, b, ds) {
+  const from = ds > 0 ? a : b, base = gas[of][from];
+  if (base <= 1e-9 || gas[arr][from] <= 0) return;
+  const v = Math.min(gas[arr][from], (gas[arr][from] / base) * Math.abs(ds));
+  gas[arr][from] -= v; gas[arr][ds > 0 ? b : a] += v;
 }
 // Pressure moves through a chamber almost instantly, so the flow between cells is solved
 // implicitly each step. Each face lets gas through according to how open it is (cubed, so a
@@ -3135,7 +3430,7 @@ const gasP = new Float32Array(GAS_MAX), gasE0 = new Float32Array(GAS_MAX), gasFp
 const gasRoot = new Int32Array(GAS_MAX), gasCV = new Float32Array(GAS_MAX), gasCD = new Float32Array(GAS_MAX), gasCOpen = new Uint8Array(GAS_MAX);
 const gasFind = (c) => { while (gasRoot[c] !== c) { gasRoot[c] = gasRoot[gasRoot[c]]; c = gasRoot[c]; } return c; };
 const GAS_ITER = 14, K_FLOW = 30;
-const gasAmb = new Float32Array(GAS_MAX), gasOrder = new Int32Array(GAS_MAX), gasOpenAir = new Uint8Array(GAS_MAX);
+const gasAmb = new Float32Array(GAS_MAX), gasOrder = new Float64Array(GAS_MAX), gasOpenAir = new Uint8Array(GAS_MAX);
 // Smoke in the open air thins out into the atmosphere around it
 const LEAN = 0.01; // fuel thinner than this in air will not burn
 const DISSIPATE = 1.6, DISS_HEAT = 2.5;
@@ -3164,9 +3459,11 @@ function gasMix(c, n, fa, kt, kd) {
   gas.en[c] -= dE; gas.en[n] += dE;
   let ds = kd * (gas.fuel[c] / nc - gas.fuel[n] / nn) * m;
   if (ds > 0) ds = Math.min(ds, gas.air[n]); else ds = Math.max(ds, -gas.air[c]);
+  if (gas.ofu[c] + gas.ofu[n] > 0) oilShare('ofu', 'fuel', c, n, ds);
   gas.fuel[c] -= ds; gas.fuel[n] += ds; gas.air[c] += ds; gas.air[n] -= ds;
   ds = kd * (gas.exh[c] / nc - gas.exh[n] / nn) * m;
   if (ds > 0) ds = Math.min(ds, gas.air[n]); else ds = Math.max(ds, -gas.air[c]);
+  if (gas.osm[c] + gas.osm[n] > 0) oilShare('osm', 'exh', c, n, ds);
   gas.exh[c] -= ds; gas.exh[n] += ds; gas.air[c] += ds; gas.air[n] -= ds;
   if (gas.stm[c] + gas.stm[n] <= 1e-9) return;
   ds = kd * (gas.stm[c] / nc - gas.stm[n] / nn) * m;
@@ -3205,6 +3502,8 @@ function pipedTo(m, port) {
   const end = w && pipeOther(w, m);
   return end ? { w, m: S.mounts.get(end.m), port: end.port } : null;
 }
+const TURB_DRIVE = 0.1, TURB_DRAG = 0.01;
+const turbineVent = (m) => { const F = mountFrameNow(m); return V(-0.24, 0.7, 0).applyQuaternion(F.quat).add(F.pos); };
 function gasBuildLinks(h) {
   gasLinks.length = 0;
   liqLinks.length = 0;
@@ -3222,9 +3521,18 @@ function gasBuildLinks(h) {
         if (m.type === 'valve') {
           addGasLink(nozzleNow(m), null, kv, 1, m);
           const L = gasLinks[gasLinks.length - 1];
-          if (L && L.valve === m) { L.vent = fluidPortNow(m, 'inlet'); liqLinks.push({ kind: 'spill', a: L.a, m, k: LIQ_K * m.params.size * deviceOpen(m) }); }
+          // (an example can send a valve's smoke out of the end of a pipe it has drawn: m.ventAt)
+          if (L && L.valve === m) { L.vent = m.ventAt ? m.ventAt() : fluidPortNow(m, 'inlet'); liqLinks.push({ kind: 'spill', a: L.a, m, k: LIQ_K * m.params.size * deviceOpen(m) }); }
         }
-      } else if (other.type === 'turbo' || other.type === 'mturbo' || other.type === 'intake') addGasLink(nozzleNow(m), null, series(kv, kc * TURBO_K, pipeK(end.w, kc)), 1 + (other.st.boost ?? 0), m, null, true); // a one-way door: air comes in, nothing goes back out
+      } else if (other.type === 'exhturbo') {
+        if (end.port.startsWith('out')) addGasLink(nozzleNow(m), null, series(kv, kc * TURBO_K, pipeK(end.w, kc)), 1 + (other.st.boost ?? 0), m, null, true);
+        else {
+          // the exhaust goes through the turbine and out of the downpipe; what rushes through spins it
+          addGasLink(nozzleNow(m), null, series(kv, kc * TURBO_K, pipeK(end.w, kc)), 1, m);
+          const L = gasLinks[gasLinks.length - 1];
+          if (L && L.valve === m) { L.turbine = other; L.vent = turbineVent(other); }
+        }
+      } else if (other.type === 'turbo' || other.type === 'mturbo' || other.type === 'intake') addGasLink(nozzleNow(m), null, series(kv, kc * TURBO_K * (other.type === 'intake' ? other.st.throttle ?? 1 : 1), pipeK(end.w, kc)), 1 + (other.st.boost ?? 0), m, null, true); // a one-way door: air comes in, nothing goes back out
       else if (NOZZLE_PORT[other.type] && other.id > m.id) {
         const ko = kc * deviceOpen(other) * other.params.size;
         if (ko >= 1e-4) {
@@ -3289,12 +3597,69 @@ function liqGather(c, vol, onlyOil = false) {
   }
   return out;
 }
+// Is this point inside something that would hold liquid? Drop to the bottom, then fill the space level by
+// level (sideways and down) until a level spills out of the sides or the bottom, or meets a roof. A box without a
+// lid counts: it holds up to its lowest rim. Returns the levels and the litres it holds, or null.
+function containerAt(p) {
+  ensureGasHash(true);
+  const room = (i, j, k) => (j < 0 ? 0 : 1 - gasSolid((i + 0.5) * GH, (j + 0.5) * GH, (k + 0.5) * GH));
+  let i0 = Math.floor(p.x / GH), j0 = Math.floor(p.y / GH), k0 = Math.floor(p.z / GH);
+  if (room(i0, j0, k0) < 0.5) return null;
+  while (j0 > 0 && room(i0, j0 - 1, k0) >= 0.5) j0--;
+  if (j0 <= 0) return null; // on the open floor
+  const levels = [], below = new Set(), MAXR = 60, MAXN = 4000;
+  let seeds = [[i0, k0]], total = 0;
+  for (let j = j0; j < j0 + 80 && seeds.length; j++) {
+    const seen = new Set(), cells = [], q = [];
+    for (const [i, k] of seeds) { const key = i * 100003 + k; if (!seen.has(key) && room(i, j, k) >= 0.5) { seen.add(key); q.push([i, k]); } }
+    let spilled = false;
+    while (q.length && !spilled) {
+      const [i, k] = q.pop();
+      const r = room(i, j, k);
+      cells.push([i, k, r]);
+      if (room(i, j - 1, k) >= 0.5 && !below.has(i * 100003 + k)) { spilled = true; break; } // a hole in the bottom
+      if (Math.abs(i - i0) > MAXR || Math.abs(k - k0) > MAXR || cells.length > MAXN) { spilled = true; break; }
+      for (const [di, dk] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+        const key = (i + di) * 100003 + (k + dk);
+        if (seen.has(key) || room(i + di, j, k + dk) < 0.5) continue;
+        seen.add(key); q.push([i + di, k + dk]);
+      }
+    }
+    if (spilled) break;
+    const vol = cells.reduce((a, c) => a + c[2], 0);
+    levels.push({ j, cells, vol });
+    total += vol;
+    below.clear();
+    for (const [i, k] of cells) below.add(i * 100003 + k);
+    seeds = cells.filter(([i, k]) => room(i, j + 1, k) >= 0.5).map(([i, k]) => [i, k]); // a roof ends it
+  }
+  if (!levels.length) return null;
+  return { levels, litres: total * GH * GH * GH * 1000 };
+}
+// Put this many litres into a container from the bottom up; returns what went in
+function fillContainer(box, kind, litres) {
+  let left = Math.min(litres, box.litres) / (GH * GH * GH * 1000); // in cells
+  const put = left;
+  for (const L of box.levels) {
+    if (left <= 1e-6) break;
+    const f = Math.min(1, left / L.vol);
+    for (const [i, k, r] of L.cells) {
+      const c = gasCellAt(V((i + 0.5) * GH, (L.j + 0.5) * GH, (k + 0.5) * GH), true);
+      if (c >= 0) gas[LIQUIDS[kind].arr][c] += Math.max(0, gas.fs[c] - liqTotal(c)) * f;
+    }
+    left -= L.vol * f;
+  }
+  return (put - left) * GH * GH * GH * 1000;
+}
 // Fill the open room inside a box with a liquid (for examples that start with full tanks)
-function liqFillBox(min, max, kind) {
+function liqFillBox(min, max, kind, skip = []) {
+  const skipped = (p) => skip.some(([a, b]) => p.x > a.x && p.x < b.x && p.y > a.y && p.y < b.y && p.z > a.z && p.z < b.z);
   for (let i = Math.ceil(min.x / GH - 0.5); (i + 0.5) * GH < max.x; i++)
     for (let j = Math.ceil(min.y / GH - 0.5); (j + 0.5) * GH < max.y; j++)
       for (let k = Math.ceil(min.z / GH - 0.5); (k + 0.5) * GH < max.z; k++) {
-        const c = gasCellAt(V((i + 0.5) * GH, (j + 0.5) * GH, (k + 0.5) * GH), true);
+        const at2 = V((i + 0.5) * GH, (j + 0.5) * GH, (k + 0.5) * GH);
+        if (skipped(at2)) continue;
+        const c = gasCellAt(at2, true);
         if (c >= 0) gas[LIQUIDS[kind].arr][c] = Math.max(0, gas.fs[c] - liqTotal(c)) * 0.98;
       }
 }
@@ -3353,6 +3718,18 @@ function fluidDevicesStep(h) {
       sprayFrom(L.sp, liqTake(L.a, Math.min(liqTotal(L.a), L.k * d)));
     }
   }
+  // Tube pumps push liquid in at their bottom end and out of their top end
+  for (const p of S.parts.values()) {
+    if (p.type !== 'tubepump' || !(p.params.rate > 0)) continue;
+    // the impeller seals the bore (nothing falls back through it); liquid is taken from just past one end and
+    // delivered just past the other
+    const P = partNow(p), a = V(0, 1, 0).applyQuaternion(P.quat), half = p.size[1] / 2 + GH * 0.6;
+    const from = gasCellAt(P.pos.clone().addScaledVector(a, -half), true), to = gasCellAt(P.pos.clone().addScaledVector(a, half), true);
+    if (from < 0 || to < 0 || from === to) continue;
+    const got = liqGather(from, p.params.rate * h);
+    liqPour(to, got);
+    p.flow = got.total / h;
+  }
   for (const m of S.mounts.values()) {
     if (m.type === 'pump' || m.type === 'oilpump' || m.type === 'mpump' || m.type === 'moilpump') {
       const mech = m.type === 'mpump' || m.type === 'moilpump';
@@ -3372,6 +3749,9 @@ function fluidDevicesStep(h) {
       const got = liqGather(src, q, m.type === 'oilpump' || m.type === 'moilpump');
       if (toSpray) sprayFrom(to.m, got); else liqPour(dst, got);
       m.st.flow = got.total / h;
+    } else if (m.type === 'outlet' && m.params.tap !== 'none' && m.params.fill > 0 && !pipeAt(m, 'pipe')) {
+      // fill the container it sits in, once, when the simulation starts (a rewind brings it back to empty)
+      if (!m.st.filled) { m.st.filled = true; const box = containerAt(nozzleNow(m)); if (box) m.st.flow = fillContainer(box, m.params.tap, m.params.fill); }
     } else if (m.type === 'outlet' && m.params.tap !== 'none' && deviceOpen(m) && !pipeAt(m, 'pipe')) {
       const c = gasCellAt(nozzleNow(m), true);
       if (c >= 0) { const v = m.params.tapRate * h; liqPour(c, { water: 0, oil: 0, gasoline: 0, [m.params.tap]: v, total: v }); m.st.flow = m.params.tapRate; }
@@ -3383,7 +3763,7 @@ const PUFF_MAX = 400;
 function ventPuffs(L, e) {
   const c = L.a, n = gasTotal(c);
   if (n <= 1e-9) return;
-  const smoke = (gas.exh[c] + gas.fuel[c] * 4) / n;
+  const smoke = (gas.exh[c] + gas.osm[c] * 2 + gas.fuel[c] * 4) / n, white = Math.min(1, gas.osm[c] / Math.max(gas.exh[c], 1e-9));
   const st = L.valve.st;
   st.puff = (st.puff ?? 0) + e * (0.15 + smoke);
   if (st.puff < 1.5) return;
@@ -3391,7 +3771,7 @@ function ventPuffs(L, e) {
   while (st.puff >= 1.5 && gas.puffs.length < PUFF_MAX) {
     st.puff -= 1.5;
     const v = dir.clone().multiplyScalar(1.2 + Math.random() * 1.5).add(V((Math.random() - 0.5) * 0.6, 0.3 + Math.random() * 0.4, (Math.random() - 0.5) * 0.6));
-    gas.puffs.push({ p: L.vent.clone(), v, life: 0.6 + Math.random() * 0.5, life0: 1.1, a: Math.min(0.5, 0.1 + smoke * 0.6), hot: (gas.en[c] / n) > 2 });
+    gas.puffs.push({ p: L.vent.clone(), v, life: 0.6 + Math.random() * 0.5, life0: 1.1, a: Math.min(0.5, 0.1 + smoke * 0.6), hot: (gas.en[c] / n) > 2, white });
   }
   st.puff = Math.min(st.puff, 3);
 }
@@ -3416,7 +3796,21 @@ const VAPOR_X = 40, EVAP_GAS = 0.6, EVAP_OIL = 0.8, T_OIL = 2.6, QUENCH = 6;
 const OIL_FRICTION = 0.15;  // an oiled part keeps this much of its grip
 const LIQ_DRAG = 1.2;       // newton-seconds per metre per square metre of wetted wall (scaled like the sandbox's light parts)
 const liqTotal = (c) => gas.lw[c] + gas.lo[c] + gas.lg[c];
-const liqOrder = new Int32Array(GAS_MAX);
+const liqOrder = new Int32Array(GAS_MAX), liqSorted = new Int32Array(GAS_MAX);
+const LIQ_SQUEEZE_DIRS = [3, 0, 1, 4, 5, 2], LIQ_SIDE_DIRS = [0, 1, 4, 5], LIQ_PUSH_DIRS = [2, 0, 1, 4, 5, 3];
+let liqCount = new Int32Array(1024);
+// The cells with liquid, bottom layer first (a counting sort on the layer: no comparison calls)
+function liqSortByLayer(nl) {
+  let lo = Infinity, hi = -Infinity;
+  for (let o = 0; o < nl; o++) { const j = gas.cj[liqOrder[o]]; if (j < lo) lo = j; if (j > hi) hi = j; }
+  const span = hi - lo + 2;
+  if (liqCount.length < span) liqCount = new Int32Array(span * 2);
+  liqCount.fill(0, 0, span);
+  for (let o = 0; o < nl; o++) liqCount[gas.cj[liqOrder[o]] - lo + 1]++;
+  for (let j = 1; j < span; j++) liqCount[j] += liqCount[j - 1];
+  for (let o = 0; o < nl; o++) { const c = liqOrder[o]; liqSorted[liqCount[gas.cj[c] - lo]++] = c; }
+  return liqSorted.subarray(0, nl);
+}
 function liqMoveFrac(src, dst, fr) {
   let v = gas.lw[src] * fr; gas.lw[src] -= v; gas.lw[dst] += v;
   v = gas.lo[src] * fr; gas.lo[src] -= v; gas.lo[dst] += v;
@@ -3448,11 +3842,14 @@ function oilCollider(col) {
   col.setFriction(col.friction() * OIL_FRICTION);
   col.setFrictionCombineRule(RAPIER.CoefficientCombineRule.Min);
 }
+const oilRefresh = []; // colliders to switch back on after one step
 function oilPart(p) {
   if (!p || p.oiled) return;
   p.oiled = true;
-  for (const col of p.colliders || []) oilCollider(col);
-  needsRebuild = true; // contacts that already exist keep their old grip, so make them afresh
+  // contacts that already exist keep their old grip: switch the part's colliders off and on again so they are
+  // made afresh next step (rebuilding the whole world would jolt a running machine)
+  for (const col of p.colliders || []) { oilCollider(col); col.setEnabled(false); }
+  oilRefresh.push(...(p.colliders || []));
 }
 // Droplets fly until they hit something, then become liquid in the cell they were in
 const DROP_MAX = 1500;
@@ -3497,7 +3894,7 @@ function liquidStep(h) {
   let nl = 0;
   for (let a = 0; a < act.length; a++) { const c = act[a]; if (liqTotal(c) > LMIN) liqOrder[nl++] = c; }
   if (!nl) return;
-  const order = liqOrder.subarray(0, nl).sort((x, y) => gas.cj[x] - gas.cj[y]); // the bottom moves first
+  const order = liqSortByLayer(nl); // the bottom moves first
   for (let o = 0; o < nl; o++) {
     const c = order[o];
     let L = liqTotal(c);
@@ -3505,7 +3902,7 @@ function liquidStep(h) {
     // 1. Squeezed: liquid beyond the room in this cell goes wherever there is space, downwards first
     let ex = L - gas.fs[c];
     if (ex > 1e-6) {
-      for (const d of [3, 0, 1, 4, 5, 2]) {
+      for (const d of LIQ_SQUEEZE_DIRS) {
         if (ex <= 1e-6) break;
         const n = liqNeighbour(c, d);
         if (n < 0) continue;
@@ -3526,7 +3923,7 @@ function liquidStep(h) {
     const resting = below < 0 || liqRoom(below) < 1e-3;
     if (resting && L > LSPREAD) {
       const cap = Math.max(gas.fs[c], 0.05), lev = L / cap;
-      for (const d of [0, 1, 4, 5]) {
+      for (const d of LIQ_SIDE_DIRS) {
         const n = liqNeighbour(c, d);
         if (n < 0) continue;
         const capN = Math.max(gas.fs[n], 0.05), levN = liqTotal(n) / capN;
@@ -3544,7 +3941,7 @@ function liquidStep(h) {
       const c = order[o];
       const L = liqTotal(c), cap = Math.max(gas.fs[c], 0.02), ex = L - gas.fs[c];
       if (ex <= 1e-5) continue;
-      for (const d of [2, 0, 1, 4, 5, 3]) {
+      for (const d of LIQ_PUSH_DIRS) {
         const n = gas.nb[c * 6 + d];
         if (n < 0 || gas.fo[c * 6 + d] < 0.05) continue;
         const Ln = liqTotal(n), capN = Math.max(gas.fs[n], 0.02), exN = Ln - gas.fs[n];
@@ -3586,7 +3983,7 @@ function liquidStep(h) {
     }
     if (gas.lo[c] > LMIN && T > T_OIL && gas.f[c] >= FMIN) {
       const dv = Math.min(gas.lo[c], h * EVAP_OIL * gas.lo[c] * (T - T_OIL));
-      gas.lo[c] -= dv; gas.fuel[c] += dv * VAPOR_X * 0.8; gas.en[c] += dv * VAPOR_X * 0.8 * T;
+      gas.lo[c] -= dv; gas.fuel[c] += dv * VAPOR_X * 0.8; gas.ofu[c] += dv * VAPOR_X * 0.8; gas.en[c] += dv * VAPOR_X * 0.8 * T;
     }
     // oil wets the parts it touches
     if (gas.lo[c] > 0.01) for (let d = 0; d < 6; d++) {
@@ -3616,77 +4013,105 @@ function steamStep(h) {
 // its faces and links, fills its volume at its new pressure. Faces pass gas very freely, so the system is stiff
 // and a few sweeps of a simple solver leave errors big enough to slosh gas back and forth; conjugate gradients
 // (with each cell scaled by its own weight) settles it properly in a few dozen passes even across a big cloud.
-const cgR = new Float64Array(GAS_MAX), cgZ = new Float64Array(GAS_MAX), cgD = new Float64Array(GAS_MAX), cgQ = new Float64Array(GAS_MAX), cgDiag = new Float64Array(GAS_MAX), cgB = new Float64Array(GAS_MAX);
+// With WebAssembly the setup below writes straight into the solver's own memory and the passes run there.
+const cgW = SIM_WASM && SIM_WASM.nmax() >= GAS_MAX ? SIM_WASM : null;
+const cgWF = (ptr) => new Float64Array(cgW.memory.buffer, ptr, GAS_MAX);
+const cgR = new Float64Array(GAS_MAX), cgZ = new Float64Array(GAS_MAX), cgD = new Float64Array(GAS_MAX), cgQ = new Float64Array(GAS_MAX);
+const cgDiag = cgW ? cgWF(cgW.diag()) : new Float64Array(GAS_MAX), cgB = cgW ? cgWF(cgW.rhs()) : new Float64Array(GAS_MAX);
 const CG_MAX = 80, CG_TOL = 2e-6;
+// Performance mode settles for a rougher pressure solve: fewer passes, a little less exact, much cheaper in big explosions
+const CG_MAX_FAST = 50, CG_TOL_FAST = 8e-6;
+// The working copies the solver runs on: the active cells packed side by side (cell a of the active list is
+// slot a), with each slot's six neighbours as slot numbers. Same sums as reading the grid in place, done on
+// short arrays that sit together in memory, which is several times quicker in a big explosion.
+const cgIdx = new Int32Array(GAS_MAX), cgX = cgW ? cgWF(cgW.x()) : new Float64Array(GAS_MAX);
+const cgNb = cgW ? new Int32Array(cgW.memory.buffer, cgW.nb(), GAS_MAX * 6) : new Int32Array(GAS_MAX * 6);
+const cgNc = cgW ? new Float64Array(cgW.memory.buffer, cgW.nc(), GAS_MAX * 6) : new Float64Array(GAS_MAX * 6);
+const cgLia = cgW && new Int32Array(cgW.memory.buffer, cgW.lia(), cgW.lmax()), cgLib = cgW && new Int32Array(cgW.memory.buffer, cgW.lib(), cgW.lmax());
+const cgLc = cgW && new Float64Array(cgW.memory.buffer, cgW.lc(), cgW.lmax());
 function gasSolvePressure(act) {
   // A one-way link (a turbo or an intake) only counts while it is letting air in
   for (const L of gasLinks) L.on = !L.oneWay || gasP[L.a] < L.src;
-  for (let a = 0; a < act.length; a++) {
-    const c = act[a];
-    if (gas.f[c] < FMIN) { cgDiag[c] = 1; cgB[c] = gasP[c]; continue; }
+  const n = act.length;
+  for (let a = 0; a < n; a++) cgIdx[act[a]] = a;
+  for (let a = 0; a < n; a++) {
+    const c = act[a], base = c * 6, k0 = a * 6;
+    if (gas.f[c] < FMIN) {
+      cgDiag[a] = 1; cgB[a] = gasP[c];
+      for (let d = 0; d < 6; d++) cgNb[k0 + d] = -1;
+      continue;
+    }
     let diag = gas.f[c] + gasAmb[c], b = gasE0[c] + gasAmb[c];
-    const base = c * 6;
     for (let d = 0; d < 6; d++) {
       const cc = FACE_C[base + d];
+      cgNb[k0 + d] = -1;
       if (!cc) continue;
       diag += cc;
-      if (FACE_NB[base + d] < 0) b += cc; // the open air sits at one atmosphere
+      const nb = FACE_NB[base + d];
+      if (nb < 0) b += cc; // the open air sits at one atmosphere
+      else { cgNb[k0 + d] = cgIdx[nb]; cgNc[k0 + d] = cc; }
     }
-    cgDiag[c] = diag; cgB[c] = b;
+    cgDiag[a] = diag; cgB[a] = b;
   }
+  const links = [];
   for (const L of gasLinks) {
     if (!L.on) continue;
-    cgDiag[L.a] += L.c;
-    if (L.b >= 0) cgDiag[L.b] += L.c; else cgB[L.a] += L.c * L.src;
+    const ia = cgIdx[L.a];
+    cgDiag[ia] += L.c;
+    if (L.b >= 0) { const ib = cgIdx[L.b]; cgDiag[ib] += L.c; links.push(ia, ib, L.c); } else cgB[ia] += L.c * L.src;
+  }
+  const ctol = settings.performance ? CG_TOL_FAST : CG_TOL, cmax = settings.performance ? CG_MAX_FAST : CG_MAX;
+  const tol = ctol * ctol * n * (K_FLOW + 1);
+  if (cgW && links.length / 3 <= cgLia.length) {
+    for (let a = 0; a < n; a++) cgX[a] = gasP[act[a]];
+    for (let i = 0, l = 0; i < links.length; i += 3, l++) { cgLia[l] = links[i]; cgLib[l] = links[i + 1]; cgLc[l] = links[i + 2]; }
+    cgW.solve(n, links.length / 3, tol, cmax);
+    for (let a = 0; a < n; a++) gasP[act[a]] = cgX[a];
+    return;
   }
   const mul = (x, out) => {
-    for (let a = 0; a < act.length; a++) {
-      const c = act[a];
-      let v = cgDiag[c] * x[c];
-      if (gas.f[c] >= FMIN) {
-        const base = c * 6;
-        for (let d = 0; d < 6; d++) {
-          const cc = FACE_C[base + d];
-          if (!cc) continue;
-          const n = FACE_NB[base + d];
-          if (n >= 0) v -= cc * x[n];
-        }
-      }
-      out[c] = v;
+    for (let a = 0, k = 0; a < n; a++, k += 6) {
+      let v = cgDiag[a] * x[a];
+      let j = cgNb[k]; if (j >= 0) v -= cgNc[k] * x[j];
+      j = cgNb[k + 1]; if (j >= 0) v -= cgNc[k + 1] * x[j];
+      j = cgNb[k + 2]; if (j >= 0) v -= cgNc[k + 2] * x[j];
+      j = cgNb[k + 3]; if (j >= 0) v -= cgNc[k + 3] * x[j];
+      j = cgNb[k + 4]; if (j >= 0) v -= cgNc[k + 4] * x[j];
+      j = cgNb[k + 5]; if (j >= 0) v -= cgNc[k + 5] * x[j];
+      out[a] = v;
     }
-    for (const L of gasLinks) if (L.on && L.b >= 0) { out[L.a] -= L.c * x[L.b]; out[L.b] -= L.c * x[L.a]; }
+    for (let i = 0; i < links.length; i += 3) { const ia = links[i], ib = links[i + 1], c = links[i + 2]; out[ia] -= c * x[ib]; out[ib] -= c * x[ia]; }
   };
   // start from the pressures as they are now
-  for (let a = 0; a < act.length; a++) { const c = act[a]; cgD[c] = gasP[c]; }
-  mul(cgD, cgQ);
-  let rz = 0, n = 0;
-  for (let a = 0; a < act.length; a++) {
-    const c = act[a];
-    cgR[c] = cgB[c] - cgQ[c];
-    cgZ[c] = cgR[c] / cgDiag[c];
-    rz += cgR[c] * cgZ[c];
-    n++;
+  for (let a = 0; a < n; a++) cgX[a] = gasP[act[a]];
+  mul(cgX, cgQ);
+  let rz = 0;
+  for (let a = 0; a < n; a++) {
+    cgR[a] = cgB[a] - cgQ[a];
+    cgZ[a] = cgR[a] / cgDiag[a];
+    rz += cgR[a] * cgZ[a];
+    cgD[a] = cgZ[a];
   }
-  for (let a = 0; a < act.length; a++) { const c = act[a]; cgD[c] = cgZ[c]; }
-  const tol = CG_TOL * CG_TOL * n * (K_FLOW + 1);
-  for (let it = 0; it < CG_MAX && rz > tol; it++) {
+  for (let it = 0; it < cmax && rz > tol; it++) {
     mul(cgD, cgQ);
     let dq = 0;
-    for (let a = 0; a < act.length; a++) { const c = act[a]; dq += cgD[c] * cgQ[c]; }
+    for (let a = 0; a < n; a++) dq += cgD[a] * cgQ[a];
     if (dq <= 0) break;
     const alpha = rz / dq;
     let rz2 = 0;
-    for (let a = 0; a < act.length; a++) {
-      const c = act[a];
-      gasP[c] += alpha * cgD[c];
-      cgR[c] -= alpha * cgQ[c];
-      cgZ[c] = cgR[c] / cgDiag[c];
-      rz2 += cgR[c] * cgZ[c];
+    for (let a = 0; a < n; a++) {
+      cgX[a] += alpha * cgD[a];
+      const r = cgR[a] - alpha * cgQ[a];
+      cgR[a] = r;
+      const z = r / cgDiag[a];
+      cgZ[a] = z;
+      rz2 += r * z;
     }
     const beta = rz2 / rz;
     rz = rz2;
-    for (let a = 0; a < act.length; a++) { const c = act[a]; cgD[c] = cgZ[c] + beta * cgD[c]; }
+    for (let a = 0; a < n; a++) cgD[a] = cgZ[a] + beta * cgD[a];
   }
+  for (let a = 0; a < n; a++) gasP[act[a]] = cgX[a];
 }
 function gasStep(h) {
   const act = gas.act;
@@ -3699,7 +4124,8 @@ function gasStep(h) {
   const nb = gas.nb, fo = gas.fo;
   // 1. Where are the walls now? Only cells near something moving need measuring again. Squeezing heats the gas,
   //    but the heat belongs to the whole chamber (step 3b), not to the one cell a piston face is sweeping through.
-  for (let a = 0; a < act.length; a++) { const c = act[a]; gas.live[c] = 0; if (gas.epoch[c] !== gas.geoEpoch || gasCellLive(c)) { gasMeasure(c); gas.live[c] = 1; } }
+  if (gas.wgeo && act.length <= GAS_MAX) gasMeasureAll(act);
+  else for (let a = 0; a < act.length; a++) { const c = act[a]; gas.live[c] = 0; if (gas.epoch[c] !== gas.geoEpoch || gasCellLive(c)) { gasMeasure(c); gas.live[c] = 1; } }
   // 1b. Liquids move; the gas gets whatever room they leave
   liquidStep(h);
   for (let a = 0; a < act.length; a++) {
@@ -3720,7 +4146,7 @@ function gasStep(h) {
       if (n < 0 || gas.f[n] < FMIN) continue;
       gasMove(c, n, 1 / cnt); gasDV[n] += gasDV[c] / cnt; cnt--;
     }
-    gas.air[c] = gas.fuel[c] = gas.exh[c] = gas.en[c] = 0;
+    gas.air[c] = gas.fuel[c] = gas.exh[c] = gas.en[c] = gas.ofu[c] = gas.osm[c] = 0;
   }
   // 3. Grow into open neighbours where something is happening, then wire up the faces.
   const n0 = act.length;
@@ -3823,7 +4249,7 @@ function gasStep(h) {
     if (es <= 1e-9) return;
     const fr = Math.min(0.95, e / es);
     if (t >= 0) gasMove(c, t, fr);
-    else { const k2 = 1 - fr; gas.air[c] *= k2; gas.fuel[c] *= k2; gas.exh[c] *= k2; gas.stm[c] *= k2; gas.en[c] *= k2; }
+    else { const k2 = 1 - fr; gas.air[c] *= k2; gas.fuel[c] *= k2; gas.exh[c] *= k2; gas.stm[c] *= k2; gas.en[c] *= k2; gas.ofu[c] *= k2; gas.osm[c] *= k2; }
   };
   for (let a = 0; a < act.length; a++) {
     const c = act[a];
@@ -3834,10 +4260,17 @@ function gasStep(h) {
   }
   for (const L of gasLinks) if (L.on && L.b < 0 && gasP[L.a] < L.src) pull(L.a, L.c * (L.src - gasP[L.a]));
   let no = 0;
-  for (let a = 0; a < act.length; a++) if (gas.f[act[a]] >= FMIN) gasOrder[no++] = act[a];
-  const order = gasOrder.subarray(0, no).sort((x, y) => gasP[y] - gasP[x]);
+  // Sorted with the browser's own number sort (a comparison function would be called from native code tens of
+  // thousands of times a step): each key is the pressure, high first, with the cell's number in the low bits.
+  for (let a = 0; a < act.length; a++) {
+    const c = act[a];
+    if (gas.f[c] < FMIN) continue;
+    const q = Math.min(4194303, Math.max(0, Math.round((64 - gasP[c]) * 65536))); // 22 bits of pressure, 1/65536 atm apart
+    gasOrder[no++] = q * 16384 + c;
+  }
+  const order = gasOrder.subarray(0, no).sort();
   for (let o = 0; o < no; o++) {
-    const c = order[o], pc = gasP[c], base = c * 6;
+    const c = order[o] % 16384, pc = gasP[c], base = c * 6;
     for (let d = 0; d < 6; d++) {
       const cc = FACE_C[base + d];
       if (!cc) continue;
@@ -3858,6 +4291,7 @@ function gasStep(h) {
     if (L.oneWay && e > 0) { if (L.valve) L.valve.st.flow = 0; continue; }
     if (L.valve) L.valve.st.flow = -e / h;
     if (L.valve2) L.valve2.st.flow = e / h;
+    if (L.turbine && e > 0) L.turbine.st.drive = (L.turbine.st.drive ?? 0) + e * Math.max(0, gasP[L.a] - 1); // the exhaust's push, spent in the turbine
     if (L.vent && e > 1e-3) ventPuffs(L, e);
   }
   // 5. Heat and fuel spread between neighbours. Smoke out in the open air, at the pressure of the air around
@@ -3872,10 +4306,14 @@ function gasStep(h) {
       if (FACE_C[base + d] && n >= 0) gasMix(c, n, FACE_A[base + d], kt, kd);
     }
     // only cool smoke thins out: a fuel cloud lingers so it can still be lit (a trace too lean to burn does not),
-    // and nothing hot or burning is touched
-    if (gasAmb[c] && !gas.flame[c] && gas.en[c] < T_IGN * gasTotal(c)) {
-      const n = gasTotal(c);
-      const vf = gas.fuel[c] * dis * (gas.fuel[c] < LEAN * n ? 1 : 0.15), vx = gas.exh[c] * dis, vs = gas.stm[c] * dis;
+    // and nothing hot or burning is touched. That goes for the open air and for any space that is open to the
+    // outside somewhere (under a machine, in a pipe), where smoke would otherwise collect for ever.
+    const openCh = !gasAmb[c] && gas.f[c] >= FMIN && gasCOpen[gasFind(c)];
+    if ((gasAmb[c] || openCh) && !gas.flame[c] && gas.en[c] < T_IGN * gasTotal(c)) {
+      const n = gasTotal(c), dd = dis;
+      const vf = gas.fuel[c] * dd * (gas.fuel[c] < LEAN * n ? 1 : 0.15), vx = gas.exh[c] * dd, vs = gas.stm[c] * dd;
+      if (gas.ofu[c] > 0) gas.ofu[c] *= 1 - vf / Math.max(gas.fuel[c], 1e-9);
+      if (gas.osm[c] > 0) gas.osm[c] *= 1 - vx / Math.max(gas.exh[c], 1e-9);
       gas.fuel[c] -= vf; gas.exh[c] -= vx; gas.stm[c] -= vs; gas.air[c] += vf + vx + vs;
       gas.en[c] += (n - gas.en[c]) * disT;
     }
@@ -3896,6 +4334,8 @@ function gasStep(h) {
     gas.flameNext[c] = 0;
     if (lit && gas.fuel[c] > 1e-6 && gas.air[c] > 1e-6) {
       const b = Math.min(gas.fuel[c], gas.air[c] / AFR) * burnK;
+      // burning oil vapour leaves thick white smoke in the exhaust
+      if (gas.ofu[c] > 0) { const bo = Math.min(gas.ofu[c], (b * gas.ofu[c]) / gas.fuel[c]); gas.ofu[c] -= bo; gas.osm[c] += bo * (1 + AFR) * 1.05; }
       gas.fuel[c] -= b;
       gas.air[c] -= b * AFR;
       gas.exh[c] += b * (1 + AFR) * 1.05;
@@ -4011,7 +4451,7 @@ function gasStep(h) {
     else {
       // out in the open a trace too faint to see goes; inside a machine even a trace keeps the cell, since a
       // missing cell there would be a hole to the outside air
-      const p = gas.en[c] / f, T = n > 1e-9 ? gas.en[c] / n : 1, open = gasAmb[c] > 0;
+      const p = gas.en[c] / f, T = n > 1e-9 ? gas.en[c] / n : 1, open = gasAmb[c] > 0 || (f >= FMIN && gasCOpen[gasFind(c)] > 0);
       const fMax = open ? 2e-3 * n : 2e-4, sMax = (open ? 0.02 : 0.01) * n;
       dead = f >= FMIN && Math.abs(p - 1) < 0.004 && gas.fuel[c] < fMax && gas.exh[c] < sMax && gas.stm[c] < sMax && Math.abs(T - 1) < 0.03 && gas.burn[c] < 0.01;
     }
@@ -4162,6 +4602,7 @@ function depthPrepass(target, always = false) {
   worldGroup.traverse((o) => { if (o.visible && o.material && !Array.isArray(o.material) && (o.material.transparent || o.material.opacity < 1)) { o.visible = false; hiddenForDepth.push(o); } });
   const vis = [sky.visible, fxGroup.visible];
   sky.visible = false; fxGroup.visible = false;
+  for (const t in nodeBatch) if (nodeBatch[t].mesh && nodeBatch[t].mesh.visible) { nodeBatch[t].mesh.visible = false; hiddenForDepth.push(nodeBatch[t].mesh); }
   scene.overrideMaterial = depthOnlyMat;
   renderer.render(scene, camera);
   scene.overrideMaterial = null;
@@ -4232,11 +4673,12 @@ function updateGasVisual(dt) {
     if (n <= 1e-6 || gas.f[c] < FMIN) continue;
     const x = (gas.ci[c] + 0.5) * GH, y = (gas.cj[c] + 0.5) * GH, z = (gas.ck[c] + 0.5) * GH;
     const T = gas.en[c] / n;
-    const fu = gas.fuel[c] / n, ex = gas.exh[c] / n, st = gas.stm[c] / n;
-    const aF = Math.min(0.5, fu * 9), aE = Math.min(0.55, ex * 0.9), aS = Math.min(0.5, st * 0.8);
+    const fu = gas.fuel[c] / n, ex = gas.exh[c] / n, st = gas.stm[c] / n, oil = Math.min(1, gas.osm[c] / Math.max(gas.exh[c], 1e-9));
+    const aF = Math.min(0.5, fu * 9), aE = Math.min(0.6, ex * (0.9 + oil * 2.5)), aS = Math.min(0.5, st * 0.8);
     const aT = aF + aE + aS;
     if (aT > 0.02 && ns < GAS_DRAW) {
-      const wF = aF / aT, wS = aS / aT, wE = 1 - wF - wS;
+      // exhaust is grey; the oil-smoke part of it is white
+      const wF = aF / aT, wE0 = aE / aT, wS = aS / aT + wE0 * oil, wE = Math.max(0, 1 - wF - wS);
       sp[ns * 3] = x; sp[ns * 3 + 1] = y; sp[ns * 3 + 2] = z;
       sc[ns * 4] = 0.95 * wF + grey * wE + 0.97 * wS; sc[ns * 4 + 1] = 0.6 * wF + grey * wE + 0.97 * wS; sc[ns * 4 + 2] = 0.12 * wF + (grey + 0.03) * wE + 0.99 * wS;
       sc[ns * 4 + 3] = Math.min(0.6, aT);
@@ -4289,7 +4731,8 @@ function updateGasVisual(dt) {
     }
     if (ns < GAS_DRAW) {
       sp[ns * 3] = s.p.x; sp[ns * 3 + 1] = s.p.y; sp[ns * 3 + 2] = s.p.z;
-      sc[ns * 4] = grey; sc[ns * 4 + 1] = grey; sc[ns * 4 + 2] = grey + 0.03; sc[ns * 4 + 3] = s.a * Math.min(1, k * 1.5);
+      const g2 = grey + (0.97 - grey) * (s.white || 0);
+      sc[ns * 4] = g2; sc[ns * 4 + 1] = g2; sc[ns * 4 + 2] = g2 + 0.02; sc[ns * 4 + 3] = s.a * Math.min(1, k * 1.5);
       ns++;
     }
   }
@@ -4476,7 +4919,12 @@ const DEVICE_TICK = {
     m.st.open = v;
     return { flow: m.st.flow ?? 0 };
   },
-  intake(m) { m.st.boost = 0; return {}; },
+  intake(m, I) {
+    m.st.boost = 0;
+    const t = I('throttle'), idle = clamp(m.params.idle ?? 0.15, 0, 1);
+    m.st.throttle = t === undefined ? 1 : idle + (1 - idle) * clamp(+t, 0, 1);
+    return {};
+  },
   inlet(m, I) { const o = I('open'); m.st.open = o === undefined || o ? 1 : 0; return { flow: m.st.flow ?? 0 }; },
   outlet(m, I) { const o = I('open'); m.st.open = o === undefined || o ? 1 : 0; return { flow: m.st.flow ?? 0 }; },
   pump(m, I) { const v = I('speed'); m.st.speed = clamp(v === undefined ? m.params.speed : v, 0, 1); m.st.spin = ((m.st.spin ?? 0) + m.st.speed * 0.4) % TAU; return { flow: m.st.flow ?? 0 }; },
@@ -4491,6 +4939,21 @@ const DEVICE_TICK = {
     return { boost: m.st.boost };
   },
   lamp(m, I) { m.st.lit = !!I('on'); return {}; },
+  exhturbo(m, I, h) {
+    // the rotor speeds up with the power of the exhaust going through the turbine and is held back by the work
+    // of compressing the air (growing with the square of its speed) and a little friction
+    // past the wastegate's limit the exhaust is let round the turbine instead of through it
+    const gate = clamp((m.params.wastegate - (m.st.boost ?? 0)) / 0.15, 0, 1);
+    const power = ((m.st.drive ?? 0) / Math.max(h, 1e-6)) * gate;
+    m.st.drive = 0;
+    let w = m.st.w ?? 0; // thousands of rpm
+    w += (h * (TURB_DRIVE * power - TURB_DRAG * w * w - 0.3 * w)) / Math.max(0.05, m.params.inertia);
+    w = Math.max(0, w);
+    m.st.w = w;
+    m.st.boost = Math.min(2.5, m.params.gain * (w / 100) ** 2);
+    m.st.spin = ((m.st.spin ?? 0) + Math.min(w, 60) * 0.02) % TAU;
+    return { rpm: w * 1000, boost: m.st.boost };
+  },
   mpump(m) { m.st.rpm = hubRpm(m); return { rpm: m.st.rpm, flow: m.st.flow ?? 0 }; },
   moilpump(m) { m.st.rpm = hubRpm(m); return { rpm: m.st.rpm, flow: m.st.flow ?? 0 }; },
   mturbo(m) {
@@ -4501,7 +4964,19 @@ const DEVICE_TICK = {
   },
   clutch(m, I) {
     const v = I('engage'), e = clamp(v === undefined ? m.params.engage : +v, 0, 1);
-    if (e !== m.st.engage) { m.st.engage = e; applyJointDrive(m); }
+    let free = false;
+    if (m.params.oneWay && !m.solverClutch) {
+      // a freewheel (like a starter's sprag clutch): it drives the hub the way the shaft turns, but lets the
+      // hub run ahead of it freely
+      const hub = m.hub != null ? S.parts.get(m.hub) : null, parent = m.parent != null ? S.parts.get(m.parent) : null;
+      if (hub && hub.body) {
+        const F = mountFrameNow(m), axis = mountLayout(m).axis.clone().applyQuaternion(F.quat);
+        const ws = parent && parent.body ? spinAlong(parent.body, axis) : 0, wh = spinAlong(hub.body, axis);
+        if (Math.abs(ws) > 0.5) m.st.dir = Math.sign(ws);
+        free = !!m.st.dir && (wh - ws) * m.st.dir > 0.3;
+      }
+    }
+    if (e !== m.st.engage || free !== !!m.st.free) { m.st.engage = e; m.st.free = free; applyJointDrive(m); }
     return {};
   },
   gearbox(m, I) {
@@ -4544,7 +5019,17 @@ const DEVICE_TICK = {
     const pos = I('position'), ext = I('extend');
     const target = pos !== undefined ? clamp(pos, 0, 1) * m.params.stroke : ext ? m.params.stroke : 0;
     if (Math.abs(target - (m.st.target ?? -1)) > 1e-4) { m.st.target = target; applyJointDrive(m); }
-    return {};
+    // how far the rod is out: the tip's distance along the axis, measured from where it started
+    const hub = m.hub != null ? S.parts.get(m.hub) : null;
+    let d = 0;
+    if (hub && hub.body) {
+      const F = mountFrameNow(m), t = hub.body.translation();
+      const along = mountLayout(m).axis.clone().applyQuaternion(F.quat).dot(V(t.x, t.y, t.z).sub(F.pos));
+      if (m.st.d0 === undefined) m.st.d0 = along;
+      d = Math.abs(along - m.st.d0);
+    }
+    const out = clamp(d / Math.max(1e-6, m.params.stroke), 0, 1);
+    return { ext: out > 0.92, pos: out };
   },
 };
 function signalTick(h) {
@@ -4616,6 +5101,7 @@ function updateDeviceVisual(m, F) {
     }
     case 'valve': if (named.wheel) named.wheel.rotation.y = (m.st.open ?? m.params.open) * Math.PI * 1.5; break;
     case 'turbo': for (const f of [named.fan, named.fan2]) if (f) f.rotation.z = -(m.st.spin ?? 0); break;
+    case 'exhturbo': for (const f of [named.fan, named.fan2]) if (f) f.rotation.x = -(m.st.spin ?? 0); break;
     case 'pressure': if (named.pivot) named.pivot.rotation.y = -clamp(((m.out.pressure ?? 1) - 1) * 0.5, -1.2, 2.6); break;
     case 'distance': {
       if (!m.laser) {
@@ -4700,7 +5186,7 @@ function serialize() {
     belts: [...S.belts.values()].map((b) => ({ id: b.id, parts: b.parts.slice(), width: b.width, grip: b.grip })),
   };
 }
-const SHAPES = ['box', 'sphere', 'cylinder', 'wedge', 'cam', 'gear', 'rack'];
+const SHAPES = ['box', 'sphere', 'cylinder', 'wedge', 'cam', 'gear', 'rack', 'bend'];
 function loadScene(data) {
   if (!data || !Array.isArray(data.parts)) throw new Error('This file is not a Red Sandbox build.');
   clearScene();
@@ -5859,6 +6345,7 @@ function resizePart(g, delta) {
     if (ax === 1) p.size[1] = want;
     else { const k = want / 2 / (g.params0.size + g.params0.lift); p.params.size = Math.max(0.08, g.params0.size * k); p.params.lift = Math.max(0.02, g.params0.lift * k); }
   } else if (p.shape === 'rack') { if (ax !== 1) p.size[ax] = want; }
+  else if (p.shape === 'bend') { if (ax === 1) p.params.d = Math.max(0.15, want); else p.params.bend = Math.max(p.params.d / 2 + 0.05, want / 2); }
   else p.size[ax] = want;
   deriveSize(p);
   const grown = p.size[ax] - old;
@@ -6042,7 +6529,8 @@ window.addEventListener('keydown', (e) => {
     if (move && gesture && gesture.type === 'move') { move.yaw += dir * 15 * DEG; applyTransform(); } else placeRot += dir;
     return;
   }
-  if (k === 'r') { flipTool(); return; }
+  // R tips over or switches the mode of what you are placing; otherwise it rewinds to where Play was pressed
+  if (k === 'r') { if (PART_TYPES[currentTool] || MOUNTS[currentTool]) flipTool(); else rewind(); return; }
   if (k === 'f') {
     // F looks at the selection; F twice quickly follows it around (F again stops)
     const now = e.timeStamp; // when the key went down, even if the page was busy drawing
@@ -6458,10 +6946,14 @@ const ICONS = {
   autoglue: '<path d="M12 3c3.2 4.3 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 2.8-6.7 6-11z"/><path d="M12.6 9.5l-2.3 4.2h3.4l-2.3 4.2"/>',
   structure: '<path d="M4 20L20 4M4 20h4M4 20v-4M20 4h-4M20 4v4"/><circle cx="4.5" cy="19.5" r="1.6"/><circle cx="19.5" cy="4.5" r="1.6"/>',
   spring: '<path d="M12 2.5V5l-5 2 10 2.5-10 2.5 10 2.5-10 2.5 5 2v2.5"/>',
+  bend90: '<path d="M4 20V13a9 9 0 0 1 9-9h7"/><path d="M9 20v-7a4 4 0 0 1 4-4h7"/>',
+  bend45: '<path d="M3 20l8-8a6 6 0 0 1 4-2h6"/><path d="M8 21l6-6a4 4 0 0 1 3-1h4"/>',
+  tubepump: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M12 9v6M9 12h6"/><path d="M18 12l-3-2v4z"/>',
   pulley: '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/>',
   belt: '<circle cx="6.5" cy="12" r="3.5"/><circle cx="18" cy="12" r="2.5"/><path d="M6.5 8.5L18 9.5M6.5 15.5L18 14.5"/>',
   mpump: '<path d="M4 18h16v3H4z"/><circle cx="12" cy="12" r="5"/><path d="M12 7V3M2 12h5M17 12h5"/>',
   moilpump: '<path d="M4 18h16v3H4z"/><path d="M12 6c-3 4-4 6-4 8a4 4 0 0 0 8 0c0-2-1-4-4-8z"/><path d="M12 3v3"/>',
+  exhturbo: '<circle cx="7" cy="13" r="4.5"/><circle cx="17" cy="13" r="4.5"/><path d="M11.5 13h1M7 8.5V3M17 8.5V5h4"/>',
   mturbo: '<path d="M4 18h16v3H4z"/><circle cx="11" cy="11" r="5.5"/><path d="M11 11l3-4M11 11l-4-2M11 11l1 5M16.5 8h4v3"/><path d="M11 3v2.5"/>',
   injector: '<path d="M10 2.5h4v3.5h-4zM8.5 6h7v7.5l-2 3h-3l-2-3zM12 16.5v2M9.5 21l2.5-2.5 2.5 2.5"/>',
   igniter: '<path d="M12 2v3M9 5h6v4H9zM10 9h4v6h-4zM12 15v2M7.5 21l2.5-2.5M16.5 21L14 18.5M12 22v-2.5"/>',
@@ -6494,8 +6986,8 @@ const RAIL = [
   ['Drivetrain', ['axle', 'bearing', 'gear', 'rack', 'cam', 'pulley', 'belt', 'motor', 'gearbox', 'clutch', 'uvjoint']],
   ['Joints', ['hinge', 'balljoint', 'slider', 'torsion', 'solenoid']],
   ['Connect', ['glue', 'autoglue', 'structure', 'spring']],
-  ['Gas', ['injector', 'igniter', 'valve', 'turbo', 'mturbo', 'intake', 'pipe', 'pressure']],
-  ['Fluids', ['inlet', 'outlet', 'pump', 'oilpump', 'mpump', 'moilpump', 'sprayer']],
+  ['Gas', ['injector', 'igniter', 'valve', 'turbo', 'mturbo', 'exhturbo', 'intake', 'pipe', 'pressure']],
+  ['Fluids', ['inlet', 'outlet', 'pump', 'oilpump', 'mpump', 'moilpump', 'sprayer', 'bend90', 'bend45', 'tubepump']],
   ['Signals', ['wire', 'button', 'lever', 'distance', 'angle', 'touch', 'gate', 'logic', 'lamp']],
 ];
 const railEl = document.getElementById('rail');
@@ -6637,7 +7129,18 @@ function shapeFields(p, onChange, prefix, undoable) {
       } else {
         sl('d', 'Diameter', 0.05, 6, 0.05, s[0], (v) => { s[0] = s[2] = v; });
         sl('h', p.type === 'wheel' ? 'Width' : 'Height', 0.03, 6, 0.01, s[1], (v) => { s[1] = v; });
+        if (p.params && 'form' in p.params) {
+          if (p.type === 'cylinder') f.push(segField('Form', [['solid', 'Solid'], ['hollow', 'Hollow'], ['cup', 'Open'], ['tube', 'Tube']], p.params.form, (v) => { if (undoable) pushUndo(); p.params.form = v; onChange(); renderInspector(); }));
+          if (p.params.form !== 'solid') sl('wall', 'Wall', 0.03, 0.5, 0.01, p.params.wall, (v) => { p.params.wall = v; });
+          if (p.type === 'tubepump') sl('rate', 'Flow', 0, 100, 0.5, p.params.rate, (v) => { p.params.rate = v; }, (v) => `${v.toFixed(1)} L/s`);
+          if (p.params.form !== 'solid') f.push(el('div', { class: 'insp-desc' }, 'Walls about 15 cm thick or more hold liquid tight: thinner ones can let it seep through.'));
+        }
       }
+      break;
+    case 'bend':
+      sl('bend', 'Bend radius', 0.2, 4, 0.05, p.params.bend, (v) => { p.params.bend = Math.max(v, p.params.d / 2 + 0.05); });
+      sl('bd', 'Tube diameter', 0.15, 3, 0.05, p.params.d, (v) => { p.params.d = v; });
+      sl('wall', 'Wall', 0.03, 0.5, 0.01, p.params.wall, (v) => { p.params.wall = v; });
       break;
     case 'gear': {
       const g = gearDims(p.params);
@@ -6707,6 +7210,7 @@ function mountFields(type, P, m, live) {
     case 'clutch':
       sl('torque', 'Grip when engaged', 1, 1000, 0, (v) => `${Math.round(v)} N·m`, { log: true });
       sl('engage', 'Engaged without a wire', 0, 1, 0.01, (v) => `${Math.round(v * 100)}%`);
+      f.push(checkField('oneway', 'One-way (freewheels when the hub runs ahead, like a starter)', !!P.oneWay, (v) => { if (live) pushUndo(); P.oneWay = v; if (live && m) { m.st.free = false; applyJointDrive(m); } }));
       break;
     case 'gearbox':
       f.push(segField(live ? 'Gear now' : 'Starts in', GEARS.map((g, i) => [i - 1, g.name]), live && m ? m.st.gear ?? P.gear : P.gear, (v) => { if (live) { pushUndo(); m.st.gear = v; } else P.gear = v; renderInspector(); }));
@@ -6715,7 +7219,15 @@ function mountFields(type, P, m, live) {
     case 'outlet':
       sl('size', 'Bore', 0.25, 4, 0.05, (v) => `${v.toFixed(2)}×`);
       f.push(segField('Tap (with nothing piped in)', [['none', 'Off'], ['water', 'Water'], ['oil', 'Oil'], ['gasoline', 'Gasoline']], P.tap, (v) => { if (live) pushUndo(); P.tap = v; if (live && m) rebuildMountMesh(m); renderInspector(); }));
-      if (P.tap !== 'none') sl('tapRate', 'Tap flow', 0.1, 100, 0.1, (v) => `${v.toFixed(1)} L/s`, { log: true });
+      if (P.tap !== 'none') {
+        const box = m && !pipeAt(m, 'pipe') ? containerAt(nozzleWorld(m)) : null;
+        if (box) {
+          const max = Math.max(1, Math.floor(box.litres));
+          f.push(el('div', { class: 'insp-desc' }, `It sits in a container that holds ${max} L. Set an amount to fill it with that much when you press Play (and again after a rewind) instead of pouring.`));
+          sl('fill', 'Fill on Play', 0, max, 1, (v) => (v > 0 ? `${Math.round(v)} of ${max} L` : 'off: pour'));
+        } else if (m) f.push(el('div', { class: 'insp-desc' }, 'Put it in a box or a tank (one without a lid is fine) and it can fill it once when you press Play.'));
+        if (!(P.fill > 0 && box)) sl('tapRate', 'Tap flow', 0.1, 100, 0.1, (v) => `${v.toFixed(1)} L/s`, { log: true });
+      }
       break;
     case 'pump': case 'oilpump':
       sl('rate', 'Flow at full speed', 0.2, 100, 0.1, (v) => `${v.toFixed(1)} L/s`, { log: true });
@@ -6729,6 +7241,11 @@ function mountFields(type, P, m, live) {
       sl('rate', 'Flow at the rated speed', 0.2, 100, 0.1, (v) => `${v.toFixed(1)} L/s`, { log: true });
       sl('rpm', 'Rated speed', 20, 1200, 1, (v) => `${Math.round(v)} rpm`, { log: true });
       sl('load', 'Drag on the shaft', 0.01, 5, 0, (v) => `${v.toFixed(2)} N·m·s`, { log: true });
+      break;
+    case 'exhturbo':
+      sl('gain', 'Boost per speed', 0.1, 4, 0.05, (v) => `${v.toFixed(2)}×`);
+      sl('inertia', 'Rotor weight (lag)', 0.1, 5, 0.05, (v) => `${v.toFixed(2)}×`);
+      sl('wastegate', 'Wastegate opens at', 0.1, 2.5, 0.05, (v) => `${v.toFixed(2)} atm`);
       break;
     case 'mturbo':
       sl('gain', 'Strength', 0.1, 4, 0.05, (v) => `${v.toFixed(2)}×`);
@@ -6844,7 +7361,7 @@ function checkField(id, label, value, onChange) {
   return el('label', { class: 'check' }, c, label);
 }
 const FLUID_DEVICES = new Set(['inlet', 'outlet', 'pump', 'oilpump', 'mpump', 'moilpump', 'sprayer']);
-const GAS_DEVICES = new Set(['injector', 'igniter', 'pressure', 'valve', 'turbo', 'mturbo', 'intake', 'inlet', 'outlet', 'pump', 'oilpump', 'mpump', 'moilpump', 'sprayer']);
+const GAS_DEVICES = new Set(['injector', 'igniter', 'pressure', 'valve', 'turbo', 'mturbo', 'exhturbo', 'intake', 'inlet', 'outlet', 'pump', 'oilpump', 'mpump', 'moilpump', 'sprayer']);
 function renderTool(body) {
   const t = currentTool;
   const ts = toolSettings[t];
@@ -7161,7 +7678,7 @@ function renderSettingsMenu() {
     checkField('s-xray', 'Show gas through walls', settings.gasXray, (v) => { settings.gasXray = v; savePrefs(); }),
     checkField('s-sound', 'Explosion sounds', settings.sound, (v) => { settings.sound = v; if (v) ensureAudio(); savePrefs(); }),
     checkField('s-perf', 'Performance mode', settings.performance, (v) => { settings.performance = v; needsRebuild = true; savePrefs(); }),
-    el('div', { class: 'insp-desc' }, 'Auto follows your system\'s light or dark mode. See-through parts like ice never hide gas. Performance mode meshes gears by rule (their speeds are simply locked together) instead of letting their teeth push on each other: faster and steadier, less real.'),
+    el('div', { class: 'insp-desc' }, 'Auto follows your system\'s light or dark mode. See-through parts like ice never hide gas. Performance mode trades accuracy for speed: gears mesh by rule (their speeds are simply locked together) instead of their teeth pushing on each other, and the gas pressure is worked out more roughly, which makes big explosions much cheaper.'),
   );
 }
 function buildTopbar() {
@@ -7742,7 +8259,7 @@ function engineCylinder(P, T, ang, mz, du, holdTo, zc = 0) {
 const Z = V(0, 0, 1), X = V(1, 0, 0), Y = V(0, 1, 0);
 const steel = { color: '#4a5059', material: 'metal' };
 // T.glass makes the block see-through, so you can watch the piston and the burning gas inside
-const wall = T.glass ? { color: '#cfe8ff', material: 'glass' } : { color: '#9aa3ad', material: 'metal' }, headM = T.glass ? wall : steel;
+const wall = T.glass ? { color: '#cfe8ff', material: 'glass' } : { color: '#9aa3ad', material: 'metal' }, headM = steel;
   const R = ENGINE_R, ROD = ENGINE_ROD, XL = ENGINE_XL;
   const c = Math.cos(ang), sn = Math.sin(ang);
   const Pt = (x, y, z) => { const dx = x + 1, dy = y - 1; return P(-1 + dx * c - dy * sn, 1 + dx * sn + dy * c, zc + z * mz); };
@@ -7763,21 +8280,25 @@ const wall = T.glass ? { color: '#cfe8ff', material: 'glass' } : { color: '#9aa3
   const carriage = ex.hub(slide);
   carriage.pos.add(Vc(X).multiplyScalar(du)); // the carriage rides with the crosshead
   ex.glue2(carriage, cross, Pt(0.25 + du, 0.92, 0));
-  const X0 = 0.8, X1 = T.head, cx = (X0 + X1) / 2, len = X1 - X0, W = 2 * inner + 0.3, zS = inner + 0.075;
-  const top = part('plank', Pt(cx, 1.0 + inner + 0.075, 0), { size: [len, 0.15, W], ...wall });
-  const bot = part('plank', Pt(cx, 1.0 - inner - 0.075, 0), { size: [len, 0.15, W], ...wall });
-  const sides = [-1, 1].map((sz) => part('plank', Pt(cx, 1.0, sz * zS), { size: [len, 2 * inner, 0.15], ...wall }));
+  const tw = T.wallT ?? 0.15; // the bore's wall thickness
+  const X0 = 0.8, X1 = T.head, cx = (X0 + X1) / 2, len = X1 - X0, W = 2 * inner + 2 * tw, zS = inner + tw / 2;
+  const top = part('plank', Pt(cx, 1.0 + inner + tw / 2, 0), { size: [len, tw, W], ...wall });
+  const bot = part('plank', Pt(cx, 1.0 - inner - tw / 2, 0), { size: [len, tw, W], ...wall });
+  const sides = [-1, 1].map((sz) => part('plank', Pt(cx, 1.0, sz * zS), { size: [len, 2 * inner, tw], ...wall }));
   const head = part('block', Pt(X1 + 0.075, 1.0, 0), { size: [0.15, W, W], ...headM });
   sides.forEach((sd, i) => {
     const z = (i ? 1 : -1) * zS;
     for (const x of [X0 + 0.3, X1 - 0.3]) { ex.glue2(sd, top, Pt(x, 1.0 + inner, z)); ex.glue2(sd, bot, Pt(x, 1.0 - inner, z)); }
     ex.glue2(sd, head, Pt(X1, 1.0, z));
   });
-  ex.glue2(head, top, Pt(X1, 1.0 + inner + 0.075, 0));
-  ex.glue2(head, bot, Pt(X1, 1.0 - inner - 0.075, 0));
+  ex.glue2(head, top, Pt(X1, 1.0 + inner + tw / 2, 0));
+  ex.glue2(head, bot, Pt(X1, 1.0 - inner - tw / 2, 0));
   holdTo(bot, Pt(X0 + 0.3, 0.2, 0), sides);
-  const inj = ex.mount('injector', 'wall', top, Pt(X1 - 0.08, 1.0 + inner + 0.15, -inner / 2), Qm(Y, X), { rate: T.rate });
-  const ign = ex.mount('igniter', 'wall', top, Pt(X1 - 0.08, 1.0 + inner + 0.15, inner / 2), Qm(Y, X));
+  // T.inHead puts the injector and the spark plug in the head beside the valves, as on a real engine
+  const inj = T.inHead ? ex.mount('injector', 'wall', head, Pt(X1 + 0.15, 1.0 + 0.12, 0), Qm(X, Z), { rate: T.rate })
+    : ex.mount('injector', 'wall', top, Pt(X1 - 0.08, 1.0 + inner + tw, -inner / 2), Qm(Y, X), { rate: T.rate });
+  const ign = T.inHead ? ex.mount('igniter', 'wall', head, Pt(X1 + 0.15, 1.0 - 0.12, 0), Qm(X, Z))
+    : ex.mount('igniter', 'wall', top, Pt(X1 - 0.08, 1.0 + inner + tw, inner / 2), Qm(Y, X));
   const inlet = ex.mount('valve', 'wall', head, Pt(X1 + 0.15, 1.0, -0.17), Qm(X, Z), { open: 1, size: T.valve });
   const outlet = ex.mount('valve', 'wall', head, Pt(X1 + 0.15, 1.0, 0.17), Qm(X, Z), { open: 1, size: T.valve });
   return { cross, pinB, piston, carriage, inj, ign, inlet, outlet, top, pinWorld: Pt(xPin, 1.0, 0) };
@@ -7897,51 +8418,103 @@ function buildVTwin(o, tune = {}) {
 // gearbox → a small gear on the gearbox output → a big gear on the solid rear axle (3 : 1). A starter motor turns
 // the flywheel (a ring gear) through its own little clutch while you hold B. The front axle hangs from a beam that
 // a motor swings to steer.
-// An inline twin four-stroke on a test stand, with everything a real one needs around it. Both pistons move
-// together (a 360° crank) and fire on alternate turns. A belt from the crank turns a water pump and an oil pump:
-// the oil pump draws motor oil from the sump tray under the crank and sprays it onto the crank and rods, and it
-// drips back; the water pump lifts water from the reservoir into a jacket over the cylinders, and the overflow
-// runs back down to the reservoir. The block is glass, so you can watch the pistons and the burning gas.
+// An inline twin four-stroke built like a real one. Two upright cylinders stand in a cast block on a crankcase,
+// with the oil pan under the crank. Round the upper part of the cylinders runs the water jacket, a sealed
+// passage inside the block: the belt-driven water pump pushes coolant from the radiator into it at the bottom
+// and it leaves at the top, back to the radiator. The belt-driven oil pump draws oil from the pan and squirts it
+// onto the crank inside the crankcase, and it drains back into the pan. The valves, injectors and spark plugs sit
+// in the heads under the red cover. Cylinder 1, part of the oil pan and a side of the water jacket are glass.
+// The same belt turns a camshaft pulley at half the crank's speed; a sensor on it tells which turn is whose power
+// stroke. With tune.turbo the exhaust drives a turbocharger that blows into the inlet valves.
 function buildI2(o, tune = {}) {
   const T = {
-    bore: 0.36, head: 2.05, flyT: 0.36, rate: 3, throttle: 0.6, valve: 3, glass: true,
-    intake: [262, 100], inj: [300, 60], spark: [268, 300], exhaust: [100, 272], flip: 100,
+    bore: 0.36, head: 2.05, flyT: 0.36, rate: 3, throttle: 0.6, valve: 3, inHead: true, turbo: false, wallT: 0.2,
+    // the spark comes just after the top of the stroke, so a slow-turning engine is not kicked backwards
+    intake: [262, 100], inj: [300, 60], spark: [280, 310], exhaust: [100, 272], flip: 100,
     ...tune,
   };
   const P = (x, y, z) => at(o, x, y, z);
-  const PE = (x, y, z) => P(x + 1, y + 0.3, z);
+  const YC = 1.3, R = ENGINE_R, ROD = ENGINE_ROD, DU = R + ROD - Math.sqrt(ROD * ROD - R * R);
+  const PE = (x, y, z) => P(x + 1, y + YC - 1, z); // engineCylinder draws its crank at (-1, 1)
   const Z = V(0, 0, 1), Y = V(0, 1, 0), X = V(1, 0, 0);
-  const steel = { color: '#4a5059', material: 'metal' }, glass = { color: '#cfe8ff', material: 'glass' };
-  const toZ = Qn().setFromUnitVectors(UP, Z), faceBack = frameQuat(V(0, 0, -1), X);
-  const YC = 1.3, R = ENGINE_R, ROD = ENGINE_ROD;
-  const ZC = [-0.45, 0.45], FLY = 1.6;
-  const frame = ex.part('block', P(1.2, 0.25, 0), { size: [7.2, 0.5, 4.6], color: '#3a3f48', material: 'wood' });
-  ex.anchor(frame, P(1.2, 0, 0));
-  // crankshaft: three main bearings, the flywheel (a ring gear for the starter), the timing disc and the belt pulley
-  const crank = ex.part('axle', P(0, YC, 0.1), { size: [0.12, 4.2, 0.12], quat: toZ });
-  for (const z of [-0.9, 0.17, 1.15]) {
-    const b = ex.part('block', P(0, 0.74, z), { size: [0.5, 0.48, 0.3], ...steel });
-    ex.glue2(b, frame, P(0.25, 0.5, z));
-    ex.mount('bearing', 'pillow', b, P(0, 0.98, z), UPQ(Z), { damping: 0.5 });
+  const iron = { color: '#5a616b', material: 'metal' }, steel = { color: '#4a5059', material: 'metal' };
+  const glass = { color: '#cfe8ff', material: 'glass' }, red = { color: '#b8312a', material: 'metal' };
+  const toZ = Qn().setFromUnitVectors(UP, Z), faceBack = frameQuat(V(0, 0, -1), X), faceFront = frameQuat(Z, X);
+  const faceLeft = frameQuat(V(-1, 0, 0), Z), faceRight = frameQuat(X, Z), faceUp = UPQ();
+  const ZC = [-0.5, 0.5], FLY = 1.72, PZ = -1.87; // cylinders, flywheel, belt plane
+  const CW = T.bore / 2 + 0.01 + T.wallT; // half the width of a cylinder, walls included
+  const box = (x0, x1, y0, y1, z0, z1, mat) => ex.part('block', P((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2), { size: [x1 - x0, y1 - y0, z1 - z0], ...mat });
+  const glueAt = (a, b, x, y, z) => ex.glue2(a, b, P(x, y, z));
+  // the base plate on the floor
+  const base = box(-1.8, 3.6, 0, 0.2, -2.8, 4.0, { color: '#3a3f48', material: 'wood' });
+  ex.anchor(base, P(0, 0, 0));
+  // ---- crankcase and oil pan: walls 12 cm thick round the inside x -0.66..0.86, z -1.26..1.26 ----
+  const X0 = -0.66, X1 = 0.86, Z1 = 1.26, TOP = YC + 1.8, PAN = 0.85, CASE = 1.95;
+  // walls that hold liquid are 20 cm thick: the gas and liquid grid is 10 cm, and thinner walls let it seep
+  const TW = 0.2, PF = 0.4;
+  const panFloor = box(X0, X1, 0.2, PF, -Z1, Z1, iron); glueAt(panFloor, base, 0, 0.2, 0);
+  const panL = box(X0 - TW, X0, 0.2, PAN, -Z1 - TW, Z1 + TW, glass); glueAt(panL, base, X0 - 0.1, 0.2, 0); // you can see the oil level
+  // the crankcase closes round the crank; above it the block stands on columns and the crossheads slide in the
+  // open, as on a big crosshead engine, so the pistons' undersides breathe the outside air
+  const caseL = box(X0 - TW, X0, PAN, CASE, -Z1 - TW, Z1 + TW, iron); glueAt(caseL, panL, X0 - 0.1, PAN, 0);
+  const caseR = box(X1, X1 + TW, 0.2, CASE, -Z1 - TW, Z1 + TW, iron); glueAt(caseR, base, X1 + 0.1, 0.2, 0);
+  // a wide slot down the middle lets the connecting rods swing through
+  const caseTop = [box(X0 - TW, -0.55, CASE - 0.1, CASE, -Z1 - TW, Z1 + TW, iron), box(0.55, X1 + TW, CASE - 0.1, CASE, -Z1 - TW, Z1 + TW, iron)];
+  glueAt(caseTop[0], caseL, X0 - 0.1, CASE - 0.1, 0); glueAt(caseTop[1], caseR, X1 + 0.1, CASE - 0.1, 0);
+  const columns = [[X0 - 0.06, -Z1 - 0.06], [X0 - 0.06, Z1 + 0.06], [X1 + 0.06, -Z1 - 0.06], [X1 + 0.06, Z1 + 0.06], [X1 + 0.06, ZC[0]], [X1 + 0.06, ZC[1]]].map(([x, z]) => {
+    const c = box(x - 0.06, x + 0.06, CASE, TOP - 0.12, z - 0.06, z + 0.06, iron);
+    glueAt(c, x < 0 ? caseTop[0] : caseTop[1], x, CASE, z);
+    return c;
+  });
+  // the end walls have a hole for the crankshaft to come through
+  const ends = [-1, 1].map((sz) => {
+    const z0 = sz < 0 ? -Z1 - TW : Z1, z1 = z0 + TW, zc = (z0 + z1) / 2;
+    const lo = box(X0, X1, 0.2, YC - 0.1, z0, z1, iron), hi = box(X0, X1, YC + 0.1, sz < 0 ? 2.8 : CASE, z0, z1, iron);
+    const l = box(X0, -0.1, YC - 0.1, YC + 0.1, z0, z1, iron), r = box(0.1, X1, YC - 0.1, YC + 0.1, z0, z1, iron);
+    glueAt(lo, base, 0, 0.2, zc); glueAt(l, lo, -0.3, YC - 0.1, zc); glueAt(r, lo, 0.3, YC - 0.1, zc); glueAt(hi, l, -0.3, YC + 0.1, zc); glueAt(hi, r, 0.3, YC + 0.1, zc);
+    glueAt(lo, caseR, X1, 0.5, zc); glueAt(hi, caseR, X1, 1.6, zc); glueAt(hi, caseL, X0, 1.6, zc);
+    return { lo, hi, outer: sz < 0 ? z0 : z1 };
+  });
+  // the crankcase top: a plate with the two bores through it
+  const deckPieces = (y0, y1, xa, xb, mat) => {
+    const zs = [[-Z1, ZC[0] - CW], [ZC[0] + CW, ZC[1] - CW], [ZC[1] + CW, Z1]];
+    const out = [box(xa, -CW, y0, y1, -Z1, Z1, mat), box(CW, xb, y0, y1, -Z1, Z1, mat)];
+    for (const [za, zb] of zs) out.push(box(-CW, CW, y0, y1, za, zb, mat));
+    for (let i = 2; i < out.length; i++) { glueAt(out[i], out[0], -CW, (y0 + y1) / 2, out[i].pos.z - o.z); glueAt(out[i], out[1], CW, (y0 + y1) / 2, out[i].pos.z - o.z); }
+    return out;
+  };
+  const top = deckPieces(TOP - 0.12, TOP, X0 - 0.12, X1 + 0.12, iron);
+  for (const c of columns) glueAt(c, c.pos.x < o.x ? top[0] : top[1], c.pos.x - o.x, TOP - 0.12, c.pos.z - o.z);
+  // ---- crankshaft: three main bearings standing in the oil, the flywheel, the timing disc and the belt pulley ----
+  const crank = ex.part('axle', P(0, YC, -0.175), { size: [0.12, 4.35, 0.12], quat: toZ });
+  for (const z of [-0.95, 0.17, 1.2]) { // between the throws, clear of the rods' pins
+    const b = box(-0.25, 0.25, PF, 0.98, z - 0.15, z + 0.15, steel);
+    glueAt(b, panFloor, 0, PF, z);
+    ex.mount('bearing', 'pillow', b, P(0, 0.98, z), UPQ(Z), { damping: 0.2 }); // oiled: they turn freely
   }
   const fly = ex.part('gear', P(0, YC, FLY), { params: { teeth: 22, module: 1 / 16 }, size: [0, T.flyT, 0], quat: toZ, color: '#8a94a6' });
   ex.glue2(fly, crank, P(0.06, YC, FLY - 0.15));
-  const disc = ex.part('cylinder', P(0, YC, -1.75), { size: [1.1, 0.08, 1.1], quat: toZ, color: '#c9a227', material: 'metal' });
-  ex.glue2(disc, crank, P(0.06, YC, -1.71));
-  const crankPulley = ex.part('pulley', P(0, YC, -1.4), { size: [0.6, 0.18, 0.6], quat: toZ });
-  ex.glue2(crankPulley, crank, P(0.06, YC, -1.4));
-  // two cylinders on one crank throw angle
-  const hold = (zc) => (p, pos) => {
-    ex.glue2(p, frame, pos);
-    if (p.type === 'plank') for (const x of [1.1, 1.75]) {
-      const hS = 1.0 - T.bore / 2 - 0.01 - 0.35;
-      const sp = ex.part('block', PE(x, 0.2 + hS / 2, zc), { size: [0.3, hS, 2 * (T.bore / 2 + 0.01) + 0.3], ...steel });
-      ex.glue2(sp, frame, PE(x + 0.15, 0.2, zc));
-      ex.glue2(sp, p, PE(x, 0.2 + hS, zc + 0.3));
+  // a heavy flywheel at the front (it also carries timing sensors): a twin fires only once a turn and needs the
+  // momentum to carry it through the compression strokes in between
+  const DZ = -2.15, DF = DZ - 0.15;
+  const disc = ex.part('cylinder', P(0, YC, DZ), { size: [1.6, 0.3, 1.6], quat: toZ, color: '#c9a227', material: 'metal' });
+  ex.glue2(disc, crank, P(0.06, YC, DZ + 0.1));
+  const crankPulley = ex.part('pulley', P(0, YC, PZ), { size: [0.6, 0.18, 0.6], quat: toZ });
+  ex.glue2(crankPulley, crank, P(0.06, YC, PZ));
+  // ---- the cylinders, upright. The crosshead rails are held by brackets from the crankcase wall. ----
+  const hold = (k) => (p, pos, sides) => {
+    if (p.type === 'block') { // the crosshead rail
+      const col = columns[4 + k];
+      const br = ex.part('block', V(o.x + 0.83, pos.y, pos.z), { size: [0.12, 0.2, 0.2], ...steel });
+      ex.glue2(br, p, pos); ex.glue2(br, col, V(o.x + X1, pos.y, pos.z));
+    } else { // the cylinder's walls sit in the crankcase top
+      ex.glue2(p, top[1], P(CW, TOP, ZC[k]));
+      if (sides) sides.forEach((sd) => ex.glue2(sd, top[2 + k + (sd.pos.z > o.z + ZC[k] ? 1 : 0)], V(o.x, o.y + TOP, sd.pos.z + Math.sign(sd.pos.z - o.z - ZC[k]) * 0.075)));
     }
   };
-  const cyls = ZC.map((zc) => {
-    const cyl = engineCylinder(PE, T, 0, 1, 0, hold(zc), zc); // both throws point straight up at the start
+  const cyls = ZC.map((zc, k) => {
+    const cyl = engineCylinder(PE, { ...T, glass: k === 0 }, Math.PI / 2, 1, DU, hold(k), zc);
+    ex.glue2(cyl.top, top[0], P(-CW, TOP, zc));
     const thr = ex.part('beam', P(0, YC + 0.15, zc), { size: [0.16, 0.5, 0.12], color: '#d4382a' });
     ex.glue2(thr, crank, P(0.06, YC, zc + 0.06));
     const pinA = ex.mount('hinge', 'axle', thr, P(0, YC + R, zc + 0.06), ZQ());
@@ -7950,102 +8523,149 @@ function buildI2(o, tune = {}) {
     const rod = ex.part('beam', mid, { size: [ROD + 0.2, 0.16, 0.12], color: '#f08a24', quat: qAxis(Z, Math.atan2(d.y, d.x)) });
     ex.glue2(rod, ex.hub(pinA), pin.clone().setZ(o.z + zc + 0.3));
     ex.glue2(rod, ex.hub(cyl.pinB), cyl.pinWorld.clone().setZ(o.z + zc + 0.3));
-    const intake = ex.mount('intake', 'pad', frame, P(4.3, 0.5, zc - 0.17), UPQ(V(-1, 0, 0)));
-    ex.pipe(intake, 'out', cyl.inlet, 'inlet');
     return cyl;
   });
-  // the starter, as on the quad: a solenoid pushes the motor's pinion into the flywheel while it cranks
-  const ear = ex.part('block', P(1.1, 0.4, 3.1), { size: [1.0, 0.2, 1.6], color: '#3a3f48', material: 'wood' });
-  ex.glue2(ear, frame, P(1.1, 0.4, 2.3));
-  const wall = ex.part('block', P(1.0, 0.85, FLY + 2.21), { size: [0.5, 0.7, 0.2], ...steel });
-  ex.glue2(wall, ear, P(1.0, 0.5, FLY + 2.21));
-  const shift = ex.mount('solenoid', 'out', wall, P(1.0, 0.85, FLY + 2.11), frameQuat(V(0, 0, -1), X), { stroke: 0.5, force: 150 });
-  const carrier = ex.part('block', P(1.0, 1.15, FLY + 1.12), { size: [0.5, 0.9, 0.2], ...steel });
-  ex.glue2(carrier, ex.hub(shift), P(1.0, 0.85, FLY + 1.12));
-  const starter = ex.mount('motor', 'axle', carrier, P(1.0, YC, FLY + 1.02), ZQ(-1), { speed: 350, strength: 2000 });
-  const sClutch = ex.mount('clutch', 'axle', ex.hub(starter), P(1.0, YC, FLY + 0.78), ZQ(-1), { torque: 800, engage: 0 });
-  const pinion = ex.part('gear', P(1.0, YC, FLY + 0.5), { params: { teeth: 10, module: 1 / 16 }, size: [0, T.flyT, 0], quat: toZ, color: '#d4382a' });
-  ex.glue2(pinion, ex.hub(sClutch), P(1.06, YC, FLY + 0.6));
-  // the belt-driven pumps, on posts behind the crank pulley
-  const pumpOn = (type, x, y, h, rate) => {
-    const post = ex.part('block', P(x, 0.5 + h / 2, -0.81), { size: [0.6, h, 0.2], ...steel });
-    ex.glue2(post, frame, P(x, 0.5, -0.81));
-    const m = ex.mount(type, 'axle', post, P(x, y, -0.91), faceBack, { rate, rpm: 200, load: 0.02 });
-    const pul = ex.part('pulley', P(x, y, -1.4), { size: [0.5, 0.18, 0.5], quat: toZ });
-    ex.glue2(pul, ex.hub(m), P(x + 0.1, y, -1.31));
+  // ---- the water jacket: a sealed passage round the top of both cylinders ----
+  const J0 = YC + 2.55, J1 = YC + 2.9, JX = CW + 0.22, JZ = ZC[1] + CW + 0.22;
+  const jFloor = deckPieces(J0 - TW, J0, -JX, JX, iron), jDeck = deckPieces(J1, J1 + TW, -JX, JX, iron);
+  const jL = box(-JX - TW, -JX, J0 - TW, J1 + TW, -JZ - TW, JZ + TW, glass); // the coolant shows through this side
+  const jR = box(JX, JX + TW, J0 - TW, J1 + TW, -JZ - TW, JZ + TW, iron);
+  const jF = box(-JX, JX, J0 - TW, J1 + TW, -JZ - TW, -JZ, glass), jB = box(-JX, JX, J0 - TW, J1 + TW, JZ, JZ + TW, iron);
+  for (const pc of [...jFloor, ...jDeck]) { glueAt(pc, jL, -JX, pc.pos.y - o.y, pc.pos.z - o.z); glueAt(pc, jR, JX, pc.pos.y - o.y, pc.pos.z - o.z); }
+  for (const w of [jF, jB]) { glueAt(w, jL, -JX, J0, w.pos.z - o.z); glueAt(w, jR, JX, J0, w.pos.z - o.z); }
+  cyls.forEach((c, k) => { ex.glue2(c.top, jFloor[0], P(-CW, J0 - 0.1, ZC[k])); ex.glue2(c.top, jDeck[0], P(-CW, J1 + 0.1, ZC[k])); });
+  // ---- the head cover over the valves, injectors and spark plugs ----
+  const CY0 = J1 + TW, CY1 = YC + 3.85;
+  const cvL = box(-0.56, -0.44, CY0, CY1, -0.95, 0.95, red), cvR = box(0.44, 0.56, CY0, CY1, -0.95, 0.95, red);
+  const cvF = box(-0.44, 0.44, CY0, CY1, -1.07, -0.95, red), cvB = box(-0.44, 0.44, CY0, CY1, 0.95, 1.07, red);
+  const lid = box(-0.56, 0.56, CY1, CY1 + 0.1, -1.07, 1.07, red);
+  for (const w of [cvL, cvR]) { glueAt(w, jDeck[w === cvL ? 0 : 1], w.pos.x - o.x, CY0, 0); glueAt(w, lid, w.pos.x - o.x, CY1, 0); }
+  for (const w of [cvF, cvB]) { glueAt(w, lid, 0, CY1, w.pos.z - o.z); glueAt(w, cvL, -0.44, (CY0 + CY1) / 2, w.pos.z - o.z); }
+  // ---- belt drive: a water pump high and an oil pump low on the front of the crankcase ----
+  const front = ends[0];
+  const pumpOn = (type, wallPart, x, y, rate) => {
+    const m = ex.mount(type, 'axle', wallPart, P(x, y, front.outer), faceBack, { rate, rpm: 200, load: 0.02 });
+    const pul = ex.part('pulley', P(x, y, PZ), { size: [0.5, 0.18, 0.5], quat: toZ });
+    ex.glue2(pul, ex.hub(m), P(x + 0.1, y, PZ + 0.09));
     return { m, pul };
   };
-  const water = pumpOn('mpump', -1.7, 1.9, 1.7, 8), oil = pumpOn('moilpump', -0.9, 0.85, 0.7, 3);
-  createBelt({ parts: [crankPulley.id, water.pul.id, oil.pul.id], width: 0.1, grip: 600 });
-  // the oil sump: a glass tray round the crank. The oil pump draws from it and sprays the crank, and it drips back.
-  const box = (cx, cz, sx, sz, y0, h, mat = glass) => {
-    for (const [x, z, w, d] of [[cx - sx / 2, cz, 0.12, sz + 0.12], [cx + sx / 2, cz, 0.12, sz + 0.12], [cx, cz - sz / 2, sx, 0.12], [cx, cz + sz / 2, sx, 0.12]]) { // walls a grid cell thick, so nothing seeps through
-      const pl = ex.part('block', P(x, y0 + h / 2, z), { size: [w, h, d], ...mat });
-      ex.glue2(pl, frame, P(x, 0.5, z));
-    }
-  };
-  box(0.075, 0.1, 1.05, 2.5, 0.5, 0.36);
-  const sump = ex.mount('inlet', 'wall', frame, P(0.3, 0.5, -0.5), UPQ());
+  const water = pumpOn('mpump', front.hi, -0.3, 2.45, 4), oil = pumpOn('moilpump', front.lo, 0.5, 0.6, 3);
+  // the camshaft pulley, twice the crank's size, turns once every two turns of the crank: a sensor on it tells
+  // the engine which turn is the power stroke's, and it never loses count, even when the crank rocks back
+  const camPost = box(1.38, 1.62, 0.2, 1.95, -1.74, -1.5, steel); glueAt(camPost, base, 1.5, 0.2, -1.62);
+  const camHinge = ex.mount('hinge', 'axle', camPost, P(1.5, 1.8, -1.74), faceBack);
+  const camD = 1.2 - 1.2 * pulleyGroove([0.6, 0.18]); // the belt rides in the grooves: this makes it exactly 2 : 1
+  const cam = ex.part('pulley', P(1.5, 1.8, PZ), { size: [camD, 0.18, camD], quat: toZ });
+  ex.glue2(cam, ex.hub(camHinge), P(1.6, 1.8, PZ + 0.09));
+  createBelt({ parts: [crankPulley.id, water.pul.id, cam.id, oil.pul.id], width: 0.1, grip: 600 });
+  // the oil filler: a tap on the floor of the pan that fills it once when you press Play (and again after a reset)
+  ex.mount('outlet', 'wall', panFloor, P(0.65, PF, -0.4), faceUp, { tap: 'oil', fill: T.oil ?? 330 });
+  // oil: from the pan, through the pump, squirted onto the crank; it drains back
+  const sump = ex.mount('inlet', 'wall', panL, P(X0 - TW, PF + 0.05, 0.6), faceLeft);
   ex.pipe(sump, 'pipe', oil.m, 'in');
-  const post = ex.part('block', P(-0.62, 1.25, 0), { size: [0.12, 1.5, 0.12], ...steel });
-  ex.glue2(post, frame, P(-0.62, 0.5, 0));
-  const bar = ex.part('block', P(-0.25, 2.05, 0), { size: [0.85, 0.1, 0.2], ...steel });
-  ex.glue2(bar, post, P(-0.62, 2.0, 0));
-  const spray = ex.mount('sprayer', 'wall', bar, P(0.05, 2.0, 0), UPQ(V(0, -1, 0)), { spread: 30, speed: 3 });
-  ex.pipe(oil.m, 'out', spray, 'in');
-  // cooling water: reservoir → pump → jacket over the cylinders → overflow back to the reservoir
-  box(-1.8, 1.3, 0.9, 1.1, 0.5, 0.9);
-  const draw = ex.mount('inlet', 'wall', frame, P(-1.8, 0.5, 1.3), UPQ());
-  ex.pipe(draw, 'pipe', water.m, 'in');
-  const floor = ex.part('block', P(2.3, 1.7, 0), { size: [0.9, 0.12, 1.7], ...glass });
-  for (const c of cyls) ex.glue2(floor, c.top, P(2.3, 1.64, ZC[cyls.indexOf(c)]));
-  for (const [x, z, w, d] of [[1.85, 0, 0.12, 1.82], [2.75, 0, 0.12, 1.82], [2.3, -0.85, 0.9, 0.12], [2.3, 0.85, 0.9, 0.12]]) {
-    const pl = ex.part('block', P(x, 1.91, z), { size: [w, 0.3, d], ...glass });
-    ex.glue2(pl, floor, P(x, 1.76, z));
+  const squirt = ex.mount('sprayer', 'wall', caseL, P(X0, 1.45, 0.17), faceRight, { spread: 25, speed: 3 }); // an oil jet onto the crank
+  ex.pipe(oil.m, 'out', squirt, 'in');
+  // coolant: radiator → pump → bottom of the jacket … top of the jacket → radiator
+  // the radiator stands higher than the jacket (its top is the header tank), so the jacket stays full
+  const RX0 = 1.7, RX1 = 2.3, RZ0 = -0.4, RZ1 = 0.4, RB = 3.2, RY = 4.9;
+  const stand = box(RX0 - TW, RX1 + TW, RB - 0.2, RB, RZ0 - TW, RZ1 + TW, steel);
+  for (const [lx, lz] of [[RX0 - 0.1, RZ0 - 0.1], [RX0 - 0.1, RZ1 + 0.1], [RX1 + 0.1, RZ0 - 0.1], [RX1 + 0.1, RZ1 + 0.1]]) {
+    const leg = box(lx - 0.08, lx + 0.08, 0.2, RB - 0.2, lz - 0.08, lz + 0.08, steel);
+    glueAt(leg, base, lx, 0.2, lz); glueAt(leg, stand, lx, RB - 0.2, lz);
   }
-  const feed = ex.mount('outlet', 'wall', floor, P(2.1, 1.85, 0.91), frameQuat(Z, X)); // on the outside of the jacket wall: it pours in
+  const rad = [box(RX0 - TW, RX0, RB, RY, RZ0 - TW, RZ1 + TW, iron), box(RX1, RX1 + TW, RB, RY, RZ0 - TW, RZ1 + TW, iron),
+    box(RX0, RX1, RB, RY, RZ0 - TW, RZ0, iron), box(RX0, RX1, RB, RY, RZ1, RZ1 + TW, glass)];
+  for (const w of rad) glueAt(w, stand, w.pos.x - o.x, RB, w.pos.z - o.z);
+  for (let i = 0; i < 6; i++) { const fin = box(RX1 + TW, RX1 + TW + 0.25, RB + 0.2 + i * 0.25, RB + 0.24 + i * 0.25, RZ0, RZ1, steel); glueAt(fin, rad[1], RX1 + TW, RB + 0.22 + i * 0.25, 0); }
+  const draw = ex.mount('inlet', 'wall', rad[0], P(RX0 - TW, RB + 0.1, 0), faceLeft);
+  ex.pipe(draw, 'pipe', water.m, 'in');
+  const feed = ex.mount('outlet', 'wall', jL, P(-JX - TW, J0 + 0.1, -0.6), faceLeft, { size: 3 });
   ex.pipe(water.m, 'out', feed, 'pipe');
-  const over = ex.mount('inlet', 'wall', floor, P(2.3, 1.83, -0.91), faceBack, { size: 4 });
-  const back = ex.mount('outlet', 'wall', frame, P(-1.8, 1.25, 0.69), faceBack, { size: 4 });
-  ex.pipe(over, 'pipe', back, 'pipe');
-  // the dashboard: start button and throttle
-  const dash = ex.part('block', P(3.9, 0.6, 1.9), { size: [0.7, 0.2, 0.6], color: '#2b3038', material: 'metal' });
-  ex.glue2(dash, frame, P(3.9, 0.5, 1.9));
-  const throttle = ex.mount('lever', 'stay', dash, P(3.72, 0.7, 1.75), UPQ(Z), { keyUp: 'i', keyDown: 'k', min: 0 });
+  const back = ex.mount('inlet', 'wall', jR, P(JX + TW, J1 - 0.1, 0.6), faceRight, { size: 4 });
+  const ret = ex.mount('outlet', 'wall', rad[2], P((RX0 + RX1) / 2, RY - 0.3, RZ0 - TW), faceBack, { size: 4 });
+  ex.pipe(back, 'pipe', ret, 'pipe');
+  // ---- air in, exhaust out ----
+  const intakes = [];
+  if (T.turbo) {
+    const stand = box(-1.75, -1.15, 0.2, 2.6, -0.6, 0.6, steel); glueAt(stand, base, -1.45, 0.2, 0);
+    const turbo = ex.mount('exhturbo', 'pad', stand, P(-1.45, 2.6, 0), faceUp, { gain: 1, wastegate: 1 });
+    cyls.forEach((c, k) => { ex.pipe(c.outlet, 'inlet', turbo, 'ex' + (k + 1)); ex.pipe(c.inlet, 'inlet', turbo, 'out' + (k + 1)); });
+  } else {
+    // the exhaust valves blow into a pipe along the side, open at both ends
+    // (a wide bore: a narrow one chokes the engine with its own exhaust)
+    const post = box(-1.4, -1.2, 0.2, J1 - 0.4, -0.1, 0.1, steel); glueAt(post, base, -1.3, 0.2, 0);
+    const pipe = ex.part('cylinder', P(-1.3, J1, 0), { size: [0.8, 2.6, 0.8], quat: toZ, params: { form: 'tube', wall: 0.15 }, ...steel });
+    glueAt(pipe, post, -1.3, J1 - 0.4, 0);
+    cyls.forEach((c, k) => {
+      // the exhaust valves breathe straight out (a pipe on a valve chokes it), and their smoke leaves the pipe's ends
+      c.outlet.ventAt = () => { const q = partNow(pipe); return V(0, (k ? 1 : -1) * 1.35, 0).applyQuaternion(q.quat).add(q.pos); };
+      const intake = ex.mount('intake', 'pad', lid, P(0.25, CY1 + 0.1, ZC[k]), faceUp); // the air filter sits on the head cover, right over the inlet valve
+      ex.pipe(intake, 'out', c.inlet, 'inlet');
+      intakes.push(intake);
+    });
+  }
+  // ---- the starter: a motor on a sled that a solenoid pushes sideways, bringing its pinion into the ring gear ----
+  // (pushed in from the side rather than along the shaft, the pinion comes out cleanly when it lets go)
+  const SX = 0.25; // how far the pinion stands off when it is out of mesh
+  const wall = box(2.9, 3.1, 0.2, YC + 0.4, FLY + 0.42, FLY + 0.82, steel); glueAt(wall, base, 3.0, 0.2, FLY + 0.62);
+  const shift = ex.mount('solenoid', 'out', wall, P(2.9, YC, FLY + 0.62), frameQuat(V(-1, 0, 0), Z), { stroke: SX, force: 150 });
+  const carrier = box(1.0 + SX, 1.92, YC - 0.25, YC + 0.25, FLY + 0.52, FLY + 0.72, steel);
+  ex.glue2(carrier, ex.hub(shift), P(1.9, YC, FLY + 0.62));
+  const starter = ex.mount('motor', 'axle', carrier, P(1.0 + SX, YC, FLY + 0.52), ZQ(-1), { speed: 350, strength: 2000 });
+  const sClutch = ex.mount('clutch', 'axle', ex.hub(starter), P(1.0 + SX, YC, FLY + 0.28), ZQ(-1), { torque: 800, engage: 0, oneWay: true });
+  const pinion = ex.part('gear', P(1.0 + SX, YC, FLY), { params: { teeth: 10, module: 1 / 16 }, size: [0, T.flyT, 0], quat: toZ, color: '#d4382a' });
+  ex.glue2(pinion, ex.hub(sClutch), P(1.06 + SX, YC, FLY + 0.1));
+  // ---- controls ----
+  const dash = box(2.7, 3.4, 0.2, 0.4, 1.5, 2.1, { color: '#2b3038', material: 'metal' }); glueAt(dash, base, 3.05, 0.2, 1.8);
+  const throttle = ex.mount('lever', 'stay', dash, P(2.88, 0.4, 1.8), UPQ(Z), { keyUp: 'i', keyDown: 'k', min: 0 });
   throttle.st.value = T.throttle;
-  const startBtn = ex.mount('button', 'push', dash, P(4.08, 0.7, 1.75), UPQ(), { key: 'b' });
-  ex.wire(startBtn, 'on', starter, 'enable');
-  ex.wire(startBtn, 'on', shift, 'extend');
-  ex.wire(startBtn, 'on', sClutch, 'engage');
-  // timing: the same windows for both cylinders (the throws are in line); their toggles start opposite, so
-  // one fires on the first turn and the other on the second
-  const ring = (k, r, off = 0) => [r * Math.sin((k * 72 + off) * DEG), r * Math.cos((k * 72 + off) * DEG)];
+  for (const it of intakes) ex.wire(throttle, 'value', it, 'throttle'); // a throttle body: the lever lets in air and fuel together
+  const startBtn = ex.mount('button', 'push', dash, P(3.22, 0.4, 1.8), faceUp, { key: 'b' });
+  // the motor's power follows the solenoid: it turns the pinion slowly while the solenoid pushes it into the ring
+  // gear, so its teeth find the gaps, gets full power once the pinion is all the way in mesh, and keeps driving it
+  // until it is back out (a pinion left to rattle in the ring gear as it pulls out would jam it)
+  ex.wire(startBtn, 'on', shift, 'extend'); ex.wire(shift, 'pos', starter, 'throttle'); ex.wire(shift, 'pos', sClutch, 'engage');
+  // ---- timing: both throws point up (a 360° twin). The windows are the flat cylinder's, 90° later, as on the
+  // V-twin's upright cylinder; the toggles start opposite so the two fire on alternate turns ----
+  const SH = T.shift ?? 90, later = (w) => [(w[0] + SH + 360) % 360, (w[1] + SH + 360) % 360];
+  const ring = (k, r) => [r * Math.sin(k * 72 * DEG), r * Math.cos(k * 72 * DEG)];
   const onFly = (k, w) => { const [dz, dy] = ring(k, 0.42); return ex.mount('angle', 'dial', fly, P(dz, YC + dy, FLY + T.flyT / 2), frameQuat(Z, Y), { from: w[0], to: w[1] }); };
   const back2 = (w) => [(360 - w[1]) % 360, (360 - w[0]) % 360];
-  const onDisc = (k, w) => { const [dz, dy] = ring(k, 0.35); const b = back2(w); return ex.mount('angle', 'dial', disc, P(dz, YC + dy, -1.79), frameQuat(V(0, 0, -1), Y), { from: b[0], to: b[1] }); };
-  const rows = [(i) => P(1.9 + i * 0.42, 0.5, -1.7), (i) => P(1.9 + i * 0.42, 0.5, -2.1)];
-  const sensors = [onFly, onDisc], startOn = [false, true];
+  const onDisc = (k, w) => { const [dz, dy] = ring(k, 0.35); const b = back2(w); return ex.mount('angle', 'dial', disc, P(dz, YC + dy, DF), frameQuat(V(0, 0, -1), Y), { from: b[0], to: b[1] }); };
+  const rows = [(i) => P(1.4 + i * 0.4, 0.2, -2.0), (i) => P(1.4 + i * 0.4, 0.2, -2.45)];
+  const sensors = [onFly, onDisc];
+  // the cam sensor is on for the half of the cam's turn (one whole crank turn) that is cylinder 0's compression
+  // and power; cylinder 1 has the other turn. It reads backwards (it faces the front) and at half the speed.
+  const c0 = (((360 - (T.flip + SH) / 2) % 360) + 360) % 360;
+  const camSense = ex.mount('angle', 'dial', cam, P(1.5, 2.2, PZ - 0.09), frameQuat(V(0, 0, -1), Y), { from: c0, to: (c0 + 180) % 360 });
+  const camOther = ex.mount('logic', 'not', base, P(1.0, 0.2, -2.45), faceUp);
+  ex.wire(camSense, 'window', camOther, 'a');
+  // a rev limiter, as every engine computer has: over its limit the injectors get no fuel
+  const [lz, ly] = [0.62 * Math.sin(36 * DEG), 0.62 * Math.cos(36 * DEG)];
+  const tach = ex.mount('angle', 'dial', fly, P(lz, YC + ly, FLY + T.flyT / 2), frameQuat(Z, Y), { from: 0, to: 10 });
+  const over = ex.mount('logic', 'threshold', base, P(0.6, 0.2, -2.45), faceUp, { value: T.limit ?? 380 });
+  const fuelOk = ex.mount('logic', 'not', base, P(0.2, 0.2, -2.45), faceUp);
+  ex.wire(tach, 'rpm', over, 'a'); ex.wire(over, 'out', fuelOk, 'a');
   cyls.forEach((cyl, k) => {
     const sense = sensors[k], row = rows[k];
-    const sIn = sense(0, T.intake), sInj = sense(1, T.inj), sSpk = sense(2, T.spark), sExh = sense(3, T.exhaust);
-    const sFlip = sense(4, [T.flip, T.flip + 40]);
-    const turn = ex.mount('logic', 'toggle', frame, row(0), UPQ());
-    turn.st.q = startOn[k];
-    const breathe = ex.mount('logic', 'not', frame, row(1), UPQ());
-    const g = [2, 3, 4, 5].map((i) => ex.mount('gate', 'and', frame, row(i), UPQ()));
-    ex.wire(sFlip, 'window', turn, 'a');
-    ex.wire(turn, 'out', breathe, 'a');
+    const sIn = sense(0, later(T.intake)), sInj = sense(1, later(T.inj)), sSpk = sense(2, later(T.spark)), sExh = sense(3, later(T.exhaust));
+    const turn = k === 0 ? { m: camSense, out: 'window' } : { m: camOther, out: 'out' };
+    const breathe = ex.mount('logic', 'not', base, row(1), faceUp);
+    const g = [2, 3, 4, 5].map((i) => ex.mount('gate', 'and', base, row(i), faceUp));
+    ex.wire(turn.m, turn.out, breathe, 'a');
     ex.wire(sIn, 'window', g[0], 'a'); ex.wire(breathe, 'out', g[0], 'b'); ex.wire(g[0], 'out', cyl.inlet, 'trigger');
-    ex.wire(sInj, 'window', g[1], 'a'); ex.wire(breathe, 'out', g[1], 'b'); ex.wire(g[1], 'out', cyl.inj, 'inject');
     ex.wire(sExh, 'window', g[2], 'a'); ex.wire(breathe, 'out', g[2], 'b'); ex.wire(g[2], 'out', cyl.outlet, 'trigger');
-    ex.wire(sSpk, 'window', g[3], 'a'); ex.wire(turn, 'out', g[3], 'b'); ex.wire(g[3], 'out', cyl.ign, 'spark');
+    ex.wire(sSpk, 'window', g[3], 'a'); ex.wire(turn.m, turn.out, g[3], 'b'); ex.wire(g[3], 'out', cyl.ign, 'spark');
     ex.wire(throttle, 'value', cyl.inj, 'rate');
+    const inject = ex.mount('gate', 'and', base, row(-1), faceUp);
+    ex.wire(sInj, 'window', g[1], 'a'); ex.wire(breathe, 'out', g[1], 'b'); ex.wire(g[1], 'out', inject, 'a'); ex.wire(fuelOk, 'out', inject, 'b');
+    ex.wire(inject, 'out', cyl.inj, 'inject');
   });
   return {
     crank, water: water.m, oil: oil.m,
     fill: [
-      { kind: 'oil', min: P(-0.39, 0.5, -1.09), max: P(0.54, 0.62, 1.29) },
-      { kind: 'water', min: P(-2.19, 0.5, 0.81), max: P(-1.41, 0.95, 1.79) },
+      { kind: 'water', min: P(-JX, J0, -JZ), max: P(JX, J1, JZ), skip: ZC.map((z) => [P(-CW, 0, z - CW), P(CW, 9, z + CW)]) }, // not inside the cylinders!
+      { kind: 'water', min: P(RX0, RB, RZ0), max: P(RX1, RB + 0.9, RZ1) },
     ],
   };
 }
@@ -8212,7 +8832,8 @@ const EXAMPLES = [
   { name: 'Turbo two-stroke', desc: 'A crank-driven turbo blows air in through the head and flushes the exhaust out of a port in the floor', build(tune) { return buildEngine(V(), { kind: 'port', gain: 3, ...tune }); }, spin: 9, cam: [V(0.45, 0.8, 0.3), 7.5, 0.55, 0.42], note: 'Near the bottom of each stroke the piston uncovers a port in the floor; the turbo (spun by the crank) blows fresh air in through the head and the exhaust out of the port into the muffler box underneath. Throttle with I / K.' },
   { name: 'V2 four-stroke (V-twin)', desc: 'A 90° motorcycle twin: one cylinder flat, one upright, both rods on one crank pin, firing 270° and 450° apart', build(tune) { return buildVTwin(V(), tune); }, spin: 11, cam: [V(0.2, 1.9, 0), 11, 0.75, 0.32], note: 'Like a motorcycle L-twin: the flat and the upright cylinder share one crank pin and fire 270° then 450° apart, which gives the lumpy V-twin beat. The flat cylinder is timed from sensors on the flywheel, the upright one from the gold timing disc. Throttle with I / K, Logic view (L) shows the wiring.' },
   { name: 'Quad with an inline-3', desc: 'A four-wheeler: three-cylinder four-stroke, clutch, five-speed gearbox, final drive and a starter', build(tune) { return buildQuad(V(-1.5, 0, 0.6), tune); }, cam: [V(0.5, 1.4, 0.2), 15, 0.75, 0.42], paused: false, note: 'Hold B to crank the engine until it fires. Press U for first gear (J shifts down; R is below N), then I / K for the throttle. Hold H to press the clutch, N / M to steer.' },
-  { name: 'Inline twin with pumps', desc: 'A see-through two-cylinder four-stroke with a belt-driven oil pump and water pump', build(tune) { return buildI2(V(-1.2, 0, 0), tune); }, cam: [V(0, 1.3, 0), 11, 0.9, 0.45], paused: false, note: 'Hold B to crank it until it fires, I / K for the throttle. The belt turns the oil pump (it sprays the crank from the sump) and the water pump (reservoir → jacket → back).' },
+  { name: 'Inline twin', desc: 'A two-cylinder four-stroke built like a real one: block, water jacket, head cover, oil pan and belt-driven pumps', build(tune) { return buildI2(V(-0.6, 0, -0.4), tune); }, cam: [V(0, 2.4, 0), 12, 0.75, 0.32], paused: false, note: 'Hold B to crank it until it runs (a freewheel lets the starter go as the engine outruns it), I / K for the throttle. The belt turns the water pump (radiator → water jacket in the block → radiator), the oil pump (oil pan → squirter on the crank → back to the pan) and the camshaft pulley, whose sensor times the four strokes.' },
+  { name: 'Inline twin turbo', desc: 'The inline twin with an exhaust-driven turbocharger', build(tune) { return buildI2(V(-0.6, 0, -0.4), { turbo: true, rate: 4.5, ...tune }); }, cam: [V(-0.5, 2.6, 0), 12, -0.9, 0.3], paused: false, note: 'Hold B to crank it until it fires, then open the throttle (I) and watch the turbo spool up: its boost builds a moment after the engine speeds up.' },
   { name: 'Turbo four-stroke single', desc: 'One cylinder: intake, compression, power, exhaust over two turns, with timed valves, a turn-counting toggle and a turbo', build(tune) { return buildEngine(V(), { kind: 'four', ...tune }); }, spin: 11, cam: [V(0.7, 0.8, 0.45), 8.5, 0.6, 0.42], note: 'A Toggle on the bottom row flips just after bottom dead centre every turn, so the valves, fuel and spark know which of the two turns they are in. Turn A: exhaust, then intake with fuel. Turn B: compression, spark just after the top, power. Throttle with I / K, Logic view (L) shows the wiring.' },
   { name: 'Fluids lab', desc: 'A tap, two tanks and a pump; a block that floats; an oil sprayer that makes a block slide', build() { buildFluids(V()); }, cam: [V(0.3, 0.6, -0.9), 8.5, 0.5, 0.45], note: 'B turns the water tap on and off; I / K set the pump speed. Hold N to spray oil on the ramp: once the yellow block is oiled it slides.' },
   { name: 'Air lift', desc: 'A turbo pumps air through a valve under a piston', build() { buildAirLift(V()); }, cam: [V(0.6, 1.1, 0.5), 8, 0.7, 0.3], note: 'Hold I to open the intake valve and lift the piston with turbo air; K closes it. U opens the vent to let it down, J closes it.' },
@@ -8234,7 +8855,7 @@ function loadExample(exDef, first = false) {
   simTime = 0;
   const extra = exDef.build();
   for (const p of S.parts.values()) { p.linvel.set(0, 0, 0); p.angvel.set(0, 0, 0); }
-  if (extra?.fill) { ensureGasHash(true); for (const f of extra.fill) liqFillBox(f.min, f.max, f.kind); }
+  if (extra?.fill) { ensureGasHash(true); for (const f of extra.fill) liqFillBox(f.min, f.max, f.kind, f.skip); }
   if (extra?.spin && exDef.spin) {
     // A starter's worth of spin around the crankshaft
     for (const p of extra.spin) { p.angvel.set(0, 0, exDef.spin); p.linvel.copy(p.angvel).cross(p.pos.clone().sub(extra.centre)); }
@@ -8289,7 +8910,13 @@ function frame(now) {
   updateHud();
   liveTimer += dt;
   if (liveTimer > 0.15) { liveTimer = 0; inspectorLive(); }
+  // glue and nodes are drawn in batches that copy where each one is, so the world's matrices are updated first
+  scene.updateMatrixWorld();
+  updateGlueBatch();
+  updateNodeBatch();
+  scene.matrixWorldAutoUpdate = false;
   renderer.render(scene, camera);
+  scene.matrixWorldAutoUpdate = true;
   renderGas();
 }
 
@@ -8317,7 +8944,7 @@ if (new URLSearchParams(location.search).has('debug')) {
     rebuild() { needsRebuild = true; ensureWorld(); },
     glueTargets: (p, r) => { ensureWorld(); return glueTargets(p, r); },
     pressButton,
-    meshError, createBelt, ex, oilPart, gasLinks, liqLinks, nozzleNow, gasInject, gasSpark, gasCellAt, V, renderer, scene, physicsStep, gasStep, updateGasVisual,
+    meshError, createBelt, containerAt, markEdited, ex, oilPart, gasLinks, liqLinks, nozzleNow, gasInject, gasSpark, gasCellAt, V, renderer, scene, physicsStep, gasStep, updateGasVisual,
     setSelection, selectedList, selectAll, boxSelect, copySelection, pasteClipboard, duplicateSelection, deleteItems, undo, redo,
     get clipboard() { return clipboard; }, get selection() { return selection; }, get multi() { return multi; },
   };
