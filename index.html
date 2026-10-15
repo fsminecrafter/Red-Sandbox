@@ -103,14 +103,20 @@ body {
 @media (max-width: 760px) { #career-hud .opt { display: none; } }
 #career-panel {
   position: fixed; z-index: 30; left: 50%; transform: translateX(-50%);
-  top: calc(112px + env(safe-area-inset-top, 0px)); width: min(400px, calc(100vw - 20px));
-  max-height: calc(100vh - 190px); overflow-y: auto; padding: 12px 14px 14px; font-size: 13px;
+  top: calc(112px + env(safe-area-inset-top, 0px)); width: min(460px, calc(100vw - 20px));
+  max-height: calc(100vh - 190px); padding: 0; font-size: 13px;
 }
-#career-panel h3 { margin: 0; font: 600 18px var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; }
-#career-panel .ph { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
-#career-panel .x { border: 0; background: transparent; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 6px; }
-#career-panel .x:hover { background: var(--chip-strong); }
-#career-panel .tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+#career-panel > .pbody { padding: 10px 14px 14px; }
+#career-panel > .phead .pt { color: var(--fg); font-size: 14px; letter-spacing: 0.08em; }
+#career-panel.full {
+  left: calc(10px + env(safe-area-inset-left, 0px)); right: calc(10px + env(safe-area-inset-right, 0px));
+  top: calc(64px + env(safe-area-inset-top, 0px)); bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  width: auto !important; height: auto !important; max-height: none; transform: none; z-index: 35;
+}
+#career-panel.full > .pgrip { display: none; }
+#career-panel.full { background: var(--surface-solid); }
+#career-panel h3 { margin: 0 0 6px; font: 600 16px var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; }
+#career-panel .tabs { display: flex; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
 #career-panel .tabs button { flex: 1; border: 0; background: var(--chip); border-radius: 8px; padding: 6px; font-weight: 600; }
 #career-panel .tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); }
 #career-panel .row { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--line); }
@@ -124,8 +130,71 @@ body {
 #career-panel .qty .cbtn { padding: 2px 8px; }
 #career-panel .seg { display: flex; gap: 4px; margin: 6px 0; }
 #career-panel .seg button { flex: 1; border: 1px solid var(--line); background: var(--chip); border-radius: 8px; padding: 5px 4px; font-size: 12px; }
-#career-panel .seg button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
-#career-panel .tot { display: flex; justify-content: space-between; font-weight: 600; margin: 8px 0; }
+#career-panel .seg button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+#career-panel .tot { display: flex; justify-content: space-between; font-weight: 600; margin: 8px 0; font-size: 15px; }
+#career-panel .trow { display: flex; justify-content: space-between; color: var(--muted); padding: 2px 0; }
+#career-panel .short { color: var(--accent); font-weight: 600; }
+#career-panel .neg, #career-hud .neg { color: var(--accent); }
+#career-panel .btn-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; margin-top: 8px; }
+#career-panel p { margin: 6px 0; line-height: 1.45; }
+#career-panel .cfoot { margin-top: 14px; text-align: right; }
+#career-panel .cintro .btn-row { justify-content: flex-start; }
+#career-panel .csave { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; margin: 10px 0; border: 1px solid var(--line); border-radius: 10px; background: var(--chip); }
+.pbar { height: 7px; border-radius: 4px; background: var(--chip-strong); overflow: hidden; margin: 4px 0; }
+.pbar i { display: block; height: 100%; width: 0; background: var(--ok); transition: width 0.2s; }
+.pbar.low i { background: var(--accent); }
+/* stats: sections side by side when there is room */
+.cgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 4px 22px; }
+.cgrid .wide { grid-column: 1 / -1; }
+#career-panel .cgrid canvas { height: 140px; }
+/* challenges */
+.chal-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; }
+.chal { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--chip); display: flex; flex-direction: column; }
+.chal .btn-row { margin-top: auto !important; padding-top: 8px; }
+.chal.done { opacity: 0.75; }
+.chal.active { border-color: var(--accent); background: var(--accent-soft); }
+.chead { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 14px; }
+/* upkeep */
+.wrow { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.wrow .wname { display: flex; justify-content: space-between; gap: 8px; }
+.wrow .pbar { grid-column: 1; }
+.wrow .cbtn { grid-row: 1 / span 2; grid-column: 2; }
+/* the store: categories, the items, and the cart */
+.store { display: grid; grid-template-columns: 170px minmax(0, 1fr) 320px; gap: 14px; height: calc(100% - 44px); min-height: 0; }
+.store-cats { display: flex; flex-direction: column; gap: 4px; }
+.store-cats button { text-align: left; border: 0; background: transparent; border-radius: 8px; padding: 8px 10px; font-weight: 600; }
+.store-cats button:hover { background: var(--chip-strong); }
+.store-cats button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+.store-cats input { margin-top: 8px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-solid); width: 100%; min-width: 0; }
+.store-items { overflow-y: auto; min-height: 0; padding-right: 4px; scrollbar-width: thin; }
+.store-items section + section { margin-top: 14px; }
+.store-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 8px; }
+.scard { display: grid; grid-template-columns: 38px 1fr; grid-template-rows: 1fr auto; gap: 4px 10px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--chip); }
+.scard.incart { border-color: var(--accent); }
+.scard .sicon { width: 38px; height: 38px; border-radius: 9px; background: var(--chip-strong); display: flex; align-items: center; justify-content: center; grid-row: 1 / span 2; }
+.scard .sicon svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.scard .sname { font-weight: 600; font-size: 14px; }
+.scard .sprice { font: 600 13px var(--font-mono); color: var(--accent); }
+.scard p { margin: 3px 0 !important; font-size: 12px; color: var(--muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.scard .sctl { display: flex; justify-content: flex-end; align-items: center; }
+.scard .meter { font-style: italic; }
+.store-cart { border-left: 1px solid var(--line); padding-left: 14px; overflow-y: auto; min-height: 0; scrollbar-width: thin; }
+.store-cart .cline { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.store-cart .cname { display: flex; flex-direction: column; min-width: 0; }
+.store-cart .qty b { min-width: 64px; text-align: right; font-family: var(--font-mono); }
+.store-cart .seg.ship button { line-height: 1.25; }
+.scard .qty b { min-width: 22px; text-align: center; }
+@media (max-width: 900px) {
+  .store { grid-template-columns: 1fr; height: auto; }
+  .store-cats { flex-direction: row; flex-wrap: wrap; }
+  .store-cats input { margin-top: 0; flex: 1 1 140px; }
+  .store-items, .store-cart { overflow: visible; }
+  .store-cart { border-left: 0; padding-left: 0; border-top: 1px solid var(--line); padding-top: 10px; }
+}
+/* build menu: how many of each part you have left (career) */
+.tool .cnt { position: absolute; top: 3px; left: 4px; min-width: 15px; height: 15px; padding: 0 4px; border-radius: 8px; background: var(--accent); color: var(--accent-fg); font: 600 9.5px/15px var(--font-mono); }
+.rail-note { font-size: 11.5px; color: var(--muted); margin: 10px 2px 2px; line-height: 1.35; }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--accent); font-weight: 600; text-decoration: underline; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -219,6 +288,12 @@ button { cursor: pointer; }
 .menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 2px; }
 .settings-menu { padding: 14px; gap: 14px; min-width: 270px; }
 .settings-menu .seg button { flex: 1; }
+.wasm-sec { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+.wasm-sum { font-weight: 600; font-size: 13px; }
+.wasm-sum.ok { color: var(--ok); } .wasm-sum.warn { color: var(--warn); } .wasm-sum.bad { color: var(--accent); }
+.wasm-row { display: flex; flex-direction: column; gap: 2px; }
+.wasm-row small { color: var(--muted); font-size: 12px; line-height: 1.35; max-width: 300px; }
+.wasm-name { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 13px; }
 .menu button:disabled { opacity: 0.45; cursor: default; background: transparent; }
 #marquee {
   position: fixed; z-index: 11; pointer-events: none;
@@ -232,13 +307,11 @@ button { cursor: pointer; }
   left: calc(10px + env(safe-area-inset-left, 0px));
   max-height: calc(100% - 76px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
   width: 182px;
-  padding: 8px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  padding: 0;
   z-index: 10;
-  scrollbar-width: thin;
 }
-.rail-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; }
+#rail > .pbody { padding: 8px; }
+.rail-group { display: grid; grid-template-columns: repeat(auto-fill, minmax(52px, 1fr)); gap: 3px; }
 .rail-label {
   font-family: var(--font-display); font-weight: 600; font-size: 11.5px;
   letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
@@ -271,9 +344,7 @@ button { cursor: pointer; }
   right: calc(10px + env(safe-area-inset-right, 0px));
   width: 284px;
   max-height: calc(100% - 170px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
-  overflow-y: auto;
   z-index: 10;
-  scrollbar-width: thin;
 }
 .insp-head { padding: 14px 16px 10px; border-bottom: 1px solid var(--line); }
 .insp-eyebrow { font-family: var(--font-display); font-weight: 600; font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); }
@@ -323,7 +394,6 @@ kbd {
   font: 500 11px var(--font-mono); padding: 1px 5px; border-radius: 4px;
   border: 1px solid var(--line); background: var(--chip); color: var(--fg); white-space: nowrap;
 }
-.insp-world { border-top: 1px solid var(--line); }
 .list { display: flex; flex-direction: column; gap: 4px; font-size: 13px; }
 .list > div { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
 .list span:last-child { color: var(--muted); font-family: var(--font-mono); font-size: 12px; text-align: right; }
@@ -420,6 +490,41 @@ kbd {
 
 #btn-inspector { display: none; }
 
+/* ---------- Panels: every panel can be resized (drag its edge) and retracted (the − in its header) ---------- */
+.rpanel { display: flex; flex-direction: column; overflow: hidden !important; }
+.rpanel > .pbody { overflow-y: auto; overflow-x: hidden; flex: 1 1 auto; min-height: 0; scrollbar-width: thin; }
+.phead {
+  display: flex; align-items: center; gap: 4px; flex: none; padding: 3px 4px 3px 10px; min-height: 30px;
+  font: 600 11.5px var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+  border-bottom: 1px solid var(--line);
+}
+.phead .pt { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.phead button {
+  border: 0; background: transparent; border-radius: 6px; width: 24px; height: 24px; padding: 0; flex: none;
+  display: inline-flex; align-items: center; justify-content: center; color: var(--muted);
+}
+.phead button:hover { background: var(--chip-strong); color: var(--fg); }
+.phead button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.rpanel.retracted { width: auto !important; height: auto !important; min-width: 0 !important; }
+.rpanel.retracted > .pbody, .rpanel.retracted > .pgrip { display: none !important; }
+.rpanel.retracted > .phead { border-bottom: 0; }
+.pgrip { position: absolute; z-index: 3; touch-action: none; }
+.pgrip.e { top: 8px; bottom: 8px; right: -2px; width: 8px; cursor: ew-resize; }
+.pgrip.w { top: 8px; bottom: 8px; left: -2px; width: 8px; cursor: ew-resize; }
+.pgrip.s { left: 8px; right: 8px; bottom: -2px; height: 8px; cursor: ns-resize; }
+.pgrip.se { right: -2px; bottom: -2px; width: 16px; height: 16px; cursor: nwse-resize; }
+.pgrip.sw { left: -2px; bottom: -2px; width: 16px; height: 16px; cursor: nesw-resize; }
+.pgrip:hover, .pgrip.drag { background: color-mix(in srgb, var(--accent) 35%, transparent); border-radius: 4px; }
+.pgrip.se:hover, .pgrip.sw:hover { background: none; }
+.pgrip.se::after, .pgrip.sw::after { content: ""; position: absolute; inset: 4px; border: solid var(--muted); border-width: 0 2px 2px 0; border-radius: 0 0 3px 0; opacity: 0.6; }
+.pgrip.sw::after { border-width: 0 0 2px 2px; border-radius: 0 0 0 3px; }
+/* toolbars (time controls, the career strip) only retract */
+.ptoggle { border: 0; background: transparent; border-radius: 8px; width: 26px; height: 26px; padding: 0; flex: none; color: var(--muted); display: inline-flex; align-items: center; justify-content: center; }
+.ptoggle:hover { background: var(--chip-strong); color: var(--fg); }
+.ptoggle svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+#timebar.retracted > :not(#btn-play):not(.ptoggle) { display: none; }
+#career-hud.retracted > :not(.keep):not(.ptoggle) { display: none; }
+
 /* ---------- Narrow screens ---------- */
 @media (max-width: 1100px) {
   #hint { display: none; }
@@ -430,12 +535,20 @@ kbd {
 }
 @media (max-width: 760px) {
   #rail {
-    top: auto; width: auto; max-height: none;
+    top: auto; width: auto !important; height: auto !important; max-height: none;
     left: calc(8px + env(safe-area-inset-left, 0px));
     right: calc(8px + env(safe-area-inset-right, 0px));
     bottom: calc(76px + env(safe-area-inset-bottom, 0px));
-    display: flex; gap: 4px; overflow-x: auto; overflow-y: hidden; padding: 5px;
+    flex-direction: row; align-items: stretch;
   }
+  #rail > .pbody { display: flex; gap: 4px; overflow-x: auto; overflow-y: hidden; padding: 5px; }
+  #rail .rail-note { display: none; }
+  #rail .tool .cnt { top: 2px; left: 2px; }
+  #rail > .phead { border-bottom: 0; border-right: 1px solid var(--line); padding: 3px; }
+  #rail > .phead .pt { display: none; }
+  #rail.retracted { right: auto; }
+  .pgrip { display: none; }
+  #inspector { width: auto !important; }
   .rail-label { display: none; }
   .rail-label[aria-expanded="false"] + .rail-group { display: flex; }
   .rail-group { display: flex; gap: 2px; }
@@ -443,7 +556,7 @@ kbd {
   .tool { width: 56px; min-height: 52px; flex: none; }
   .tool .key { display: none; }
   #inspector { display: none; left: calc(8px + env(safe-area-inset-left, 0px)); right: calc(8px + env(safe-area-inset-right, 0px)); width: auto; top: calc(60px + env(safe-area-inset-top, 0px)); max-height: 46%; }
-  #inspector.open { display: block; }
+  #inspector.open { display: flex; }
   #btn-inspector { display: inline-flex; }
   #status { display: none; }
   .top-actions .lbl-text { display: none; }
@@ -517,7 +630,7 @@ kbd {
 <nav id="rail" class="panel" aria-label="Tools"></nav>
 <aside id="inspector" class="panel" aria-label="Inspector"></aside>
 <div id="career-hud" class="panel" hidden aria-label="Career mode"></div>
-<div id="career-panel" class="panel" hidden aria-label="Career"></div>
+<div id="career-panel" class="panel" data-centred="1" hidden aria-label="Career" role="dialog"></div>
 
 <div id="hint" class="panel"></div>
 <div id="marquee" hidden></div>
@@ -602,6 +715,10 @@ kbd {
     <p style="margin-top:10px">In most browsers <kbd>Ctrl</kbd> + <kbd>W</kbd> closes the tab and a page cannot block it, so the sandbox asks before leaving while Ctrl is held. <kbd>Alt</kbd> works for turtle mode too.</p>
     <h3>Moving things</h3>
     <p>The <b>Grabber</b> pulls parts around while time runs, presses buttons and drags levers. While paused it moves whole assemblies. <b>Move</b>, <b>Rotate</b> and <b>Size</b> put a gizmo on the selected part. Drag an arrow, a ring or a box handle.</p>
+    <h3>Career mode</h3>
+    <p>Press <b>Career</b> in the top bar to run an electricity business: an engine turns a generator, a <b>Transformer</b> steps its power up to grid voltage and a <b>Pylon</b> sells it. Only parts you own show in the build menu; buy more (and engines, upgrades and fuel) in the full-screen <b>Store</b>, where orders arrive after an in-game delivery time. One real minute at 1× is one in-game hour. Power wires wear out and snap unless you replace them under <b>Upkeep</b>, liquid from taps is billed every hour, the <b>Bank</b> pays interest (even while you are away), and <b>Challenges</b> give you a budget and a goal. Your career is saved in this browser.</p>
+    <h3>Panels</h3>
+    <p>Drag the edge or corner of a panel to resize it (double-click the edge for its original size), and press <b>−</b> in its header to fold it away. The time controls and the career strip fold away with the arrow at their end.</p>
     <h3>Copy and paste</h3>
     <p>Select several things with <kbd>Ctrl</kbd> + click or a <kbd>Ctrl</kbd> + drag box, or press <kbd>Ctrl</kbd> + <kbd>A</kbd> for everything. Copy takes the glue, springs, wires and pipes between them along, and a device copied without the part it sits on stands on its own. Paste drops the copy under the pointer, and the copy stays selected so <b>Move</b> and <b>Rotate</b> can put it in place. Copies go through the system clipboard, so you can paste into another Red Sandbox tab. The <b>Edit</b> menu has the same commands.</p>
     <div class="btn-row" style="margin-top:16px"><button class="btn primary" id="help-close">Start building</button></div>
@@ -642,15 +759,45 @@ try {
   setLoading('The 3D or physics engine did not load. Check your internet connection, then reload the page.');
   throw err;
 }
-// The heavy number crunching of the gas simulation runs as WebAssembly, compiled from C (the source is in
-// wasm/sim.c; wasm/build.sh rebuilds it). Without WebAssembly (or with ?nowasm in the address) the same sums run in JavaScript.
-const SIM_WASM_B64 = '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';
-let SIM_WASM = null;
-if (typeof WebAssembly === 'object' && !/[?&]nowasm\b/.test(location.search)) {
-  try {
-    const bytes = Uint8Array.from(atob(SIM_WASM_B64), (ch) => ch.charCodeAt(0));
-    SIM_WASM = (await WebAssembly.instantiate(bytes)).instance.exports;
-  } catch (e) { console.warn('WebAssembly solver unavailable, using JavaScript', e); SIM_WASM = null; }
+// The heavy number crunching of the gas simulation runs as WebAssembly, compiled from C (the sources are in
+// wasm/*.c; wasm/build.sh rebuilds them). Each module loads on its own, so one that fails only sends its own
+// work back to JavaScript, which does the same sums. ?nowasm in the address turns them all off, ?nowasm=gas,solver
+// only those; Settings shows which are running.
+const WASM_B64 = {
+  solver: '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',
+  geometry: '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',
+  gas: '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',
+};
+const WASM_INFO = {
+  solver: ['Pressure solver', 'how the gas pressure settles each step'],
+  geometry: ['Geometry', 'how solid each gas cell is, from the shapes of the parts'],
+  gas: ['Gas chemistry', 'mixing, burning, cooling and steam in every gas cell'],
+};
+const WASM = {}, WASM_STATUS = {};
+{
+  const q = new URLSearchParams(location.search), off = q.has('nowasm') ? (q.get('nowasm') || '').split(',').filter(Boolean) : null;
+  let pref = true;
+  try { pref = JSON.parse(localStorage.getItem('red-sandbox-prefs') || '{}').wasm !== false; } catch { /* storage blocked */ }
+  await Promise.all(Object.keys(WASM_B64).map(async (name) => {
+    const why = typeof WebAssembly !== 'object' ? 'This browser has no WebAssembly.' : !pref ? 'Turned off in Settings.' : off && (!off.length || off.includes(name)) ? 'Turned off with ?nowasm in the address.' : '';
+    if (why) { WASM_STATUS[name] = { ok: false, why }; return; }
+    const t0 = performance.now();
+    try {
+      const bytes = Uint8Array.from(atob(WASM_B64[name]), (ch) => ch.charCodeAt(0));
+      WASM[name] = (await WebAssembly.instantiate(bytes)).instance.exports;
+      WASM_STATUS[name] = { ok: true, ms: performance.now() - t0, kb: bytes.length / 1024 };
+    } catch (e) {
+      console.warn(`WebAssembly module "${name}" unavailable, using JavaScript`, e);
+      WASM_STATUS[name] = { ok: false, why: `Failed to load: ${e && e.message ? e.message : e}` };
+    }
+  }));
+}
+// A loaded module is only used when it fits (its arrays are big enough); otherwise JavaScript takes over its work
+function wasmUse(name, fits) {
+  const w = WASM[name];
+  if (!w) return null;
+  try { if (fits(w)) return w; WASM_STATUS[name] = { ok: false, why: 'Loaded, but too small for this build of the sandbox: using JavaScript.' }; } catch (e) { WASM_STATUS[name] = { ok: false, why: `Failed a check: ${e.message}` }; }
+  return null;
 }
 
 // =====================================================================
@@ -1107,6 +1254,19 @@ const MOUNTS = {
       k.cyl(0.14, 0.12, 0, 0.12, 0, '#2b3038', false, Q_Z2Y);
       k.cyl(0.05, 0.1, 0, 0.27, 0, JCOL.pin, false);
       return { base: k.base, hub: disc('#e0a526', V(0, 0.34, 0), Q_ID), axis: V(0, 1, 0), nodes: { y: 0.08, w: 0.46 } };
+    },
+  },
+  transformer: {
+    label: 'Transformer', cat: 'device', modes: ['pad'], modeLabels: { pad: 'Stand' }, params: { limit: 300, volts: 11000 }, nozzle: false,
+    io: { in: [N('power', 'Power')], out: [N('watts', 'Watts'), N('volts', 'Volts'), N('amps', 'Amps')] },
+    desc: 'Steps a generator\'s low voltage up to grid voltage so it can be sent down the line. Wire a Generator\'s Watts to Power, and Watts out to a Pylon. It handles up to its rated power: past that it lets no more through. The higher its voltage, the less is lost on the way (10% at 400 V, 3% at 11 kV, 1% at 33 kV). In a career the grid only buys power that comes through a transformer.',
+    layout() {
+      const k = kit();
+      k.box(0.5, 0.08, 0.4, 0, 0.04, 0, JCOL.dark);
+      k.box(0.42, 0.5, 0.3, 0, 0.33, 0, '#59636e');
+      for (const x of [-0.14, -0.07, 0, 0.07, 0.14]) k.box(0.035, 0.42, 0.36, x, 0.33, 0, '#7b858f', false);
+      for (const x of [-0.12, 0, 0.12]) { k.cyl(0.035, 0.16, x, 0.66, 0, '#c9cfd6', false); k.box(0.05, 0.05, 0.05, x, 0.76, 0, JCOL.copper, false); }
+      return { base: k.base, nodes: { y: 0.1, w: 0.5 } };
     },
   },
   pylon: {
@@ -1879,12 +2039,15 @@ function nodeWorld(m, port, dir) {
 // =====================================================================
 //  Creating and removing things
 // =====================================================================
+// While a kit (a ready-made engine from the career store) is being built, everything it creates carries its tag:
+// kit pieces belong to the kit, not to the loose parts in the career inventory.
+let kitTag = null;
 function createPart(d) {
   const p = {
     id: d.id ?? newId(), type: d.type, shape: d.shape, size: d.size.slice(), color: d.color, material: d.material,
     params: d.params ? { ...d.params } : null,
     pos: d.pos.clone(), quat: d.quat.clone(), linvel: d.linvel ? d.linvel.clone() : V(), angvel: d.angvel ? d.angvel.clone() : V(),
-    hubOf: d.hubOf ?? null,
+    hubOf: d.hubOf ?? null, kit: d.kit ?? kitTag,
     body: null, bodyInfo: null, localPos: V(), localQuat: Qn(), colliders: [], mesh: null,
   };
   deriveSize(p);
@@ -1903,7 +2066,7 @@ function createMountRaw(d) {
   const m = {
     id: d.id, type: d.type, mode: d.mode, params: { ...MOUNTS[d.type].params, ...d.params }, parent: d.parent ?? null,
     framePos: d.framePos.clone(), frameQuat: d.frameQuat.clone(), hub: d.hub ?? null,
-    st: { ...(d.st || {}) }, out: {}, rj: null, base: null, nodes: [], bound: [],
+    st: { ...(d.st || {}) }, out: {}, rj: null, base: null, nodes: [], bound: [], kit: d.kit ?? kitTag,
   };
   m.base = buildMountObject(m, mountLayout(m));
   worldGroup.add(m.base);
@@ -1939,7 +2102,7 @@ function createMount(type, mode, params, target, wpos, wquat) {
   return createMountRaw({ id, type, mode, params, parent: target ? target.id : null, framePos, frameQuat, hub: hubId });
 }
 function createGlue(d) {
-  const g = { id: d.id ?? newId(), radius: d.radius, targets: new Set(d.targets), anchor: d.anchor ?? null, local: null, mesh: null, struct: d.struct || null };
+  const g = { id: d.id ?? newId(), radius: d.radius, targets: new Set(d.targets), anchor: d.anchor ?? null, local: null, mesh: null, struct: d.struct || null, kit: d.kit ?? kitTag };
   if (d.local) g.local = d.local.clone();
   else g.local = g.anchor != null ? worldToLocal(S.parts.get(g.anchor), d.pos) : d.pos.clone();
   g.mesh = new THREE.Mesh(g.struct ? STRUCT_GEO : GLUE_GEO, new THREE.MeshStandardMaterial({ color: '#ffc93c', emissive: '#ff9d00', emissiveIntensity: 0.3, roughness: 0.22, metalness: 0 }));
@@ -2126,7 +2289,7 @@ function createSpring(d) {
     id: d.id ?? newId(), kind,
     a: { part: d.a.part ?? null, local: d.a.local.clone() },
     b: { part: d.b.part ?? null, local: d.b.local.clone() },
-    k: d.k, c: d.c, rest: d.rest, coilR: d.coilR ?? 0.1, wire: d.wire ?? 0.02, lastL: -1,
+    k: d.k, c: d.c, rest: d.rest, coilR: d.coilR ?? 0.1, wire: d.wire ?? 0.02, lastL: -1, kit: d.kit ?? kitTag,
   };
   buildSpringObject(s);
   S.springs.set(s.id, s);
@@ -2172,7 +2335,7 @@ function springEnd(e, out) {
   return p ? out.copy(e.local).applyQuaternion(p.quat).add(p.pos) : out.copy(e.local);
 }
 function createWire(d) {
-  const w = { id: d.id ?? newId(), from: { m: d.from.m, port: d.from.port }, to: { m: d.to.m, port: d.to.port }, type: d.type, dirty: true };
+  const w = { id: d.id ?? newId(), from: { m: d.from.m, port: d.from.port }, to: { m: d.to.m, port: d.to.port }, type: d.type, dirty: true, kit: d.kit ?? kitTag, hp: d.hp ?? 1 };
   if (w.type === 'fluid') {
     w.geo = makeTubeGeometry(28, 10);
     w.mat = new THREE.MeshStandardMaterial({ color: PIPE_COLOR, roughness: 0.32, metalness: 0.65 });
@@ -2206,7 +2369,7 @@ function beltRadius(p) {
   return p.size[0] / 2;
 }
 function createBelt(d) {
-  const b = { id: d.id ?? newId(), parts: d.parts.slice(), width: d.width ?? 0.12, grip: d.grip ?? 300 };
+  const b = { id: d.id ?? newId(), parts: d.parts.slice(), width: d.width ?? 0.12, grip: d.grip ?? 300, kit: d.kit ?? kitTag };
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(BELT_PTS * 4 * 3), 3));
   const idx = [];
@@ -2319,6 +2482,7 @@ function finishBelt() {
   const ids = beltPick.filter((id) => S.parts.has(id));
   beltPick = [];
   if (ids.length < 2) { toast('A belt needs at least two pulleys.'); refreshHint(); return; }
+  if (!careerAllow('belt')) return;
   pushUndo();
   const ts = toolSettings.belt;
   const b = createBelt({ parts: ids, width: ts.width, grip: ts.grip });
@@ -3199,16 +3363,22 @@ const GH = 0.1, GAS_MAX = 9000, FMIN = 0.08;
 const T_IGN = 2.0, T_FLAME = 2.6, T_LIGHT = 1.25, IGN_RATE = 6, AFR = 14, HEAT = 125, BURN_K = 55, COOL = 3.5, KT = 45, KD = 25;
 const P_UNIT = 140; // newtons per square metre of wall for each atmosphere above ambient (scaled to this sandbox's light parts)
 const DX = [1, -1, 0, 0, 0, 0], DY = [0, 0, 1, -1, 0, 0], DZ = [0, 0, 0, 0, 1, -1];
+// What a transformer loses sending power down the line, by its voltage
+const lineLoss = (v) => (v >= 33000 ? 0.01 : v >= 11000 ? 0.03 : 0.1);
+// With the "gas" WebAssembly module the arrays its sums work on live in its memory (wasm/gas.c): these are views
+// of them, so everything here reads and writes the same numbers either way.
+const gasW = wasmUse('gas', (w) => w.nmax() >= GAS_MAX);
+const gasArr = (name, T, n) => (gasW ? new T(gasW.memory.buffer, gasW[name](), n) : new T(n));
 const gas = {
   map: new Map(), top: 0, free: [], act: [],
-  ci: new Int32Array(GAS_MAX), cj: new Int32Array(GAS_MAX), ck: new Int32Array(GAS_MAX),
-  air: new Float32Array(GAS_MAX), fuel: new Float32Array(GAS_MAX), exh: new Float32Array(GAS_MAX), en: new Float32Array(GAS_MAX), stm: new Float32Array(GAS_MAX),
+  ci: gasArr('ci', Int32Array, GAS_MAX), cj: gasArr('cj', Int32Array, GAS_MAX), ck: gasArr('ck', Int32Array, GAS_MAX),
+  air: gasArr('air', Float32Array, GAS_MAX), fuel: gasArr('fuel', Float32Array, GAS_MAX), exh: gasArr('exh', Float32Array, GAS_MAX), en: gasArr('en', Float32Array, GAS_MAX), stm: gasArr('stm', Float32Array, GAS_MAX),
   // how much of the fuel is oil vapour, and how much of the exhaust is oil smoke (burnt oil: thick and white)
-  ofu: new Float32Array(GAS_MAX), osm: new Float32Array(GAS_MAX),
-  lw: new Float32Array(GAS_MAX), lo: new Float32Array(GAS_MAX), lg: new Float32Array(GAS_MAX), pl: new Float32Array(GAS_MAX), po: new Float32Array(GAS_MAX), // liquids, the weight of liquid above, and the push of squeezed liquid
+  ofu: gasArr('ofu', Float32Array, GAS_MAX), osm: gasArr('osm', Float32Array, GAS_MAX),
+  lw: gasArr('lw', Float32Array, GAS_MAX), lo: new Float32Array(GAS_MAX), lg: new Float32Array(GAS_MAX), pl: new Float32Array(GAS_MAX), po: new Float32Array(GAS_MAX), // liquids, the weight of liquid above, and the push of squeezed liquid
   fs: new Float32Array(GAS_MAX), // room left by the parts; the gas gets f = fs minus the liquid
-  f: new Float32Array(GAS_MAX), ph: new Float32Array(GAS_MAX), burn: new Float32Array(GAS_MAX), ign: new Float32Array(GAS_MAX), flame: new Uint8Array(GAS_MAX), flameNext: new Uint8Array(GAS_MAX), own: new Int32Array(GAS_MAX), alive: new Uint8Array(GAS_MAX),
-  nb: new Int32Array(GAS_MAX * 6).fill(-1), // each cell's six neighbours, or -1 where the grid stops
+  f: gasArr('f', Float32Array, GAS_MAX), ph: new Float32Array(GAS_MAX), burn: gasArr('burn', Float32Array, GAS_MAX), ign: gasArr('ign', Float32Array, GAS_MAX), flame: gasArr('flame', Uint8Array, GAS_MAX), flameNext: gasArr('flameNext', Uint8Array, GAS_MAX), own: new Int32Array(GAS_MAX), alive: new Uint8Array(GAS_MAX),
+  nb: gasArr('nb', Int32Array, GAS_MAX * 6).fill(-1), // each cell's six neighbours, or -1 where the grid stops
   fo: new Float32Array(GAS_MAX * 6),         // how open each of a cell's six faces is
   epoch: new Int32Array(GAS_MAX).fill(-1),   // the wall layout a cell's numbers were measured against
   hash: new Map(), owners: [], hashStamp: -1, geoEpoch: 0,
@@ -3232,9 +3402,9 @@ function gasClear() {
 // a part that is moving is "live": the cells in it measure their walls again every step. Everywhere
 // else the walls stand still, so the cells keep the numbers they measured.
 const _gm = new THREE.Matrix4(), _gv = V();
-// With WebAssembly the buckets live in its memory (wasm/sim.c) and the parts are copied there as numbers:
+// With WebAssembly the buckets live in its memory (wasm/geometry.c) and the parts are copied there as numbers:
 // their shape, where they are and the shape's own sizes. gas.wgeo says whether this step's buckets are there.
-const geoW = SIM_WASM && SIM_WASM.omax ? SIM_WASM : null;
+const geoW = wasmUse('geometry', (w) => w.nmax() >= GAS_MAX && w.omax() > 0);
 const geoOwn = geoW && new Float64Array(geoW.memory.buffer, geoW.owners(), geoW.omax() * geoW.ofields());
 const GEO_OF = geoW ? geoW.ofields() : 0;
 function geoShape(p, o) {
@@ -3502,12 +3672,12 @@ function oilShare(arr, of, a, b, ds) {
 // Pressure moves through a chamber almost instantly, so the flow between cells is solved
 // implicitly each step. Each face lets gas through according to how open it is (cubed, so a
 // one-centimetre gap around a piston leaks slowly while an open face does not resist at all).
-const FACE_NB = new Int32Array(GAS_MAX * 6), FACE_C = new Float32Array(GAS_MAX * 6), FACE_A = new Float32Array(GAS_MAX * 6);
+const FACE_NB = gasArr('faceNb', Int32Array, GAS_MAX * 6), FACE_C = gasArr('faceC', Float32Array, GAS_MAX * 6), FACE_A = gasArr('faceA', Float32Array, GAS_MAX * 6);
 const gasP = new Float32Array(GAS_MAX), gasE0 = new Float32Array(GAS_MAX), gasFprev = new Float32Array(GAS_MAX), gasDV = new Float32Array(GAS_MAX);
-const gasRoot = new Int32Array(GAS_MAX), gasCV = new Float32Array(GAS_MAX), gasCD = new Float32Array(GAS_MAX), gasCOpen = new Uint8Array(GAS_MAX);
+const gasRoot = gasArr('root', Int32Array, GAS_MAX), gasCV = new Float32Array(GAS_MAX), gasCD = new Float32Array(GAS_MAX), gasCOpen = gasArr('copen', Uint8Array, GAS_MAX);
 const gasFind = (c) => { while (gasRoot[c] !== c) { gasRoot[c] = gasRoot[gasRoot[c]]; c = gasRoot[c]; } return c; };
 const GAS_ITER = 14, K_FLOW = 30;
-const gasAmb = new Float32Array(GAS_MAX), gasOrder = new Float64Array(GAS_MAX), gasOpenAir = new Uint8Array(GAS_MAX);
+const gasAmb = gasArr('amb', Float32Array, GAS_MAX), gasOrder = new Float64Array(GAS_MAX), gasOpenAir = new Uint8Array(GAS_MAX);
 // Smoke in the open air thins out into the atmosphere around it
 const LEAN = 0.01; // fuel thinner than this in air will not burn
 const DISSIPATE = 1.6, DISS_HEAT = 2.5;
@@ -3828,10 +3998,10 @@ function fluidDevicesStep(h) {
       m.st.flow = got.total / h;
     } else if (m.type === 'outlet' && m.params.tap !== 'none' && m.params.fill > 0 && !pipeAt(m, 'pipe')) {
       // fill the container it sits in, once, when the simulation starts (a rewind brings it back to empty)
-      if (!m.st.filled) { m.st.filled = true; const box = containerAt(nozzleNow(m)); if (box) m.st.flow = fillContainer(box, m.params.tap, m.params.fill); }
+      if (!m.st.filled) { m.st.filled = true; const box = containerAt(nozzleNow(m)); if (box) { m.st.flow = fillContainer(box, m.params.tap, m.params.fill); if (career.active) careerMeter(m.params.tap, m.st.flow); } }
     } else if (m.type === 'outlet' && m.params.tap !== 'none' && deviceOpen(m) && !pipeAt(m, 'pipe')) {
       const c = gasCellAt(nozzleNow(m), true);
-      if (c >= 0) { const v = m.params.tapRate * h; liqPour(c, { water: 0, oil: 0, gasoline: 0, [m.params.tap]: v, total: v }); m.st.flow = m.params.tapRate; }
+      if (c >= 0) { const v = m.params.tapRate * h; liqPour(c, { water: 0, oil: 0, gasoline: 0, [m.params.tap]: v, total: v }); m.st.flow = m.params.tapRate; if (career.active) careerMeter(m.params.tap, v); } // a tap's liquid is billed in a career
     }
   }
 }
@@ -4073,7 +4243,11 @@ function liquidStep(h) {
 }
 const liqWeight = (c) => (gas.lw[c] * LIQUIDS.water.density + gas.lo[c] * LIQUIDS.oil.density + gas.lg[c] * LIQUIDS.gasoline.density) * settings.gravity * GH / P_UNIT;
 // Steam that cools turns back into water
+// The gas module's copy of the constants it needs (in the order wasm/gas.c reads them)
+if (gasW) new Float64Array(gasW.memory.buffer, gasW.consts(), 12).set([FMIN, T_IGN, T_FLAME, T_LIGHT, IGN_RATE, AFR, HEAT, LEAN, T_COND, COND_RATE, STEAM_X, LATENT]);
+const gasWAct = gasW && new Int32Array(gasW.memory.buffer, gasW.act(), GAS_MAX), gasWAcc = gasW && new Float64Array(gasW.memory.buffer, gasW.acc(), 8);
 function steamStep(h) {
+  if (gasW) { gasWAct.set(gas.act); gasW.steamStep(gas.act.length, h); return; }
   for (const c of gas.act) {
     if (gas.stm[c] <= 1e-6) continue;
     const n = gasTotal(c), T = n > 1e-6 ? gas.en[c] / n : 1;
@@ -4091,7 +4265,7 @@ function steamStep(h) {
 // and a few sweeps of a simple solver leave errors big enough to slosh gas back and forth; conjugate gradients
 // (with each cell scaled by its own weight) settles it properly in a few dozen passes even across a big cloud.
 // With WebAssembly the setup below writes straight into the solver's own memory and the passes run there.
-const cgW = SIM_WASM && SIM_WASM.nmax() >= GAS_MAX ? SIM_WASM : null;
+const cgW = wasmUse('solver', (w) => w.nmax() >= GAS_MAX);
 const cgWF = (ptr) => new Float64Array(cgW.memory.buffer, ptr, GAS_MAX);
 const cgR = new Float64Array(GAS_MAX), cgZ = new Float64Array(GAS_MAX), cgD = new Float64Array(GAS_MAX), cgQ = new Float64Array(GAS_MAX);
 const cgDiag = cgW ? cgWF(cgW.diag()) : new Float64Array(GAS_MAX), cgB = cgW ? cgWF(cgW.rhs()) : new Float64Array(GAS_MAX);
@@ -4375,7 +4549,8 @@ function gasStep(h) {
   //    it, thins out into the atmosphere: the grid only tracks the air near the action, not the whole sky.
   const kt = Math.min(0.4, KT * h), kd = Math.min(0.3, KD * h);
   const dis = Math.min(0.5, DISSIPATE * h), disT = Math.min(0.5, DISS_HEAT * h);
-  for (let a = 0; a < act.length; a++) {
+  if (gasW) { gasWAct.set(act); gasW.mixStep(act.length, kt, kd, dis, disT); }
+  else for (let a = 0; a < act.length; a++) {
     const c = act[a];
     const base = c * 6;
     for (let d = 0; d < 6; d += 2) {
@@ -4399,6 +4574,11 @@ function gasStep(h) {
   //    temperature they only catch after a delay, the way a fuel mix that is squeezed and warmed has to sit hot
   //    for a moment before it goes off by itself. Burning turns them into hot exhaust. Then cooling.
   const burnK = Math.min(1, BURN_K * h), coolK = Math.min(1, COOL * h);
+  if (gasW) {
+    gasWAcc[0] = gas.released; gasWAcc[1] = gas.flashSum.x; gasWAcc[2] = gas.flashSum.y; gasWAcc[3] = gas.flashSum.z; gasWAcc[4] = gas.flashW;
+    gasW.burnStep(act.length, h, burnK, coolK);
+    gas.released = gasWAcc[0]; gas.flashSum.set(gasWAcc[1], gasWAcc[2], gasWAcc[3]); gas.flashW = gasWAcc[4];
+  } else {
   for (let a = 0; a < act.length; a++) {
     const c = act[a];
     gas.burn[c] *= 0.9;
@@ -4427,6 +4607,7 @@ function gasStep(h) {
     gas.en[c] += (gasTotal(c) - gas.en[c]) * coolK;
   }
   for (let a = 0; a < act.length; a++) { const c = act[a]; gas.flame[c] = gas.flameNext[c]; }
+  }
   steamStep(h);
   // 7. Pressure pushes on whatever part makes up each wall.
   const PU = P_UNIT * settings.gasPower * GH * GH;
@@ -5045,22 +5226,37 @@ const DEVICE_TICK = {
     const w = (rpm * Math.PI) / 30, wr = Math.max(1, (m.params.ratedRpm * Math.PI) / 30);
     const k = (m.params.ratedW * clamp(m.st.load ?? 0, 0, 1)) / (wr * wr);
     if (Math.abs(k - (m.st.k ?? -1)) > 1e-5) { m.st.k = k; applyJointDrive(m); }
-    const watts = k * w * w;
+    const watts = k * w * w * (career.active && !m.kit ? m.st.eff ?? 0.7 : 1); // in a career, upgrades decide how much of the shaft power becomes electricity
     const volts = m.params.ratedV * Math.min(1.5, rpm / Math.max(1, m.params.ratedRpm));
     return { watts, volts, amps: volts > 1 ? watts / volts : 0, rpm };
   },
-  pylon(m, I, h) {
+  transformer(m) {
     const wire = wireInto(m, 'power'), src = wire ? S.mounts.get(wire.from.m) : null;
+    const win = src && src.type === 'generator' ? src.out.watts ?? 0 : 0;
+    const watts = Math.min(win, m.params.limit) * (1 - lineLoss(m.params.volts));
+    m.st.watts = watts;
+    return { watts, volts: watts > 0 ? m.params.volts : 0, amps: watts / m.params.volts };
+  },
+  pylon(m, I, h) {
+    const wire = wireInto(m, 'power');
+    let src = wire ? S.mounts.get(wire.from.m) : null, cap = career.active ? Infinity : m.params.limit, xf = null;
+    // through a transformer: the generator behind it, and no more than the transformer handles
+    if (src && src.type === 'transformer') { xf = src; cap = Math.min(cap, xf.params.limit); const w2 = wireInto(xf, 'power'); src = w2 ? S.mounts.get(w2.from.m) : null; }
     const en = I('enable'), on = en === undefined ? true : !!en;
     let sold = 0;
+    m.st.warn = '';
     if (src && src.type === 'generator') {
+      if (career.active && !xf) m.st.warn = 'needs a transformer';
+      const live = on && !m.st.warn;
       const d = careerDemand();
-      const L = on ? Math.min(clamp(0.5 * d + 0.35, 0, 1), m.params.limit / Math.max(1, src.params.ratedW)) : 0;
+      // the grid loads the generator by demand; in a career a full transformer just turns away what it cannot take
+      const L = live ? Math.min(clamp(0.5 * d + 0.35, 0, 1), career.active ? 1 : cap / Math.max(1, src.params.ratedW)) : 0;
       src.st.load = L;
-      sold = on ? Math.min(src.out.watts ?? 0, m.params.limit) : 0;
-      if (sold > 0 && career.active) careerEarn(sold, h);
+      sold = live ? Math.min(src.out.watts ?? 0, cap) * (xf ? 1 - lineLoss(xf.params.volts) : 1) : 0;
+      if (sold > 0 && career.active) careerEarn(sold, h, xf ? xf.params.volts : 0);
     }
     m.st.sold = sold;
+    m.st.volts = sold > 0 ? (xf ? xf.params.volts : src.out.volts ?? 0) : 0;
     return { sold };
   },
   clutch(m, I) {
@@ -5281,13 +5477,13 @@ function serialize() {
     app: 'red-sandbox', version: 2, nextId: S.nextId, simTime,
     parts: [...S.parts.values()].map((p) => ({
       id: p.id, type: p.type, shape: p.shape, size: p.size.slice(), color: p.color, material: p.material, params: p.params ? { ...p.params } : undefined,
-      pos: p.pos.toArray(), quat: p.quat.toArray(), linvel: p.linvel.toArray(), angvel: p.angvel.toArray(), hubOf: p.hubOf,
+      pos: p.pos.toArray(), quat: p.quat.toArray(), linvel: p.linvel.toArray(), angvel: p.angvel.toArray(), hubOf: p.hubOf, kit: p.kit || undefined,
     })),
-    mounts: [...S.mounts.values()].map((m) => ({ id: m.id, type: m.type, mode: m.mode, params: { ...m.params }, parent: m.parent, framePos: m.framePos.toArray(), frameQuat: m.frameQuat.toArray(), hub: m.hub, st: saveState(m) })),
-    glues: [...S.glues.values()].map((g) => ({ id: g.id, radius: g.radius, targets: [...g.targets], anchor: g.anchor, local: g.local.toArray(), struct: g.struct ? { a: { part: g.struct.a.part, local: g.struct.a.local.toArray() }, b: { part: g.struct.b.part, local: g.struct.b.local.toArray() } } : null })),
-    springs: [...S.springs.values()].map((s) => ({ id: s.id, kind: s.kind, a: { part: s.a.part, local: s.a.local.toArray() }, b: { part: s.b.part, local: s.b.local.toArray() }, k: s.k, c: s.c, rest: s.rest, coilR: s.coilR, wire: s.wire })),
-    wires: [...S.wires.values()].map((w) => ({ id: w.id, from: { ...w.from }, to: { ...w.to }, type: w.type })),
-    belts: [...S.belts.values()].map((b) => ({ id: b.id, parts: b.parts.slice(), width: b.width, grip: b.grip })),
+    mounts: [...S.mounts.values()].map((m) => ({ id: m.id, type: m.type, mode: m.mode, params: { ...m.params }, parent: m.parent, framePos: m.framePos.toArray(), frameQuat: m.frameQuat.toArray(), hub: m.hub, st: saveState(m), kit: m.kit || undefined })),
+    glues: [...S.glues.values()].map((g) => ({ id: g.id, radius: g.radius, targets: [...g.targets], anchor: g.anchor, local: g.local.toArray(), struct: g.struct ? { a: { part: g.struct.a.part, local: g.struct.a.local.toArray() }, b: { part: g.struct.b.part, local: g.struct.b.local.toArray() } } : null, kit: g.kit || undefined })),
+    springs: [...S.springs.values()].map((s) => ({ id: s.id, kind: s.kind, a: { part: s.a.part, local: s.a.local.toArray() }, b: { part: s.b.part, local: s.b.local.toArray() }, k: s.k, c: s.c, rest: s.rest, coilR: s.coilR, wire: s.wire, kit: s.kit || undefined })),
+    wires: [...S.wires.values()].map((w) => ({ id: w.id, from: { ...w.from }, to: { ...w.to }, type: w.type, kit: w.kit || undefined, hp: w.hp < 1 ? w.hp : undefined })),
+    belts: [...S.belts.values()].map((b) => ({ id: b.id, parts: b.parts.slice(), width: b.width, grip: b.grip, kit: b.kit || undefined })),
   };
 }
 const SHAPES = ['box', 'sphere', 'cylinder', 'wedge', 'cam', 'gear', 'rack', 'bend'];
@@ -5316,7 +5512,7 @@ function loadScene(data) {
     if (!targets.length) continue;
     const st = d.struct ? { a: { part: d.struct.a.part, local: V().fromArray(d.struct.a.local) }, b: { part: d.struct.b.part, local: V().fromArray(d.struct.b.local) } } : null;
     if (st && ((st.a.part != null && !S.parts.has(st.a.part)) || (st.b.part != null && !S.parts.has(st.b.part)))) continue;
-    createGlue({ id: d.id, radius: d.radius, targets, anchor: S.parts.has(d.anchor) ? d.anchor : null, local: V().fromArray(d.local), struct: st });
+    createGlue({ id: d.id, radius: d.radius, targets, anchor: S.parts.has(d.anchor) ? d.anchor : null, local: V().fromArray(d.local), struct: st, kit: d.kit });
     maxId = Math.max(maxId, d.id);
   }
   for (const d of data.springs || []) {
@@ -5737,6 +5933,7 @@ function partThickness(p, point, dir) {
   return 0.3;
 }
 function placePart(tool, hit, f) {
+  if (!careerAllow(tool)) return;
   const snap = snapPlacement(tool, hit, f);
   const d = PART_TYPES[tool], ts = toolSettings[tool];
   const pl = snap || partPlacement(tool, f);
@@ -5783,6 +5980,7 @@ function bearingSnap(hit) {
   return { pos, quat, params, mode };
 }
 function placeMount(type, f, hit) {
+  if (!careerAllow(type)) return;
   if (type === 'bearing') {
     const bs = bearingSnap(hit);
     if (bs) { // wrap it around the axle under the pointer
@@ -5812,6 +6010,7 @@ function structureClick(f) {
   if (springStart.part == null && ep.part == null) { toast('At least one end has to be on a part.'); return; }
   const a = springEnd(springStart, V());
   if (a.distanceTo(f.point) < 0.05) { toast('Those two points are too close.'); return; }
+  if (!careerAllow('structure')) return;
   pushUndo();
   const targets = [springStart.part ?? 'floor', ep.part ?? 'floor'];
   createGlue({ pos: springStart.part != null ? a : f.point.clone(), radius: 0.05, targets, anchor: springStart.part ?? ep.part, struct: { a: springStart, b: ep } });
@@ -5832,6 +6031,7 @@ function springClick(f) {
   const a = springEnd(springStart, V());
   const rest = a.distanceTo(f.point);
   if (rest < 0.05) { toast('Those two points are too close.'); return; }
+  if (!careerAllow('spring')) return;
   pushUndo();
   const ts = toolSettings.spring;
   createSpring({ kind: ts.kind, a: springStart, b: ep, k: ts.k, c: ts.c, rest });
@@ -5855,8 +6055,9 @@ function wireClick(node) {
     toast(`That input takes ${inn.type === 'bool' ? 'On/Off' : 'Analog'} signals, but this output sends ${out.type === 'bool' ? 'On/Off' : 'Analog'}. Use a Threshold gate to turn a number into On/Off.`);
     return;
   }
-  pushUndo();
   const old = wireInto(inn.mount, inn.port);
+  if (!old && !careerAllow('wire')) return;
+  pushUndo();
   if (old) deleteWire(old);
   createWire({ from: { m: out.mount.id, port: out.port }, to: { m: inn.mount.id, port: inn.port }, type: out.type });
   wiresDirty = true;
@@ -5869,6 +6070,7 @@ function wireClick(node) {
 function pipeClick(node) {
   if (node.type !== 'fluid' || wireStart.type !== 'fluid') { wireStart = node; refreshHint(); return; }
   if (node.mount === wireStart.mount) { toast('Pipe it to a different device.'); return; }
+  if (!pipeAt(wireStart.mount, wireStart.port) && !pipeAt(node.mount, node.port) && !careerAllow('pipe')) return;
   pushUndo();
   for (const e of [wireStart, node]) { const old = pipeAt(e.mount, e.port); if (old) { deleteWire(old); wiresDirty = true; } }
   createWire({ from: { m: wireStart.mount.id, port: wireStart.port }, to: { m: node.mount.id, port: node.port }, type: 'fluid' });
@@ -6049,6 +6251,9 @@ function pasteClipboard(data = clipboard, atPointer = true) {
   if (!target) target = base.clone().add(V(data.width + 0.5, 0, 0));
   if (settings.snap) { target.x = Math.round(target.x / 0.125) * 0.125; target.z = Math.round(target.z / 0.125) * 0.125; }
   const off = target.sub(base).add(V(0, 0.002, 0));
+  if (!careerAllowPaste(data)) return;
+  // a copy of a kit's pieces is not the kit: in a career every piece of it comes out of the inventory
+  if (career.active) data = { ...data, ...Object.fromEntries(['parts', 'mounts', 'glues', 'springs', 'belts', 'wires'].map((k) => [k, (data[k] || []).map((d) => ({ ...d, kit: null, hp: undefined }))])) };
   pushUndo();
   const ids = new Map();
   const fresh = (old) => { if (old == null || old === 'floor') return old; if (!ids.has(old)) ids.set(old, newId()); return ids.get(old); };
@@ -6116,6 +6321,7 @@ function onToolClick(additive = false) {
   if (!hit) return;
   const f = surfaceFrame(hit);
   if (PART_TYPES[t]) placePart(t, hit, f);
+  else if (t.startsWith('kit:')) placeKit(t.slice(4), f);
   else if (t === 'glue') placeGlue(f);
   else if (MOUNTS[t]) placeMount(t, f, hit);
   else if (t === 'spring') springClick(f);
@@ -7084,24 +7290,118 @@ const ICONS = {
   pipe: '<path d="M3 7h8a3 3 0 0 1 3 3v4a3 3 0 0 0 3 3h4"/><path d="M3 4.5v5M21 14.5v5"/>',
   generator: '<circle cx="12" cy="12" r="7"/><path d="M8 13l2-3 2 3 2-3 2 3M12 2v3M12 19v3"/>',
   pylon: '<path d="M12 2v20M6 22l6-16 6 16M7 9h10M8.5 14h7"/>',
+  transformer: '<rect x="5" y="7" width="14" height="13" rx="1.5"/><path d="M9 7V4M12 7V3M15 7V4M8.5 11v6M12 11v6M15.5 11v6"/>',
+  kit: '<rect x="3" y="9" width="11" height="9" rx="1.5"/><path d="M14 12h3l3-2v8l-3-2h-3M6 9V6h5v3M7.5 13.5h4"/>',
   lamp: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/>',
 };
 const RAIL = [
   ['Tools', ['select', 'grabber', 'move', 'rotate', 'size', 'delete']],
   ['Parts', ['block', 'plank', 'beam', 'domino', 'ball', 'cylinder', 'wheel', 'ramp']],
   ['Drivetrain', ['axle', 'bearing', 'gear', 'rack', 'cam', 'pulley', 'belt', 'motor', 'gearbox', 'clutch', 'uvjoint']],
-  ['Power', ['generator', 'pylon']],
+  ['Power', ['generator', 'transformer', 'pylon']],
   ['Joints', ['hinge', 'balljoint', 'slider', 'torsion', 'solenoid']],
   ['Connect', ['glue', 'autoglue', 'structure', 'spring']],
   ['Gas', ['injector', 'igniter', 'valve', 'turbo', 'mturbo', 'exhturbo', 'intake', 'pipe', 'pressure']],
   ['Fluids', ['inlet', 'outlet', 'pump', 'oilpump', 'mpump', 'moilpump', 'sprayer', 'bend90', 'bend45', 'tubepump']],
   ['Signals', ['wire', 'button', 'lever', 'distance', 'angle', 'touch', 'gate', 'logic', 'lamp']],
 ];
-const railEl = document.getElementById('rail');
-function buildRail() {
+// ----- Panels: a header with a retract button, and grips on the edges to resize them; remembered in this browser -----
+const PANEL_ICONS = {
+  min: '<path d="M5 12h14"/>', max: '<path d="M5 12h14M12 5v14"/>', close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  full: '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>', unfull: '<path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/>',
+  left: '<path d="M15 6l-6 6 6 6"/>', right: '<path d="M9 6l6 6-6 6"/>', up: '<path d="M6 15l6-6 6 6"/>', down: '<path d="M6 9l6 6 6-6"/>',
+};
+const PANEL_KEY = 'red-sandbox-panels';
+let panelState = {};
+try { panelState = JSON.parse(localStorage.getItem(PANEL_KEY) || '{}') || {}; } catch { /* storage blocked or damaged */ }
+const savePanels = () => { try { localStorage.setItem(PANEL_KEY, JSON.stringify(panelState)); } catch { /* storage blocked */ } };
+function iconBtn(icon, title, onclick, cls) {
+  return el('button', { type: 'button', class: cls, title, 'aria-label': title, onclick, html: `<svg viewBox="0 0 24 24" aria-hidden="true">${PANEL_ICONS[icon]}</svg>` });
+}
+// Wraps a panel's contents in a body under a header. grips: the edges that resize it ('e', 'w', 's', 'se', 'sw');
+// a panel centred on the screen (data-centred) grows on both sides, so its edge moves twice as far.
+// Returns the body, which is where the panel's contents go from now on. Double-click a grip for the original size.
+function makePanel(outer, { key, title, grips = [], minW = 150, maxW = 1200, minH = 90, buttons = [] }) {
+  const st = panelState[key] || (panelState[key] = {});
+  const body = el('div', { class: 'pbody' });
+  body.append(...outer.childNodes);
+  const ret = iconBtn('min', 'Retract', () => setRetracted(!outer.classList.contains('retracted')));
+  const head = el('div', { class: 'phead' }, el('span', { class: 'pt' }, title), ...buttons, ret);
+  outer.classList.add('rpanel');
+  outer.append(head, body);
+  function setRetracted(on, keep) {
+    outer.classList.toggle('retracted', on);
+    ret.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${PANEL_ICONS[on ? 'max' : 'min']}</svg>`;
+    ret.title = on ? `Show the ${title.toLowerCase()} panel` : `Retract the ${title.toLowerCase()} panel`;
+    ret.setAttribute('aria-label', ret.title); ret.setAttribute('aria-expanded', String(!on));
+    if (!keep) { st.retracted = on; savePanels(); }
+  }
+  const apply = () => {
+    outer.style.width = st.w ? `${Math.min(st.w, innerWidth - 20)}px` : '';
+    outer.style.height = st.h ? `${Math.min(st.h, innerHeight - 40)}px` : '';
+  };
+  for (const g of grips) {
+    const grip = el('div', { class: 'pgrip ' + g, title: 'Drag to resize (double-click: original size)' });
+    grip.addEventListener('pointerdown', (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault(); e.stopPropagation();
+      grip.setPointerCapture(e.pointerId); grip.classList.add('drag');
+      const r = outer.getBoundingClientRect(), x0 = e.clientX, y0 = e.clientY, k = outer.dataset.centred ? 2 : 1;
+      const sx = g.includes('e') ? 1 : g.includes('w') ? -1 : 0, sy = g.includes('s') ? 1 : 0;
+      const move = (ev) => {
+        if (sx) st.w = Math.round(clamp(r.width + sx * k * (ev.clientX - x0), minW, Math.min(maxW, innerWidth - 20)));
+        if (sy) st.h = Math.round(clamp(r.height + (ev.clientY - y0), minH, innerHeight - 40));
+        apply();
+      };
+      const up = () => { grip.classList.remove('drag'); grip.removeEventListener('pointermove', move); grip.removeEventListener('pointerup', up); grip.removeEventListener('pointercancel', up); savePanels(); };
+      grip.addEventListener('pointermove', move); grip.addEventListener('pointerup', up); grip.addEventListener('pointercancel', up);
+    });
+    grip.addEventListener('dblclick', () => { delete st.w; delete st.h; apply(); savePanels(); });
+    outer.append(grip);
+  }
+  apply();
+  addEventListener('resize', apply);
+  setRetracted(!!st.retracted, true);
+  outer._panel = { body, head, setRetracted, title: head.firstChild };
+  return body;
+}
+// A toolbar (the time controls, the career strip) only retracts: a small arrow at its end folds it away
+function makeToolbarRetract(outer, key, label, icons = ['down', 'up']) {
+  const st = panelState[key] || (panelState[key] = {});
+  const b = iconBtn(icons[0], '', () => set(!outer.classList.contains('retracted')), 'ptoggle');
+  outer.append(b);
+  function set(on, keep) {
+    outer.classList.toggle('retracted', on);
+    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${PANEL_ICONS[on ? icons[1] : icons[0]]}</svg>`;
+    b.title = on ? `Show the ${label}` : `Retract the ${label}`; b.setAttribute('aria-label', b.title);
+    if (!keep) { st.retracted = on; savePanels(); }
+  }
+  set(!!st.retracted, true);
+  return b;
+}
+const railEl = makePanel(document.getElementById('rail'), { key: 'rail', title: 'Build', grips: ['e', 's', 'se'], minW: 70, maxW: 520 });
+// The build menu. In a career it only shows what you own and have not placed yet, with how many are left.
+function railGroups() {
+  if (!career.active) return RAIL.map(([label, tools]) => [label, tools, null]);
+  const n = placedCounts(), A = acct(), groups = [];
+  const kits = Object.keys(KITS).map((k) => 'kit:' + k).filter((t) => available(t, n, A) > 0);
+  if (kits.length) groups.push(['Kits', kits]);
+  for (const [label, tools] of RAIL) {
+    const keep = tools.filter((t) => CAREER_FREE.has(t) || available(t, n, A) > 0);
+    if (keep.some((t) => !CAREER_FREE.has(t)) || label === 'Tools' || label === 'Connect') groups.push([label, keep]);
+  }
+  return groups.map(([label, tools]) => [label, tools, Object.fromEntries(tools.filter((t) => !CAREER_FREE.has(t)).map((t) => [t, available(t, n, A)]))]);
+}
+let railSig = '';
+function railRefresh() { const g = railGroups(); if (JSON.stringify(g) !== railSig) buildRail(g); }
+function buildRail(groups = railGroups()) {
+  railSig = JSON.stringify(groups);
   let collapsed = {};
   try { collapsed = JSON.parse(localStorage.getItem('red-sandbox-rail') || '{}'); } catch { /* storage blocked */ }
-  for (const [label, tools] of RAIL) {
+  const keepScroll = railEl.scrollTop;
+  railEl.textContent = '';
+  const shown = new Set();
+  for (const [label, tools, counts] of groups) {
     const lab = document.createElement('button');
     lab.className = 'rail-label';
     lab.textContent = label;
@@ -7115,19 +7415,24 @@ function buildRail() {
     const grp = document.createElement('div');
     grp.className = 'rail-group';
     for (const t of tools) {
+      shown.add(t);
       const b = document.createElement('button');
       const toggle = !!TOOL_INFO[t]?.toggle;
       b.className = 'tool' + (toggle ? ' toggle' : '');
       b.dataset.tool = t;
-      const key = toolKey(t);
-      b.title = `${toolLabel(t)}${key ? ` (${key})` : ''}`;
-      b.setAttribute('aria-pressed', 'false');
-      b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[t] || ''}</svg><span class="lbl">${toolLabel(t)}</span>${key ? `<span class="key">${key}</span>` : ''}${toggle ? '<span class="state">off</span>' : ''}`;
+      const key = toolKey(t), cnt = counts && counts[t] != null ? counts[t] : null;
+      b.title = `${toolLabel(t)}${key ? ` (${key})` : ''}${cnt != null ? ` · ${cnt} left` : ''}`;
+      b.setAttribute('aria-pressed', String(toggle ? settings.autoGlue : t === currentTool));
+      b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[t] || ''}</svg><span class="lbl">${toolLabel(t)}</span>${key ? `<span class="key">${key}</span>` : ''}${cnt != null ? `<span class="cnt">${cnt}</span>` : ''}${toggle ? `<span class="state">${settings.autoGlue ? 'on' : 'off'}</span>` : ''}`;
       b.addEventListener('click', () => (toggle ? toggleAutoGlue() : setTool(t)));
       grp.appendChild(b);
     }
     railEl.append(lab, grp);
   }
+  if (career.active) railEl.append(el('p', { class: 'rail-note' }, 'Only parts you own show here. Buy more in ', el('button', { class: 'linkbtn', onclick: () => { careerUI.tab = 'store'; careerPanelToggle(true); } }, 'the Store'), '.'));
+  railEl.parentNode._panel.title.textContent = career.active ? 'Your parts' : 'Build';
+  railEl.scrollTop = keepScroll;
+  if (career.active && currentTool && !shown.has(currentTool)) setTool('grabber');
 }
 function setTool(t) {
   currentTool = t;
@@ -7148,7 +7453,8 @@ function setTool(t) {
 // =====================================================================
 //  UI: inspector
 // =====================================================================
-const inspEl = document.getElementById('inspector');
+const inspOuter = document.getElementById('inspector');
+const inspEl = makePanel(inspOuter, { key: 'inspector', title: 'Inspector', grips: ['w', 's', 'sw'], minW: 220, maxW: 640 });
 function el(tag, attrs = {}, ...kids) {
   const e = document.createElement(tag);
   for (const [k, v] of Object.entries(attrs)) {
@@ -7315,7 +7621,8 @@ function mountFields(type, P, m, live) {
       sl('size', 'Bore', 0.25, 4, 0.05, (v) => `${v.toFixed(2)}×`);
       break;
     case 'clutch':
-      sl('torque', 'Grip when engaged', 1, 1000, 0, (v) => `${Math.round(v)} N·m`, { log: true });
+      if (career.active) f.push(careerLockNote(`Grip ${Math.round(P.torque)} N·m when engaged.`, 'Clutch plate upgrades'));
+      else sl('torque', 'Grip when engaged', 1, 1000, 0, (v) => `${Math.round(v)} N·m`, { log: true });
       sl('engage', 'Engaged without a wire', 0, 1, 0.01, (v) => `${Math.round(v * 100)}%`);
       f.push(checkField('oneway', 'One-way (freewheels when the hub runs ahead, like a starter)', !!P.oneWay, (v) => { if (live) pushUndo(); P.oneWay = v; if (live && m) { m.st.free = false; applyJointDrive(m); } }));
       break;
@@ -7355,11 +7662,18 @@ function mountFields(type, P, m, live) {
       sl('wastegate', 'Wastegate opens at', 0.1, 2.5, 0.05, (v) => `${v.toFixed(2)} atm`);
       break;
     case 'generator':
+      if (career.active) { f.push(careerLockNote(`Rated ${Math.round(P.ratedW)} W at ${Math.round(P.ratedRpm)} rpm, ${Math.round(P.ratedV)} V. Turns ${UPGRADES.gen.value(acct().upg.gen)}% of the shaft power into electricity.`, 'Generator upgrades')); break; }
       sl('ratedW', 'Power at the rated speed', 20, 5000, 1, (v) => `${Math.round(v)} W`, { log: true });
       sl('ratedRpm', 'Rated speed', 60, 1500, 1, (v) => `${Math.round(v)} rpm`, { log: true });
       sl('ratedV', 'Volts at the rated speed', 5, 400, 1, (v) => `${Math.round(v)} V`, { log: true });
       break;
+    case 'transformer':
+      f.push(segField('Voltage', [[400, '400 V'], [11000, '11 kV'], [33000, '33 kV']], P.volts, (v) => { if (live) pushUndo(); P.volts = v; renderInspector(); }));
+      if (career.active) { f.push(careerLockNote(`Handles up to ${Math.round(P.limit)} W.`, 'Transformer upgrades')); break; }
+      sl('limit', 'Most power it handles', 20, 20000, 1, (v) => `${Math.round(v)} W`, { log: true });
+      break;
     case 'pylon':
+      if (career.active) { f.push(el('div', { class: 'insp-desc' }, 'The grid takes everything a transformer sends it. A transformer sets the limit.')); break; }
       sl('limit', 'Most power it will take', 20, 10000, 1, (v) => `${Math.round(v)} W`, { log: true });
       break;
     case 'mturbo':
@@ -7460,13 +7774,7 @@ function renderInspector() {
   if (multi.length === 1) { selection = multi[0]; multi = []; }
   if (multi.length && !multi.some((x) => sameSel(x, selection))) selection = multi[multi.length - 1];
   const header = multi.length ? renderMulti(multi, body) : selection ? renderSelection(selection, body) : renderTool(body);
-  const worldSec = el('div', { class: 'insp-body insp-world' },
-    el('div', { class: 'section-label' }, 'World'),
-    sliderField('w-gravity', 'Gravity', { min: 0, max: 25, step: 0.05, value: settings.gravity, fmt: (v) => `${v.toFixed(2)} m/s²`, onInput: (v) => { settings.gravity = v; if (world) { world.gravity = { x: 0, y: -v, z: 0 }; world.forEachRigidBody((b) => b.wakeUp()); } } }),
-    sliderField('w-gas', 'Explosion strength', { min: 0.1, max: 4, step: 0.05, value: settings.gasPower, fmt: (v) => `${v.toFixed(2)}×`, onInput: (v) => { settings.gasPower = v; } }),
-    checkField('w-snap', 'Snap to grid', settings.snap, (v) => { settings.snap = v; }),
-  );
-  inspEl.replaceChildren(header, body, worldSec);
+  inspEl.replaceChildren(header, body);
   inspectorLive();
 }
 function checkField(id, label, value, onChange) {
@@ -7731,6 +8039,7 @@ function buildTimebar() {
   $('btn-slower').addEventListener('click', () => nudgeSpeed(-1));
   $('btn-faster').addEventListener('click', () => nudgeSpeed(1));
   $('btn-reset').addEventListener('click', rewind);
+  makeToolbarRetract($('timebar'), 'timebar', 'time controls', ['right', 'left']);
 }
 let lastClock = '';
 function updateHud() {
@@ -7766,7 +8075,7 @@ function toggleMenu(btn, menu) {
 }
 // ----- Settings: kept in this browser between visits -----
 const PREFS_KEY = 'red-sandbox-prefs';
-const prefs = { theme: 'auto', brightness: 1 };
+const prefs = { theme: 'auto', brightness: 1, wasm: true };
 function savePrefs() {
   try { localStorage.setItem(PREFS_KEY, JSON.stringify({ ...prefs, gasXray: settings.gasXray, sound: settings.sound, performance: settings.performance })); } catch { /* storage blocked */ }
 }
@@ -7779,6 +8088,7 @@ try {
   const p = JSON.parse(localStorage.getItem(PREFS_KEY) || '{}');
   if (['auto', 'light', 'dark'].includes(p.theme)) prefs.theme = p.theme;
   if (Number.isFinite(p.brightness)) prefs.brightness = clamp(p.brightness, 0.3, 2.5);
+  if (typeof p.wasm === 'boolean') prefs.wasm = p.wasm;
   if (typeof p.gasXray === 'boolean') settings.gasXray = p.gasXray;
   if (typeof p.sound === 'boolean') settings.sound = p.sound;
   if (typeof p.performance === 'boolean') settings.performance = p.performance;
@@ -7794,6 +8104,47 @@ function renderSettingsMenu() {
     checkField('s-sound', 'Explosion sounds', settings.sound, (v) => { settings.sound = v; if (v) ensureAudio(); savePrefs(); }),
     checkField('s-perf', 'Performance mode', settings.performance, (v) => { settings.performance = v; needsRebuild = true; savePrefs(); }),
     el('div', { class: 'insp-desc' }, 'Auto follows your system\'s light or dark mode. See-through parts like ice never hide gas. Performance mode trades accuracy for speed: gears mesh by rule (their speeds are simply locked together) instead of their teeth pushing on each other, and the gas pressure is worked out more roughly, which makes big explosions much cheaper.'),
+    worldSection(),
+    wasmSection(),
+  );
+}
+// The world: gravity and how hard gas pushes. A career always runs in the same world (CAREER_WORLD), so there
+// they are fixed; the sandbox's own values come back when the career is left.
+function setGravity(v) {
+  settings.gravity = v;
+  if (world) { world.gravity = { x: 0, y: -v, z: 0 }; world.forEachRigidBody((b) => b.wakeUp()); }
+}
+function worldSection() {
+  const sec = el('div', { class: 'wasm-sec' }, el('div', { class: 'section-label' }, 'World'));
+  if (career.active) {
+    sec.append(
+      el('div', { class: 'wasm-name' }, el('span', {}, 'Gravity'), el('b', {}, `${settings.gravity.toFixed(2)} m/s²`)),
+      el('div', { class: 'wasm-name' }, el('span', {}, 'Explosion strength'), el('b', {}, `${settings.gasPower.toFixed(2)}×`)),
+      el('div', { class: 'insp-desc' }, 'Fixed in career mode, so every career and challenge plays by the same rules. Leave the career to change them.'));
+  } else {
+    sec.append(
+      sliderField('w-gravity', 'Gravity', { min: 0, max: 25, step: 0.05, value: settings.gravity, fmt: (v) => `${v.toFixed(2)} m/s²`, onInput: setGravity }),
+      sliderField('w-gas', 'Explosion strength', { min: 0.1, max: 4, step: 0.05, value: settings.gasPower, fmt: (v) => `${v.toFixed(2)}×`, onInput: (v) => { settings.gasPower = v; } }));
+  }
+  sec.append(checkField('w-snap', 'Snap to grid', settings.snap, (v) => { settings.snap = v; }));
+  return sec;
+}
+// Which WebAssembly modules are running, and why any that are not fell back to JavaScript
+function wasmSection() {
+  const names = Object.keys(WASM_INFO), on = names.filter((n) => WASM_STATUS[n]?.ok).length;
+  const failed = names.some((n) => !WASM_STATUS[n]?.ok && /^Failed/.test(WASM_STATUS[n]?.why || ''));
+  const rows = names.map((n) => {
+    const st = WASM_STATUS[n] || { ok: false, why: 'Not loaded.' }, [label, what] = WASM_INFO[n];
+    return el('div', { class: 'wasm-row' },
+      el('div', { class: 'wasm-name' }, el('b', {}, label), el('span', { class: 'chip ' + (st.ok ? 'ok' : failed ? 'accent' : 'warn') }, st.ok ? 'WebAssembly' : 'JavaScript')),
+      el('small', {}, st.ok ? `${what} · ${st.kb.toFixed(1)} KB, ready in ${st.ms.toFixed(1)} ms` : `${what} · ${st.why}`));
+  });
+  return el('div', { class: 'wasm-sec' },
+    el('div', { class: 'section-label' }, 'WebAssembly'),
+    el('div', { class: 'wasm-sum ' + (on === names.length ? 'ok' : failed ? 'bad' : 'warn') }, on === names.length ? `All ${on} modules online` : failed ? `WebAssembly failed to load: ${on} of ${names.length} modules online` : `${on} of ${names.length} modules online`),
+    ...rows,
+    checkField('s-wasm', 'Use WebAssembly (reload to apply)', prefs.wasm, (v) => { prefs.wasm = v; savePrefs(); toast('Reload the page to apply.'); }),
+    el('div', { class: 'insp-desc' }, 'Modules that do not run fall back to JavaScript, which works out exactly the same numbers, only slower.'),
   );
 }
 function buildTopbar() {
@@ -7807,7 +8158,7 @@ function buildTopbar() {
   $('btn-logic').addEventListener('click', toggleLogicView);
   $('help-close').addEventListener('click', () => showHelp(false));
   helpEl.addEventListener('click', (e) => { if (e.target === helpEl) showHelp(false); });
-  $('btn-inspector').addEventListener('click', () => inspEl.classList.toggle('open'));
+  $('btn-inspector').addEventListener('click', () => inspOuter.classList.toggle('open'));
   const exMenu = $('menu-examples');
   for (const ex of EXAMPLES) exMenu.append(el('button', { onclick: () => { closeMenus(); loadExample(ex); } }, ex.name, el('span', {}, ex.desc)));
   $('btn-examples').addEventListener('click', (e) => { e.stopPropagation(); toggleMenu($('btn-examples'), exMenu); });
@@ -7840,6 +8191,7 @@ function buildTopbar() {
     r.onload = () => {
       try {
         const data = JSON.parse(String(r.result));
+        careerSuspend();
         pushUndo();
         loadScene(data);
         afterLoad(false);
@@ -7865,7 +8217,7 @@ function fileAction(a) {
     let s = null;
     try { s = localStorage.getItem(SAVE_KEY) || localStorage.getItem('red-sandbox-save-v1'); } catch { /* storage blocked */ }
     if (!s) { toast('There is no saved build in this browser yet.'); return; }
-    try { pushUndo(); loadScene(JSON.parse(s)); afterLoad(false); toast('Loaded your saved build. Press Play to run it.'); }
+    try { careerSuspend(); pushUndo(); loadScene(JSON.parse(s)); afterLoad(false); toast('Loaded your saved build. Press Play to run it.'); }
     catch { toast('The saved build is damaged and could not be loaded.'); }
   } else if (a === 'export') {
     const blob = new Blob([JSON.stringify(serialize(), null, 1)], { type: 'application/json' });
@@ -7878,6 +8230,7 @@ function fileAction(a) {
   } else if (a === 'import') {
     $('file-input').click();
   } else if (a === 'clear') {
+    careerSuspend();
     pushUndo();
     clearScene();
     simTime = 0;
@@ -8941,112 +9294,305 @@ function buildQuad(o, tune = {}) {
 }
 // =====================================================================
 //  Career mode: build a machine that sells electricity to the grid
-//  Engine -> clutch -> generator -> pylon. Money comes from the grid, fuel costs money.
-//  The Career button in the top bar opens the panel: Stats, Store and Bank.
+//  Engine -> clutch -> generator -> transformer -> pylon. Money comes from the grid; parts, fuel, the liquid
+//  taps use and repairs cost money. The Career button in the top bar opens the panel: Stats, Store (full
+//  screen), Bank, Challenges and Upkeep. Only parts you own show in the build menu, and each placed part
+//  comes out of the inventory (deleting it puts it back). A career is kept in this browser.
 // =====================================================================
 const SIM_SEC_PER_HOUR = 60;       // one second of simulated time is one in-game minute
-const PRICE_PER_KWH = 25;          // $ per kWh at average demand
-const FUEL_PRICE = 2;              // $ per litre of gasoline
+const PRICE_PER_WH = 2;            // $ per watt-hour at average demand (sandbox engines make watts, not kilowatts)
+const FUEL_PRICE = 3;              // $ per litre of gasoline
 const FUEL_L_PER_UNIT = 0.002;     // litres burned for one unit of injected fuel
 const INTEREST_PER_HOUR = 0.01;    // the bank pays 1.0% every in-game hour
+const OFFLINE_MAX_H = 48;          // while you are away the bank keeps paying, for up to this many in-game hours
 const HIST_STEP = 0.25;            // demand is recorded every quarter of an in-game hour
-const SHIPPING = { standard: { label: 'Standard', hours: 24, cost: 12 }, express: { label: 'Express', hours: 8, cost: 30 }, rocket: { label: 'Rocket', hours: 2, cost: 60 } };
+const WIRE_LIFE_H = 60;            // a power wire carrying 20 W lasts about this many in-game hours
+const WIRE_REPAIR = 8;             // $ to replace one worn wire on the spot
+const CAREER_KEY = 'red-sandbox-career';
+const CAREER_WORLD = { gravity: 9.81, gasPower: 1.5 }; // gravity and explosion strength in every career
+let sandboxWorld = null; // the sandbox's own world settings while a career runs
+function careerWorld(on) {
+  if (on && !sandboxWorld) sandboxWorld = { gravity: settings.gravity, gasPower: settings.gasPower };
+  const w = on ? CAREER_WORLD : sandboxWorld;
+  if (!on) sandboxWorld = null;
+  if (w) { setGravity(w.gravity); settings.gasPower = w.gasPower; }
+  if (!$('menu-settings').hidden) renderSettingsMenu();
+}
+// Delivery: the price starts at the base and grows by a quarter for every five more things in the order
+const SHIPPING = { standard: { label: 'Standard', hours: 24, base: 12 }, express: { label: 'Express', hours: 8, base: 30 }, rocket: { label: 'Rocket', hours: 2, base: 60 } };
+const shipCost = (id, units) => SHIPPING[id].base * (1 + 0.25 * Math.floor(Math.max(0, units - 1) / 5));
+// Liquids a tap pours are billed every in-game hour, by the litre
+const METERED = { water: { price: 0.02 }, oil: { price: 3 }, gasoline: { price: FUEL_PRICE } };
+// What each loose part costs. Electric motors are not sold: they would turn a generator for free.
+const PART_PRICE = {
+  block: 8, plank: 6, beam: 6, domino: 2, ball: 5, cylinder: 10, wheel: 14, ramp: 8,
+  axle: 10, bearing: 18, gear: 22, rack: 20, cam: 18, pulley: 15, belt: 12, gearbox: 70, clutch: 40, uvjoint: 25,
+  generator: 120, transformer: 90, pylon: 60,
+  hinge: 15, balljoint: 15, slider: 20, torsion: 20, solenoid: 35,
+  structure: 6, spring: 10,
+  injector: 30, igniter: 25, valve: 28, turbo: 80, mturbo: 70, exhturbo: 110, intake: 20, pipe: 5, pressure: 15,
+  inlet: 15, outlet: 15, pump: 60, oilpump: 60, mpump: 45, moilpump: 45, sprayer: 25, bend90: 8, bend45: 8, tubepump: 50,
+  wire: 5, button: 8, lever: 10, distance: 18, angle: 18, touch: 12, gate: 10, logic: 10, lamp: 6,
+};
+const RAIL_CAT = { Parts: 'Mechanical', Drivetrain: 'Mechanical', Joints: 'Mechanical', Connect: 'Mechanical', Power: 'Electrical', Signals: 'Electrical', Gas: 'Other Parts', Fluids: 'Other Parts' };
+const CAREER_FREE = new Set(['select', 'grabber', 'move', 'rotate', 'size', 'delete', 'glue', 'autoglue']);
+const POWER_TYPES = new Set(['generator', 'transformer']);
+// Engines come as kits: built in one go where you click, with everything wired up. Their pieces belong to the kit.
+const KITS = {
+  lenoir: { name: 'Single-cylinder engine', price: 250, spin: 9, desc: 'The two-stroke you start with: sucks in a charge, fires it and blows the exhaust out every turn. Light and thirsty.', build: (o) => buildEngine(o, { kind: 'lenoir', rate: 2.5 }) },
+  port: { name: 'Turbo two-stroke', price: 700, spin: 9, desc: 'A crank-driven turbo blows air in through the head and flushes the exhaust out through a port in the floor.', build: (o) => buildEngine(o, { kind: 'port', gain: 3 }) },
+  four: { name: 'Turbo four-stroke single', price: 1200, spin: 11, desc: 'Intake, compression, power, exhaust over two turns, with timed valves and a turbo.', build: (o) => buildEngine(o, { kind: 'four' }) },
+  vtwin: { name: 'V-twin', price: 2200, spin: 11, desc: 'A 90° twin: one cylinder flat, one upright, both rods on one crank pin.', build: (o) => buildVTwin(o) },
+  i2: { name: 'Inline twin', price: 3200, desc: 'A two-cylinder four-stroke with a water-cooled block, oil pump and a starter (hold B to crank it).', build: (o) => buildI2(o) },
+  i2t: { name: 'Inline twin turbo', price: 4800, desc: 'The inline twin with an exhaust-driven turbocharger (hold B to crank it).', build: (o) => buildI2(o, { turbo: true, rate: 4.5 }) },
+};
+for (const [k, d] of Object.entries(KITS)) { TOOL_INFO['kit:' + k] = { label: d.name, desc: `${d.desc} Click the floor to put it down.` }; ICONS['kit:' + k] = ICONS.kit; }
+// Upgrades come in levels; each costs more than the one before
+const UPGRADES = {
+  gen: { cat: 'Electrical', name: 'Generator upgrade', prices: [150, 300, 600, 1200, 2400], value: (l) => 70 + 6 * l, unit: '%', what: 'of the shaft power every generator turns into electricity (better windings: no extra drag on the engine)', icon: 'generator' },
+  xfmr: { cat: 'Electrical', name: 'Transformer upgrade', prices: [120, 250, 500, 1000, 2000], value: (l) => [25, 50, 80, 120, 170, 240][l], unit: 'W', what: 'that every transformer handles', icon: 'transformer' },
+  clutch: { cat: 'Mechanical', name: 'Clutch plate upgrade', prices: [60, 140, 300, 650], value: (l) => 80 + 40 * l, unit: 'N·m', what: 'grip on every clutch', icon: 'clutch' },
+  tank: { cat: 'Other Parts', name: 'Fuel tank upgrade', prices: [80, 200, 450, 1000, 2200], value: (l) => [5, 10, 20, 40, 80, 160][l], unit: 'L', what: 'of fuel tank (it cannot be built from parts)', icon: 'injector' },
+};
+const tankCap = (A = acct()) => UPGRADES.tank.value(A.upg.tank);
+// Everything the store sells
+const STORE_CATS = ['Fluids', 'Mechanical', 'Electrical', 'Other Parts'];
 const STORE = [
-  { id: 'gasoline', cat: 'Fluids', name: 'Gasoline', unit: 'L', price: FUEL_PRICE, desc: 'Goes into your fuel tank when it arrives; what does not fit is lost.' },
-  { id: 'clutch', cat: 'Mechanical', name: 'Clutch plate upgrade', price: 60, desc: '+40 N·m of grip, so the clutch holds a heavier load.' },
-  { id: 'generator', cat: 'Electrical', name: 'Generator upgrade', price: 150, desc: '+100 W rated power (it needs more torque from the engine).' },
-  { id: 'transformer', cat: 'Electrical', name: 'Transformer upgrade', price: 120, desc: '+250 W more power the pylon will take.' },
-  { id: 'tank', cat: 'Other Parts', name: 'Fuel tank upgrade', price: 80, desc: '+5 L of tank capacity.' },
+  { id: 'fluid:gasoline', cat: 'Fluids', sub: 'Fuel', name: 'Gasoline', unit: 'L', price: FUEL_PRICE, max: 999, icon: 'injector', desc: 'For the engine\'s fuel tank: poured straight in when it arrives. What does not fit is lost.' },
+  { id: 'meter:water', cat: 'Fluids', sub: 'Billed as you use them', name: 'Water', unit: 'L', price: METERED.water.price, metered: true, icon: 'outlet', desc: 'What taps (outlets with nothing piped in) pour. Billed every in-game hour.' },
+  { id: 'meter:oil', cat: 'Fluids', sub: 'Billed as you use them', name: 'Motor oil', unit: 'L', price: METERED.oil.price, metered: true, icon: 'oilpump', desc: 'Oil from taps. Billed every in-game hour.' },
+  { id: 'meter:gasoline', cat: 'Fluids', sub: 'Billed as you use them', name: 'Gasoline from taps', unit: 'L', price: METERED.gasoline.price, metered: true, icon: 'outlet', desc: 'Liquid gasoline poured by taps (not the engine\'s tank). Billed every in-game hour.' },
+  ...Object.entries(KITS).map(([k, d]) => ({ id: 'kit:' + k, cat: 'Mechanical', sub: 'Engines', name: d.name, price: d.price, max: 9, icon: 'kit', desc: d.desc })),
+  ...Object.entries(UPGRADES).map(([k, d]) => ({ id: 'upg:' + k, cat: d.cat, sub: 'Upgrades', name: d.name, upgrade: k, icon: d.icon })),
 ];
-const career = { active: false, ref: null };
-const careerUI = { open: false, tab: 'stats', period: 24, bankAmt: 10 };
+for (const [group, tools] of RAIL) for (const t of tools) {
+  if (!PART_PRICE[t] || !RAIL_CAT[group]) continue;
+  const d = PART_TYPES[t] || MOUNTS[t] || TOOL_INFO[t];
+  STORE.push({ id: 'part:' + t, cat: RAIL_CAT[group], sub: group === 'Power' ? 'Power' : group, name: toolLabel(t), price: PART_PRICE[t], max: 99, icon: t, tool: t, desc: d?.desc || '' });
+}
+const storeItem = (id) => STORE.find((it) => it.id === id);
+
+function newAccount(money) {
+  return { money, fuel: 5, own: {}, upg: { gen: 0, xfmr: 0, clutch: 0, tank: 0 }, pend: { gen: 0, xfmr: 0, clutch: 0, tank: 0 }, cart: {}, ship: 'standard', orders: [] };
+}
+const career = { active: false };
+const careerUI = { open: false, tab: 'stats', period: 24, bankAmt: 10, cat: 'all', dirty: false };
 function careerFresh() {
-  return { money: 100, fuel: 5, tankCap: 5, t: 0, bank: 0, kWh: 0, earned: 0, litres: 0, hourDone: 0,
-    cur: { rev: 0, fuel: 0 }, ledger: [], history: [], cart: {}, ship: 'standard', orders: [], storeSpent: 0 };
+  return { ...newAccount(100), t: 0, bank: 0, Wh: 0, earned: 0, litres: 0, hourDone: 0, seed: Math.random() * 1000,
+    cur: { rev: 0, fuel: 0, fluids: 0, maint: 0 }, ledger: [], history: [], use: { water: 0, oil: 0, gasoline: 0 },
+    engines: {}, nextKit: 1, done: {}, challenge: null, snapped: 0, stepW: 0, lastW: 0 };
 }
 Object.assign(career, careerFresh());
-// Demand through the day: a smooth daily swing plus a small wobble. It only ever depends on the time already
-// passed, and `history` only records moments that have happened, so nobody can look ahead.
-function careerDemandAt(t) { return 1 + 0.22 * Math.sin(TAU * (t / 24 - 0.3)) + 0.06 * Math.sin(TAU * (t * 3.7 / 24) + 1); }
+// The account money and parts come out of: the career's own, or a challenge's while one runs
+const acct = () => career.challenge?.acct || career;
+
+// Demand through the day: a smooth daily swing plus a small wobble, and each day a little higher or lower than
+// the last (settling in over the first three hours of the day). It only ever depends on days that have begun,
+// and `history` only records moments that have happened, so nobody can look ahead.
+function dayFactor(d) { if (d < 0) return 1; const x = Math.sin((d + 1) * 12.9898 + career.seed * 78.233) * 43758.5453; return 0.92 + 0.16 * (x - Math.floor(x)); }
+function careerDemandAt(t) {
+  const d = Math.floor(t / 24), f = clamp((t / 24 - d) * 8, 0, 1), s = f * f * (3 - 2 * f);
+  const k = dayFactor(d - 1) + (dayFactor(d) - dayFactor(d - 1)) * s;
+  return k * (1 + 0.22 * Math.sin(TAU * (t / 24 - 0.3)) + 0.06 * Math.sin(TAU * (t * 3.7 / 24) + 1));
+}
 function careerDemand() { return careerDemandAt(career.t); }
-function careerEarn(watts, h) {
-  const kWh = (watts * (h / SIM_SEC_PER_HOUR)) / 1000;
-  const pay = kWh * PRICE_PER_KWH * careerDemand();
-  career.kWh += kWh; career.earned += pay; career.money += pay; career.cur.rev += pay;
+function careerEarn(watts, h, volts) {
+  const Wh = watts * (h / SIM_SEC_PER_HOUR);
+  const pay = Wh * PRICE_PER_WH * careerDemand();
+  career.stepW += watts;
+  acct().money += pay;
+  const ch = career.challenge;
+  if (ch) { ch.Wh += Wh; ch.rev += pay; if (volts >= (CHALLENGES[ch.id].goal.V || 0)) ch.goalWh += Wh; return; }
+  career.Wh += Wh; career.earned += pay; career.cur.rev += pay;
 }
 function careerBurn(units) { // fuel taken out of the tank for `units` of injection; returns how much can really be injected
-  if (career.fuel <= 0) return 0;
+  const A = acct();
+  if (A.fuel <= 0) return 0;
   let litres = units * FUEL_L_PER_UNIT;
-  if (litres > career.fuel) { litres = career.fuel; units = litres / FUEL_L_PER_UNIT; }
-  career.fuel -= litres; career.litres += litres;
+  if (litres > A.fuel) { litres = A.fuel; units = litres / FUEL_L_PER_UNIT; }
+  A.fuel -= litres;
+  if (!career.challenge) career.litres += litres;
   return units;
 }
+function careerMeter(kind, litres) { if (METERED[kind] && litres > 0) career.use[kind] += litres; }
+function careerCharge(amount, kind) { // money out of the current account, booked as an operating cost
+  acct().money -= amount;
+  if (career.challenge) career.challenge.cost += amount; else career.cur[kind] += amount;
+}
+const isPowerWire = (w) => w.type !== 'fluid' && POWER_TYPES.has(S.mounts.get(w.from.m)?.type);
 function careerTick(h) { // called every physics step while a career runs
-  career.t += h / SIM_SEC_PER_HOUR;
+  const dh = h / SIM_SEC_PER_HOUR;
+  career.t += dh;
+  career.lastW = career.stepW; career.stepW = 0;
   while (career.history.length < Math.floor(career.t / HIST_STEP)) { const t = (career.history.length + 1) * HIST_STEP; career.history.push({ t, d: careerDemandAt(t) }); }
-  while (career.hourDone < Math.floor(career.t)) { // an in-game hour has passed: interest, then close the books for it
+  while (career.hourDone < Math.floor(career.t)) { // an in-game hour has passed: interest, the fluid bill, then close the books
     career.hourDone++;
     career.bank *= 1 + INTEREST_PER_HOUR;
-    career.ledger.push(career.cur); career.cur = { rev: 0, fuel: 0 };
+    const bill = Object.keys(METERED).reduce((a, k) => a + career.use[k] * METERED[k].price, 0);
+    if (bill > 0.005) { careerCharge(bill, 'fluids'); toast(`Fluid bill for the last hour: $${bill.toFixed(2)}.`); }
+    career.use = { water: 0, oil: 0, gasoline: 0 };
+    career.ledger.push(career.cur); career.cur = { rev: 0, fuel: 0, fluids: 0, maint: 0 };
   }
-  if (career.orders.length && career.orders.some((o) => o.at <= career.t)) careerDeliver();
+  // Power wires wear out, faster the more they carry, and snap when worn through
+  for (const w of S.wires.values()) {
+    if (!isPowerWire(w)) continue;
+    const before = w.hp;
+    w.hp -= (dh / WIRE_LIFE_H) * (0.6 + (S.mounts.get(w.from.m).out.watts ?? 0) / 50);
+    if (before > 0.25 && w.hp <= 0.25) toast('A power wire is badly worn: replace it in Career → Upkeep before it snaps.');
+    if (w.hp <= 0) { deleteWire(w); wiresDirty = true; career.snapped++; careerUI.dirty = true; toast('A worn power wire snapped! Wire it up again (Wire tool) or the power stops.'); }
+  }
+  if (career.challenge) challengeTick();
+  for (const A of career.challenge ? [career.challenge.acct] : [career]) if (A.orders.length && A.orders.some((o) => o.at <= career.t)) careerDeliver(A);
 }
-function careerDeliver() {
-  const arrived = career.orders.filter((o) => o.at <= career.t);
-  career.orders = career.orders.filter((o) => o.at > career.t);
-  const r = career.ref || {};
-  for (const o of arrived) for (const [id, q] of o.lines) {
-    if (id === 'gasoline') career.fuel = Math.min(career.tankCap, career.fuel + q);
-    else if (id === 'tank') career.tankCap += 5 * q;
-    else if (id === 'generator') { const m = S.mounts.get(r.gen); if (m) m.params.ratedW += 100 * q; }
-    else if (id === 'transformer') { const m = S.mounts.get(r.pylon); if (m) m.params.limit += 250 * q; }
-    else if (id === 'clutch') { const m = S.mounts.get(r.clutch); if (m) { m.params.torque += 40 * q; applyJointDrive(m); } }
-  }
-  toast(arrived.length > 1 ? `${arrived.length} orders arrived.` : 'Your order arrived.');
+function careerDeliver(A) {
+  const arrived = A.orders.filter((o) => o.at <= career.t);
+  A.orders = A.orders.filter((o) => o.at > career.t);
+  for (const o of arrived) careerReceive(A, o.lines);
+  if (arrived.length) toast(arrived.length > 1 ? `${arrived.length} orders arrived.` : 'Your order arrived.');
   careerUI.dirty = true;
 }
-function careerReset(ref) {
-  Object.assign(career, careerFresh(), { active: !!ref, ref: ref || null });
-  if (!ref) careerUI.open = false;
-  careerHudBuild(); careerPanelRender();
+function careerReceive(A, lines) {
+  for (const [id, q] of lines) {
+    const [kind, key] = id.split(':');
+    if (kind === 'fluid') A.fuel = Math.min(tankCap(A), A.fuel + q);
+    else if (kind === 'upg') { A.upg[key] += q; A.pend[key] -= q; }
+    else A.own[kind === 'kit' ? id : key] = (A.own[kind === 'kit' ? id : key] || 0) + q;
+  }
+  careerApplyUpgrades();
+}
+// What is on the floor right now, by what it came out of the inventory as (kit pieces count as their kit)
+function placedCounts() {
+  const n = {}, kits = new Set();
+  const add = (k) => { n[k] = (n[k] || 0) + 1; };
+  const item = (x, type) => { if (x.kit) kits.add(x.kit); else if (type) add(type); };
+  for (const p of S.parts.values()) item(p, p.hubOf == null ? p.type : null);
+  for (const m of S.mounts.values()) item(m, m.type);
+  for (const g of S.glues.values()) item(g, g.struct ? 'structure' : null);
+  for (const sp of S.springs.values()) item(sp, 'spring');
+  for (const b of S.belts.values()) item(b, 'belt');
+  for (const w of S.wires.values()) item(w, w.type === 'fluid' ? 'pipe' : 'wire');
+  for (const k of kits) add('kit:' + k.split('#')[0]);
+  return n;
+}
+const available = (t, n = placedCounts(), A = acct()) => (A.own[t] || 0) - (n[t] || 0);
+function careerAllow(t) {
+  if (!career.active || CAREER_FREE.has(t)) return true;
+  if (available(t) >= 1) return true;
+  toast(`You have no ${toolLabel(t)} left. Buy more in Career → Store.`);
+  return false;
+}
+function careerAllowPaste(data) {
+  if (!career.active) return true;
+  const need = {};
+  const add = (k) => { need[k] = (need[k] || 0) + 1; };
+  for (const d of data.parts) if (d.hubOf == null) add(d.type);
+  for (const d of data.mounts) add(d.type);
+  for (const d of data.glues) if (d.struct) add('structure');
+  for (const d of data.springs) add('spring');
+  for (const d of data.belts || []) add('belt');
+  for (const d of data.wires) add(d.type === 'fluid' ? 'pipe' : 'wire');
+  const n = placedCounts(), short = Object.entries(need).filter(([t, q]) => available(t, n) < q);
+  if (!short.length) return true;
+  toast(`Not enough in your inventory to paste that: short of ${short.map(([t, q]) => `${q - Math.max(0, available(t, n))} × ${toolLabel(t)}`).join(', ')}.`);
+  return false;
+}
+// Upgrades apply to every generator, transformer and clutch you own (not to the pieces inside a kit)
+function careerApplyUpgrades() {
+  if (!career.active) return;
+  const u = acct().upg;
+  for (const m of S.mounts.values()) {
+    if (m.kit) continue;
+    if (m.type === 'generator') { m.params.ratedW = 200; m.params.ratedRpm = 240; m.params.ratedV = 48; m.st.eff = UPGRADES.gen.value(u.gen) / 100; }
+    else if (m.type === 'transformer') m.params.limit = UPGRADES.xfmr.value(u.xfmr);
+    else if (m.type === 'clutch' && m.params.torque !== UPGRADES.clutch.value(u.clutch)) { m.params.torque = UPGRADES.clutch.value(u.clutch); applyJointDrive(m); }
+  }
+}
+function placeKit(k, f) {
+  if (!career.active) { setTool('grabber'); return; }
+  if (available('kit:' + k) < 1) { toast(`You have no ${KITS[k].name} kit left. Buy one in Career → Store.`); return; }
+  pushUndo();
+  const o = V(Math.round(f.point.x * 4) / 4, 0, Math.round(f.point.z * 4) / 4);
+  kitTag = `${k}#${career.nextKit++}`;
+  let extra;
+  try { extra = KITS[k].build(o); } finally { kitTag = null; }
+  if (extra?.fill) { ensureGasHash(true); for (const fl of extra.fill) liqFillBox(fl.min, fl.max, fl.kind, fl.skip); }
+  careerRegisterEngine(`${k}#${career.nextKit - 1}`, extra, KITS[k].spin);
+  wiresDirty = true;
+  markEdited();
+  applyLogicViewMaterials();
+  setTool('grabber');
+  toast(`${KITS[k].name} placed. Couple its crank to a generator with a clutch, then press Start.`);
+}
+function careerRegisterEngine(tag, extra, w) {
+  if (!extra?.spin || !w) return;
+  career.engines[tag] = { spin: extra.spin.map((q) => q.id), slide: (extra.slide || []).map((q) => q.id), centre: extra.centre.toArray(), slideVel: (extra.slideVel || V()).toArray(), w };
 }
 function careerRefill() {
-  const need = career.tankCap - career.fuel;
+  const A = acct(), need = tankCap(A) - A.fuel;
   if (need < 0.01) { toast('The tank is already full.'); return; }
-  const litres = Math.min(need, career.money / FUEL_PRICE);
+  const litres = Math.min(need, Math.max(0, A.money) / FUEL_PRICE);
   if (litres < 0.01) { toast('Not enough money for fuel.'); return; }
   const cost = litres * FUEL_PRICE;
-  career.money -= cost; career.cur.fuel += cost; career.fuel += litres;
-  toast(litres < need ? `Bought ${litres.toFixed(2)} L for $${cost.toFixed(2)}: that is all you can afford.` : `Tank filled: ${litres.toFixed(2)} L for $${cost.toFixed(2)}.`);
+  careerCharge(cost, 'fuel');
+  A.fuel += litres;
+  toast(litres < need - 0.01 ? `Bought ${litres.toFixed(2)} L for $${cost.toFixed(2)}: that is all you can afford.` : `Tank filled: ${litres.toFixed(2)} L for $${cost.toFixed(2)}.`);
 }
-function careerStartEngine() { // a starter's worth of spin on the crank, the same as the examples give
-  const r = career.ref;
-  if (!r || !r.engine) return;
+function careerStartEngine() { // a starter's worth of spin on each engine's crank, the same as the examples give
   ensureWorld();
-  const w = 9, c = r.engine.centre;
-  const setBody = (id, lin, ang) => { const b = S.parts.get(id)?.body; if (b && !b.isFixed()) { if (ang) b.setAngvel({ x: 0, y: 0, z: w }, true); b.setLinvel({ x: lin.x, y: lin.y, z: lin.z }, true); } };
-  for (const id of r.engine.spin) { const q = S.parts.get(id); if (q) setBody(id, V(0, 0, w).cross(q.pos.clone().sub(c)), true); }
-  for (const id of r.engine.slide) setBody(id, r.engine.slideVel.clone().multiplyScalar(w), false);
-  if (career.fuel <= 0) toast('The tank is empty: refill it first.');
+  let n = 0;
+  for (const e of Object.values(career.engines)) {
+    if (!e.spin.every((id) => S.parts.has(id))) continue;
+    const c = V().fromArray(e.centre), sv = V().fromArray(e.slideVel), w = e.w;
+    const setBody = (id, lin, ang) => { const b = S.parts.get(id)?.body; if (b && !b.isFixed()) { if (ang) b.setAngvel({ x: 0, y: 0, z: w }, true); b.setLinvel({ x: lin.x, y: lin.y, z: lin.z }, true); } };
+    for (const id of e.spin) setBody(id, V(0, 0, w).cross(S.parts.get(id).pos.clone().sub(c)), true);
+    for (const id of e.slide) setBody(id, sv.clone().multiplyScalar(w), false);
+    n++;
+  }
+  if (!n) toast('No engine to start. Engines with a starter crank with B.');
+  else if (acct().fuel <= 0) toast('The tank is empty: refill it first.');
   if (!running) setRunning(true);
 }
+// In the inspector: a setting the store's upgrades decide in a career, with a way to the store
+function careerLockNote(text, upgrade) {
+  return el('div', { class: 'insp-desc' }, text, ' In a career this comes from ',
+    el('button', { class: 'linkbtn', onclick: () => { careerUI.tab = 'store'; careerUI.search = upgrade.replace(/s$/, ''); careerPanelToggle(true); } }, upgrade), ' in the store.');
+}
 // ----- Store -----
-const storeLine = (it) => it.price * (career.cart[it.id] || 0);
-const storeItemsTotal = () => STORE.reduce((a, it) => a + storeLine(it), 0);
-const storeCount = () => STORE.reduce((a, it) => a + (career.cart[it.id] || 0), 0);
-const storeTotal = () => (storeCount() ? storeItemsTotal() + SHIPPING[career.ship].cost : 0);
-function cartSet(id, q) { q = Math.max(0, Math.min(999, Math.floor(+q || 0))); if (q) career.cart[id] = q; else delete career.cart[id]; careerPanelRender(); }
+function upgradeQuote(A, k, q) { // what the next q levels of an upgrade cost (null if there are not that many left)
+  const P = UPGRADES[k].prices, from = A.upg[k] + A.pend[k];
+  if (from + q > P.length) return null;
+  return P.slice(from, from + q).reduce((a, b) => a + b, 0);
+}
+const itemMax = (it, A = acct()) => (it.upgrade ? UPGRADES[it.upgrade].prices.length - A.upg[it.upgrade] - A.pend[it.upgrade] : it.max || 0);
+const linePrice = (it, q, A = acct()) => (it.upgrade ? upgradeQuote(A, it.upgrade, q) ?? Infinity : it.price * q);
+const unitPrice = (it, A = acct()) => (it.upgrade ? upgradeQuote(A, it.upgrade, 1) : it.price);
+const cartLines = (A = acct()) => Object.entries(A.cart).filter(([, q]) => q > 0).map(([id, q]) => [storeItem(id), q]).filter(([it]) => it);
+const cartItemsTotal = (A = acct()) => cartLines(A).reduce((a, [it, q]) => a + linePrice(it, q, A), 0);
+const cartUnits = (A = acct()) => cartLines(A).reduce((a, [it, q]) => a + (it.unit === 'L' ? Math.ceil(q / 20) : q), 0);
+const cartShipping = (A = acct()) => (career.challenge || !cartLines(A).length ? 0 : shipCost(A.ship, cartUnits(A)));
+function cartSet(id, q) {
+  const A = acct(), it = storeItem(id);
+  q = clamp(Math.floor(+q || 0), 0, itemMax(it, A));
+  if (q) A.cart[id] = q; else delete A.cart[id];
+  careerPanelRender();
+}
 function careerOrder() {
-  const total = storeTotal();
-  if (!total) return;
-  if (total > career.money + 1e-9) { toast(`That order costs $${total.toFixed(2)}, and you have $${career.money.toFixed(2)}.`); return; }
-  const lines = STORE.filter((it) => career.cart[it.id]).map((it) => [it.id, career.cart[it.id]]);
-  const fuelCost = (career.cart.gasoline || 0) * FUEL_PRICE;
-  career.money -= total; career.cur.fuel += fuelCost; career.storeSpent += total - fuelCost;
-  const sh = SHIPPING[career.ship];
-  career.orders.push({ at: career.t + sh.hours, lines, label: lines.map(([id, q]) => `${q} × ${STORE.find((it) => it.id === id).name}`).join(', ') });
-  career.cart = {};
-  toast(`Order placed. ${sh.label} delivery: ${sh.hours} in-game hours.`);
+  const A = acct(), lines = cartLines(A);
+  if (!lines.length) return;
+  const total = cartItemsTotal(A) + cartShipping(A);
+  if (total > A.money + 1e-9) { toast(`That order costs $${total.toFixed(2)}, and you have $${A.money.toFixed(2)}.`); return; }
+  A.money -= total;
+  const fuelCost = lines.filter(([it]) => it.id === 'fluid:gasoline').reduce((a, [it, q]) => a + it.price * q, 0);
+  if (career.challenge) career.challenge.cost += fuelCost; else career.cur.fuel += fuelCost;
+  for (const [it, q] of lines) if (it.upgrade) A.pend[it.upgrade] += q;
+  const order = lines.map(([it, q]) => [it.id, q]);
+  A.cart = {};
+  if (career.challenge) { careerReceive(A, order); toast('Bought. Challenge parts arrive at once.'); }
+  else {
+    const sh = SHIPPING[A.ship];
+    A.orders.push({ at: career.t + sh.hours, lines: order, label: lines.map(([it, q]) => `${q}${it.unit ? ' ' + it.unit : ' ×'} ${it.name}`).join(', ') });
+    toast(`Order placed. ${sh.label} delivery: ${sh.hours} in-game hours.`);
+  }
   careerPanelRender();
 }
 // ----- Bank -----
@@ -9056,142 +9602,434 @@ function bankMove(dir, all) {
   if (x < 0.005) { toast(dir > 0 ? 'No money to deposit.' : 'Nothing to withdraw.'); return; }
   career.money -= dir * x; career.bank += dir * x;
 }
-// ----- HUD (slim) and panel -----
+// ----- Upkeep -----
+function careerRepairWire(w) {
+  const A = acct();
+  if (A.money < WIRE_REPAIR) { toast(`A new wire costs $${WIRE_REPAIR}.`); return false; }
+  careerCharge(WIRE_REPAIR, 'maint');
+  w.hp = 1;
+  return true;
+}
+// ----- Challenges: a fixed budget and a goal; what you do not spend goes into your career account -----
+const CHALLENGES = {
+  first: { name: 'First light', desc: 'Sell 4 Wh of electricity to the grid.', budget: 700, reward: 200, goal: { Wh: 4 } },
+  steady: { name: 'Steady hand', desc: 'Keep at least 3 W flowing into the grid for 30 in-game minutes without a break.', budget: 900, reward: 400, goal: { W: 3, hold: 0.5 } },
+  hv: { name: 'High voltage', desc: 'Sell 4 Wh to the grid through a transformer set to 33 kV.', budget: 900, reward: 350, goal: { Wh: 4, V: 33000 } },
+  profit: { name: 'Quick profit', desc: 'Make $15 of profit (sales minus fuel and running costs) within 6 in-game hours.', budget: 800, reward: 500, goal: { profit: 15, hours: 6 } },
+  big: { name: 'Big iron', desc: 'Keep 40 W flowing into the grid for 20 in-game minutes. You will need a bigger engine and a better transformer.', budget: 5000, reward: 1500, goal: { W: 40, hold: 1 / 3 } },
+};
+function challengeProgress(ch) {
+  const g = CHALLENGES[ch.id].goal;
+  if (g.hold) return { f: ch.held / g.hold, text: `${Math.round(ch.held * 60)} of ${Math.round(g.hold * 60)} min at ${g.W} W or more (now ${Math.round(career.lastW)} W)` };
+  if (g.profit) { const p = ch.rev - ch.cost; return { f: p / g.profit, text: `$${p.toFixed(2)} of $${g.profit} profit · ${Math.max(0, g.hours - (career.t - ch.t0)).toFixed(1)} h left` }; }
+  return { f: ch.goalWh / g.Wh, text: `${ch.goalWh.toFixed(2)} of ${g.Wh} Wh${g.V ? ` at ${g.V / 1000} kV` : ''}` };
+}
+function challengeTick() {
+  const ch = career.challenge, g = CHALLENGES[ch.id].goal;
+  if (ch.result) return;
+  if (g.hold) ch.held = career.lastW >= g.W ? ch.held + (career.t - (ch.lastT ?? career.t)) : 0;
+  ch.lastT = career.t;
+  if (challengeProgress(ch).f >= 1) { ch.result = 'won'; careerUI.dirty = true; toast(`Challenge complete: ${CHALLENGES[ch.id].name}! Collect your reward in Career → Challenges.`); }
+  else if (g.hours && career.t - ch.t0 > g.hours) { ch.result = 'lost'; careerUI.dirty = true; toast(`Out of time: ${CHALLENGES[ch.id].name} failed.`); }
+}
+function challengeStart(id) {
+  if (career.challenge) return;
+  if (!confirm(`Start "${CHALLENGES[id].name}"? Your machine is put away and comes back when the challenge ends. You get $${CHALLENGES[id].budget} to build with on an empty floor.`)) return;
+  const saved = serialize();
+  career.challenge = { id, acct: newAccount(CHALLENGES[id].budget), t0: career.t, Wh: 0, goalWh: 0, rev: 0, cost: 0, held: 0, result: null, scene: saved, engines: career.engines };
+  career.engines = {};
+  careerSwapScene(null);
+  careerUI.tab = 'store';
+  toast('Challenge started. Buy what you need in the Store: in a challenge it arrives at once.');
+}
+function challengeEnd(collect) {
+  const ch = career.challenge;
+  if (!ch) return;
+  if (!collect && !ch.result && !confirm('Leave the challenge? Nothing is paid out and what you built is lost.')) return;
+  let msg = 'Challenge left. Your machine is back.';
+  if (collect && ch.result === 'won') {
+    const left = Math.max(0, ch.acct.money), C = CHALLENGES[ch.id];
+    career.money += C.reward + left;
+    career.done[ch.id] = true;
+    msg = `Reward $${C.reward} and $${left.toFixed(2)} of unspent budget paid into your account.`;
+  }
+  career.engines = ch.engines;
+  career.challenge = null;
+  careerSwapScene(ch.scene);
+  careerUI.tab = 'challenges';
+  toast(msg);
+}
+function careerSwapScene(data) {
+  clearScene();
+  if (data) loadScene(data);
+  simTime = 0;
+  needsRebuild = true;
+  applyLogicViewMaterials();
+  afterLoad(true);
+  undoStack.length = 0; redoStack.length = 0; updateUndoButtons(); // undo would bring back the other floor's parts for free
+  careerWorld(true);
+  careerApplyUpgrades();
+  careerHudBuild(); careerPanelRender(); buildRail();
+}
+// ----- Saving: the career and its floor are kept in this browser; the bank pays interest while you are away -----
+function careerSave() {
+  if (!career.active) return;
+  try {
+    const { active, ...data } = career;
+    localStorage.setItem(CAREER_KEY, JSON.stringify({ v: 1, savedAt: Date.now(), career: data, scene: serialize() }));
+  } catch { /* storage blocked or full */ }
+}
+function careerSaved() { try { const d = JSON.parse(localStorage.getItem(CAREER_KEY) || 'null'); return d && d.v === 1 && d.career ? d : null; } catch { return null; } }
+function careerContinue() {
+  const d = careerSaved();
+  if (!d) { toast('There is no saved career in this browser.'); return; }
+  clearScene();
+  Object.assign(career, careerFresh(), d.career, { active: true });
+  careerSwapScene(d.scene);
+  rig.set(...CAREER_DEF.cam);
+  const hours = Math.min(OFFLINE_MAX_H, Math.max(0, (Date.now() - d.savedAt) / 1000 / SIM_SEC_PER_HOUR));
+  const gain = career.bank * (Math.pow(1 + INTEREST_PER_HOUR, hours) - 1);
+  career.bank += gain;
+  toast(gain >= 0.01 ? `Welcome back. While you were away (${hours.toFixed(1)} in-game hours) your bank paid $${gain.toFixed(2)} of interest.` : 'Welcome back to your career.');
+}
+// Leaving career mode (another example, a loaded file, Clear): save it so Continue brings it back
+function careerSuspend() {
+  if (!career.active) return;
+  careerSave();
+  career.active = false;
+  careerWorld(false);
+  careerUI.open = false;
+  careerHudBuild(); careerPanelRender(); buildRail();
+  toast('Career saved. Career → Continue picks it up again.');
+}
+function careerBegin(extra) {
+  Object.assign(career, careerFresh(), { active: true });
+  career.own = placedCounts();
+  career.own.wire = (career.own.wire || 0) + 2; // two spare wires for repairs
+  career.nextKit = 2;
+  careerWorld(true);
+  careerRegisterEngine('lenoir#1', extra, KITS.lenoir.spin);
+  undoStack.length = 0; redoStack.length = 0; updateUndoButtons();
+  careerApplyUpgrades();
+  careerHudBuild(); careerPanelRender(); buildRail();
+  careerSave();
+}
+function careerEnd() {
+  if (!confirm('End this career? Its money, bank account, orders and saved progress are deleted. The machine stays on the floor.')) return;
+  try { localStorage.removeItem(CAREER_KEY); } catch { /* storage blocked */ }
+  Object.assign(career, careerFresh(), { active: false });
+  careerWorld(false);
+  careerUI.open = false;
+  careerHudBuild(); careerPanelRender(); buildRail();
+}
+// ----- HUD (slim strip under the top bar) and panel -----
 let careerHudEls = null, careerPanelEls = null;
+const money$ = (v) => `${v < 0 ? '−' : ''}$${Math.abs(v).toFixed(2)}`;
 function careerHudBuild() {
   const hud = document.getElementById('career-hud');
   hud.hidden = !career.active;
   hud.textContent = '';
   careerHudEls = null;
-  $('btn-career').setAttribute('aria-pressed', String(career.active && careerUI.open));
+  $('btn-career').setAttribute('aria-pressed', String(careerUI.open));
   if (!career.active) return;
-  const stat = (label, cls) => { const b = el('b', {}, '—'); return { b, node: el('div', { class: 'cs ' + (cls || '') }, el('small', {}, label), b) }; };
-  const money = stat('Money'), fuel = stat('Fuel'), out = stat('Output', 'opt');
+  const stat = (label, cls) => { const b = el('b', {}, '—'), s = el('small', {}, label); return { b, s, node: el('div', { class: 'cs ' + (cls || '') }, s, b) }; };
+  const money = stat(career.challenge ? 'Budget' : 'Money', 'keep'), fuel = stat('Fuel'), out = stat('To grid', 'opt'), goal = stat('Challenge', 'opt');
   const bar = el('div', { class: 'bar' }, el('i', {}));
   fuel.node.append(bar);
-  const start = el('button', { class: 'cbtn', title: 'Give the crank a starting spin', onclick: careerStartEngine }, 'Start');
+  const start = el('button', { class: 'cbtn', title: 'Give each engine\'s crank a starting spin', onclick: careerStartEngine }, 'Start');
   const refill = el('button', { class: 'cbtn primary', title: 'Fill the tank at the current fuel price', onclick: careerRefill }, 'Refill');
-  hud.append(money.node, fuel.node, out.node, start, refill);
-  careerHudEls = { money: money.b, fuel: fuel.b, bar, out: out.b, refill };
+  hud.append(money.node, fuel.node, out.node);
+  if (career.challenge) hud.append(goal.node);
+  hud.append(start, refill);
+  makeToolbarRetract(hud, 'career-hud', 'career strip', ['left', 'right']);
+  careerHudEls = { money: money.b, fuel: fuel.b, bar, out: out.b, refill, goal: career.challenge ? goal.b : null };
 }
 function careerPanelToggle(open) {
   careerUI.open = open ?? !careerUI.open;
+  if (careerUI.open) careerPanel.setRetracted(false, true);
   careerPanelRender();
 }
+const careerPanelEl = document.getElementById('career-panel');
+const careerFullBtn = iconBtn('full', 'Full screen', () => { careerUI.full = !careerUI.full; careerPanelRender(); });
+const careerBody = makePanel(careerPanelEl, {
+  key: 'career', title: 'Career', grips: ['s', 'se'], minW: 320, maxW: 1400, minH: 200,
+  buttons: [careerFullBtn, iconBtn('close', 'Close', () => careerPanelToggle(false))],
+});
+const careerPanel = careerPanelEl._panel;
 function careerPanelRender() {
-  const pan = document.getElementById('career-panel');
+  const pan = careerPanelEl, body = careerBody;
   $('btn-career').setAttribute('aria-pressed', String(careerUI.open));
   pan.hidden = !careerUI.open;
   careerPanelEls = null;
+  careerUI.dirty = false;
   if (!careerUI.open) return;
-  const keepScroll = pan.scrollTop;
-  pan.textContent = '';
-  const head = el('div', { class: 'ph' }, el('h3', {}, 'Career'), el('button', { class: 'x', title: 'Close', onclick: () => careerPanelToggle(false) }, '×'));
-  pan.append(head);
+  const full = career.active && (careerUI.tab === 'store' || !!careerUI.full);
+  pan.classList.toggle('full', full);
+  careerFullBtn.hidden = career.active && careerUI.tab === 'store';
+  careerFullBtn.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${PANEL_ICONS[full ? 'unfull' : 'full']}</svg>`;
+  careerFullBtn.title = full ? 'Leave full screen' : 'Full screen';
+  const keepScroll = body.scrollTop, keepItems = body.querySelector('.store-items')?.scrollTop ?? 0, keepCart = body.querySelector('.store-cart')?.scrollTop ?? 0;
+  body.textContent = '';
+  careerPanel.title.textContent = career.challenge ? `Challenge: ${CHALLENGES[career.challenge.id].name}` : career.active ? 'Career' : 'Career mode';
   if (!career.active) {
-    pan.append(el('p', {}, 'Start with an engine, a clutch, a generator and a pylon, $100 and a small tank of fuel. Sell electricity to the grid, then spend what you earn in the store.'),
-      el('button', { class: 'cbtn primary', onclick: () => { loadExample(CAREER_DEF); careerUI.tab = 'stats'; careerPanelRender(); } }, 'Start a new career'),
-      el('p', {}, el('small', {}, 'This replaces the build on the floor. Undo brings it back.')));
+    const saved = careerSaved();
+    const intro = el('div', { class: 'cintro' },
+      el('p', {}, 'Start with a single-cylinder engine and a small fuel tank, a clutch, a generator, a transformer and a pylon, plus $100. Sell electricity to the grid, then spend what you earn in the store on bigger engines, upgrades and parts.'));
+    if (saved) {
+      const c = saved.career, day = Math.floor((c.t || 0) / 24) + 1;
+      intro.append(el('div', { class: 'csave' }, el('div', {}, el('b', {}, `Saved career · day ${day}`), el('br'), el('small', {}, `${money$(c.money)} cash, ${money$(c.bank)} in the bank · saved ${new Date(saved.savedAt).toLocaleString()}`)),
+        el('button', { class: 'cbtn primary', onclick: () => { careerContinue(); careerUI.tab = 'stats'; careerPanelRender(); } }, 'Continue')));
+    }
+    intro.append(el('div', { class: 'btn-row' }, el('button', { class: 'cbtn' + (saved ? '' : ' primary'), onclick: () => {
+      if (saved && !confirm('Start a new career? The saved one is replaced.')) return;
+      loadExample(CAREER_DEF); careerUI.tab = 'stats'; careerPanelRender();
+    } }, 'Start a new career')), el('p', {}, el('small', {}, 'This replaces the build on the floor. Your career is saved in this browser as you play.')));
+    body.append(intro);
     return;
   }
   const tabs = el('div', { class: 'tabs', role: 'tablist' });
-  for (const [id, label] of [['stats', 'Stats'], ['store', 'Store'], ['bank', 'Bank']]) tabs.append(el('button', { role: 'tab', 'aria-selected': String(careerUI.tab === id), onclick: () => { careerUI.tab = id; careerPanelRender(); } }, label));
-  pan.append(tabs);
-  const body = el('div', {});
-  pan.append(body);
+  for (const [id, label] of [['stats', 'Stats'], ['store', 'Store'], ['bank', 'Bank'], ['challenges', 'Challenges'], ['upkeep', 'Upkeep']]) {
+    if (id === 'bank' && career.challenge) continue;
+    tabs.append(el('button', { role: 'tab', 'aria-selected': String(careerUI.tab === id), onclick: () => { careerUI.tab = id; careerPanelRender(); } }, label));
+  }
+  if (careerUI.tab === 'bank' && career.challenge) careerUI.tab = 'stats';
+  body.append(tabs);
   const E = {};
   const row = (label, key, init = '—') => { const b = el('b', {}, init); if (key) E[key] = b; return el('div', { class: 'row' }, el('span', { class: 'm' }, label), b); };
+  const A = acct();
   if (careerUI.tab === 'stats') {
-    body.append(el('h4', {}, 'Electrical'), row('Power output', 'w'), row('Voltage', 'v'), row('Current', 'a'));
+    const grid = el('div', { class: 'cgrid' });
+    grid.append(el('section', {}, el('h4', {}, 'Electrical'), row('Power output', 'w'), row('Voltage', 'v'), row('Current', 'a'),
+      el('h4', {}, 'Into the grid'), row('Power sold', 'gw'), row('Line voltage', 'gv'), row('Line current', 'ga')));
     const seg = el('div', { class: 'seg' });
-    for (const [h, label] of [[6, 'Last 6 h'], [24, 'Last 24 h'], [0, 'All time']]) seg.append(el('button', { 'aria-pressed': String(careerUI.period === h), onclick: () => { careerUI.period = h; careerPanelRender(); } }, label));
-    body.append(el('h4', {}, 'Finance'), seg, row('Profit (electricity sales)', 'rev'), row('Operating costs (fuel)', 'cost'), row('Net earnings', 'net'));
-    const cv = el('canvas', { width: 380, height: 100 });
+    for (const [h, label] of [[1, 'Last hour'], [6, 'Last 6 h'], [24, 'Last 24 h'], [0, 'All time']]) seg.append(el('button', { 'aria-pressed': String(careerUI.period === h), onclick: () => { careerUI.period = h; careerPanelRender(); } }, label));
+    grid.append(el('section', {}, el('h4', {}, 'Finance'), seg, row('Profit (electricity sales)', 'rev'), row('Fuel', 'cfuel'), row('Fluids', 'cfluids'), row('Maintenance', 'cmaint'), row('Operating costs', 'cost'), row('Net earnings', 'net')));
+    const cv = el('canvas', { width: 600, height: 140 });
     E.cv = cv;
-    body.append(el('h4', {}, 'Power demand'), cv, row('Grid price now', 'price'), row('Time', 'time'), row('Energy sold', 'kwh'));
+    grid.append(el('section', { class: 'wide' }, el('h4', {}, 'Power demand'), cv, el('small', {}, 'Recorded demand up to now. Tomorrow\'s is anyone\'s guess.'), row('Demand now', 'dem'), row('Grid price now', 'price'), row('Time', 'time'), row('Energy sold', 'wh')));
+    body.append(grid);
   } else if (careerUI.tab === 'store') {
-    for (const cat of ['Fluids', 'Mechanical', 'Electrical', 'Other Parts']) {
-      const items = STORE.filter((it) => it.cat === cat);
-      if (!items.length) continue;
-      body.append(el('h4', {}, cat));
-      for (const it of items) body.append(el('div', { class: 'row' }, el('div', {}, el('div', {}, it.name, ' ', el('small', {}, `$${it.price}${it.unit ? ' / ' + it.unit : ''}`)), el('small', {}, it.desc)), el('button', { class: 'cbtn', onclick: () => cartSet(it.id, (career.cart[it.id] || 0) + 1) }, 'Add')));
-    }
-    body.append(el('h4', {}, 'Cart'));
-    if (!storeCount()) body.append(el('small', {}, 'Your cart is empty.'));
-    for (const it of STORE) {
-      const q = career.cart[it.id];
-      if (!q) continue;
-      const inp = el('input', { type: 'number', min: 0, value: q, 'aria-label': `${it.name} quantity`, onchange: (e) => cartSet(it.id, e.target.value) });
-      body.append(el('div', { class: 'row' }, el('span', {}, it.name), el('div', { class: 'qty' },
-        el('button', { class: 'cbtn', onclick: () => cartSet(it.id, q - 1) }, '−'), inp, el('button', { class: 'cbtn', onclick: () => cartSet(it.id, q + 1) }, '+'), el('b', {}, `$${storeLine(it).toFixed(2)}`))));
-    }
-    const seg = el('div', { class: 'seg' });
-    for (const [id, sh] of Object.entries(SHIPPING)) seg.append(el('button', { 'aria-pressed': String(career.ship === id), onclick: () => { career.ship = id; careerPanelRender(); } }, `${sh.label}`, el('br'), el('small', {}, `${sh.hours} h · $${sh.cost}`)));
-    body.append(el('h4', {}, 'Delivery'), seg,
-      el('div', { class: 'tot' }, el('span', {}, 'Total'), el('span', {}, `$${storeTotal().toFixed(2)}`)),
-      el('button', { class: 'cbtn primary', disabled: storeTotal() <= 0 ? '' : null, onclick: careerOrder }, 'Place order'));
-    if (career.orders.length) {
-      body.append(el('h4', {}, 'On the way'));
-      for (const o of career.orders) { const b = el('b', {}, ''); body.append(el('div', { class: 'row' }, el('span', {}, o.label), b)); (E.orders ||= []).push([o, b]); }
-    }
-  } else {
+    renderStore(body, A, E);
+  } else if (careerUI.tab === 'bank') {
     body.append(el('h4', {}, 'Account'), row('Cash', 'cash'), row('In the bank', 'bank'), row('Interest', null, `${(INTEREST_PER_HOUR * 100).toFixed(1)}% every in-game hour`));
     const inp = el('input', { type: 'number', min: 0, step: 1, value: careerUI.bankAmt, 'aria-label': 'Amount', onchange: (e) => { careerUI.bankAmt = +e.target.value || 0; } });
     body.append(el('h4', {}, 'Move money'), el('div', { class: 'qty' }, inp,
       el('button', { class: 'cbtn', onclick: () => bankMove(1, false) }, 'Deposit'), el('button', { class: 'cbtn', onclick: () => bankMove(-1, false) }, 'Withdraw')),
-      el('div', { class: 'qty', style: 'margin-top:6px' }, el('button', { class: 'cbtn', onclick: () => bankMove(1, true) }, 'Deposit all'), el('button', { class: 'cbtn', onclick: () => bankMove(-1, true) }, 'Withdraw all')));
+    el('div', { class: 'qty', style: 'margin-top:6px' }, el('button', { class: 'cbtn', onclick: () => bankMove(1, true) }, 'Deposit all'), el('button', { class: 'cbtn', onclick: () => bankMove(-1, true) }, 'Withdraw all')),
+    el('p', {}, el('small', {}, `Interest keeps adding up while you are away: one in-game hour for every real minute, for up to ${OFFLINE_MAX_H} in-game hours. Money in the bank cannot be spent in the store until you withdraw it.`)));
+  } else if (careerUI.tab === 'challenges') {
+    renderChallenges(body, E);
+  } else {
+    renderUpkeep(body, A, E);
   }
-  body.append(el('div', { style: 'margin-top:12px;text-align:right' }, el('button', { class: 'cbtn', onclick: () => { if (confirm('End the career? Your machine stays, but money, orders and the bank are cleared.')) careerReset(null); } }, 'End career')));
+  if (!career.challenge && careerUI.tab !== 'store') body.append(el('div', { class: 'cfoot' }, el('button', { class: 'cbtn', onclick: careerEnd }, 'End career')));
   careerPanelEls = E;
   careerHudUpdate();
-  pan.scrollTop = keepScroll;
+  body.scrollTop = keepScroll;
+  const si = body.querySelector('.store-items'), sc = body.querySelector('.store-cart');
+  if (si) si.scrollTop = keepItems;
+  if (sc) sc.scrollTop = keepCart;
+}
+function renderStore(body, A, E) {
+  const n = placedCounts();
+  const search = el('input', { type: 'search', placeholder: 'Search the store', 'aria-label': 'Search the store', value: careerUI.search || '' });
+  const cats = el('nav', { class: 'store-cats', 'aria-label': 'Store categories' });
+  for (const c of ['all', ...STORE_CATS]) cats.append(el('button', { 'aria-pressed': String(careerUI.cat === c), onclick: () => { careerUI.cat = c; careerPanelRender(); } }, c === 'all' ? 'Everything' : c));
+  cats.append(search);
+  const items = el('div', { class: 'store-items' });
+  const cards = [];
+  for (const cat of STORE_CATS) {
+    if (careerUI.cat !== 'all' && careerUI.cat !== cat) continue;
+    const inCat = STORE.filter((it) => it.cat === cat);
+    const sec = el('section', {}, el('h3', {}, cat));
+    for (const sub of [...new Set(inCat.map((it) => it.sub))]) {
+      const grid = el('div', { class: 'store-grid' });
+      for (const it of inCat.filter((x) => x.sub === sub)) { const c = storeCard(it, A, n); cards.push([c, it]); grid.append(c); }
+      sec.append(el('h4', {}, sub), grid);
+    }
+    items.append(sec);
+  }
+  const filter = () => {
+    const q = search.value.trim().toLowerCase();
+    careerUI.search = search.value;
+    for (const [c, it] of cards) c.hidden = !!q && !`${it.name} ${it.desc} ${it.sub}`.toLowerCase().includes(q);
+    for (const g of items.querySelectorAll('.store-grid')) { const any = [...g.children].some((c) => !c.hidden); g.hidden = !any; g.previousSibling.hidden = !any; }
+  };
+  search.addEventListener('input', filter);
+  filter();
+  // the cart
+  const cart = el('aside', { class: 'store-cart', 'aria-label': 'Shopping cart' }, el('h3', {}, 'Cart'));
+  const lines = cartLines(A);
+  if (!lines.length) cart.append(el('p', {}, el('small', {}, 'Your cart is empty. Add things with the + on each card.')));
+  for (const [it, q] of lines) {
+    const inp = el('input', { type: 'number', min: 0, max: itemMax(it, A), value: q, 'aria-label': `${it.name} quantity`, onchange: (e) => cartSet(it.id, e.target.value) });
+    cart.append(el('div', { class: 'cline' }, el('div', { class: 'cname' }, it.name, el('small', {}, it.upgrade ? `level ${A.upg[it.upgrade] + A.pend[it.upgrade] + 1}${q > 1 ? `–${A.upg[it.upgrade] + A.pend[it.upgrade] + q}` : ''}` : `$${it.price}${it.unit ? ' / ' + it.unit : ' each'}`)),
+      el('div', { class: 'qty' }, el('button', { class: 'cbtn', 'aria-label': `One fewer ${it.name}`, onclick: () => cartSet(it.id, q - 1) }, '−'), inp,
+        el('button', { class: 'cbtn', 'aria-label': `One more ${it.name}`, disabled: q >= itemMax(it, A) ? '' : null, onclick: () => cartSet(it.id, q + 1) }, '+'),
+        el('b', {}, `$${linePrice(it, q, A).toFixed(2)}`))));
+  }
+  if (!career.challenge) {
+    const seg = el('div', { class: 'seg ship' });
+    for (const [id, sh] of Object.entries(SHIPPING)) seg.append(el('button', { 'aria-pressed': String(A.ship === id), onclick: () => { A.ship = id; careerPanelRender(); } }, sh.label, el('br'), el('small', {}, `${sh.hours} h · $${shipCost(id, Math.max(1, cartUnits(A))).toFixed(2)}`)));
+    cart.append(el('h4', {}, 'Delivery'), seg);
+  } else cart.append(el('p', {}, el('small', {}, 'In a challenge everything arrives at once, with no delivery charge.')));
+  const items$ = cartItemsTotal(A), ship$ = cartShipping(A), total = items$ + ship$;
+  cart.append(el('div', { class: 'trow' }, el('span', {}, 'Items'), el('span', {}, `$${items$.toFixed(2)}`)));
+  if (!career.challenge) cart.append(el('div', { class: 'trow' }, el('span', {}, 'Delivery'), el('span', {}, `$${ship$.toFixed(2)}`)));
+  cart.append(el('div', { class: 'tot' }, el('span', {}, 'Total'), el('span', {}, `$${total.toFixed(2)}`)),
+    el('div', { class: 'trow' }, el('span', {}, career.challenge ? 'Budget left' : 'Your cash'), el('span', { class: total > A.money ? 'short' : '' }, money$(A.money))),
+    el('div', { class: 'btn-row' }, el('button', { class: 'cbtn', disabled: lines.length ? null : '', onclick: () => { A.cart = {}; careerPanelRender(); } }, 'Empty cart'),
+      el('button', { class: 'cbtn primary', disabled: lines.length && total <= A.money + 1e-9 ? null : '', onclick: careerOrder }, 'Place order')));
+  if (A.orders.length) {
+    cart.append(el('h4', {}, 'On the way'));
+    for (const o of A.orders) { const b = el('b', {}, ''); cart.append(el('div', { class: 'row' }, el('span', {}, o.label), b)); (E.orders ||= []).push([o, b]); }
+  }
+  body.append(el('div', { class: 'store' }, cats, items, cart));
+}
+function storeCard(it, A, n) {
+  const q = A.cart[it.id] || 0, max = itemMax(it, A);
+  const icon = el('div', { class: 'sicon', html: `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[it.icon] || ICONS.kit}</svg>` });
+  let price = it.upgrade ? (max > 0 ? `$${unitPrice(it, A)}` : 'Maxed out') : `$${it.price}${it.unit ? ' / ' + it.unit : ''}`;
+  let desc = it.desc, have = '';
+  if (it.upgrade) {
+    const U = UPGRADES[it.upgrade], lvl = A.upg[it.upgrade], pend = A.pend[it.upgrade];
+    desc = `More ${U.what}: ${U.value(lvl)} ${U.unit} now${max > 0 ? `, ${U.value(lvl + pend + 1)} ${U.unit} at the next level` : ''}.`;
+    have = `Level ${lvl} of ${U.prices.length}${pend ? ` (+${pend} on the way)` : ''}`;
+  } else if (it.metered) have = `This hour: ${career.use[it.id.slice(6)].toFixed(1)} L`;
+  else if (it.id === 'fluid:gasoline') have = `Tank: ${A.fuel.toFixed(1)} / ${tankCap(A)} L`;
+  else { const key = it.tool || it.id, own = A.own[key] || 0, left = own - (n[key] || 0); have = own ? `You own ${own} · ${left} not placed` : 'You own none'; }
+  const ctl = it.metered ? el('small', { class: 'meter' }, 'Billed hourly') : q
+    ? el('div', { class: 'qty' }, el('button', { class: 'cbtn', 'aria-label': `One fewer ${it.name}`, onclick: () => cartSet(it.id, q - 1) }, '−'), el('b', {}, String(q)), el('button', { class: 'cbtn', 'aria-label': `One more ${it.name}`, disabled: max > q ? null : '', onclick: () => cartSet(it.id, q + (it.unit === 'L' ? 5 : 1)) }, '+'))
+    : el('button', { class: 'cbtn primary', disabled: max > 0 ? null : '', onclick: () => cartSet(it.id, it.id === 'fluid:gasoline' ? Math.max(1, Math.ceil(tankCap(A) - A.fuel)) : 1) }, 'Add');
+  return el('div', { class: 'scard' + (q ? ' incart' : '') }, icon,
+    el('div', { class: 'sinfo' }, el('div', { class: 'sname' }, it.name), el('div', { class: 'sprice' }, price), el('p', {}, desc), el('small', {}, have)),
+    el('div', { class: 'sctl' }, ctl));
+}
+function renderChallenges(body, E) {
+  const ch = career.challenge;
+  if (ch) {
+    const C = CHALLENGES[ch.id], bar = el('div', { class: 'pbar' }, el('i', {})), txt = el('small', {}, '');
+    E.chBar = bar; E.chText = txt;
+    const card = el('div', { class: 'chal active' }, el('div', { class: 'chead' }, el('b', {}, C.name), el('span', { class: 'chip accent' }, ch.result === 'won' ? 'Complete' : ch.result === 'lost' ? 'Failed' : 'Running')),
+      el('p', {}, C.desc), bar, txt,
+      row2('Budget left', money$(ch.acct.money)), row2('Reward', `$${C.reward} + what you do not spend`), row2('Sales so far', money$(ch.rev)));
+    if (ch.result === 'won') card.append(el('div', { class: 'btn-row' }, el('button', { class: 'cbtn primary', onclick: () => challengeEnd(true) }, `Collect $${(C.reward + Math.max(0, ch.acct.money)).toFixed(2)} and go back`)));
+    else if (ch.result === 'lost') card.append(el('div', { class: 'btn-row' }, el('button', { class: 'cbtn primary', onclick: () => challengeEnd(false) }, 'Go back to my career')));
+    else card.append(el('div', { class: 'btn-row' }, el('button', { class: 'cbtn', onclick: () => challengeEnd(false) }, 'Leave challenge')));
+    body.append(card);
+    return;
+  }
+  body.append(el('p', {}, el('small', {}, 'Each challenge gives you a budget and an empty floor. Build something that meets the goal; you keep the reward and every dollar of the budget you did not spend. Your own machine waits for you.')));
+  const list = el('div', { class: 'chal-list' });
+  for (const [id, C] of Object.entries(CHALLENGES)) {
+    const done = !!career.done[id];
+    list.append(el('div', { class: 'chal' + (done ? ' done' : '') }, el('div', { class: 'chead' }, el('b', {}, C.name), done ? el('span', { class: 'chip ok' }, 'Completed') : el('span', { class: 'chip' }, `Reward $${C.reward}`)),
+      el('p', {}, C.desc), row2('Budget', `$${C.budget}`),
+      el('div', { class: 'btn-row' }, el('button', { class: 'cbtn' + (done ? '' : ' primary'), disabled: done ? '' : null, onclick: () => challengeStart(id) }, done ? 'Done' : 'Start'))));
+  }
+  body.append(list);
+}
+const row2 = (label, value) => el('div', { class: 'row' }, el('span', { class: 'm' }, label), el('b', {}, value));
+function renderUpkeep(body, A, E) {
+  const wires = [...S.wires.values()].filter(isPowerWire);
+  body.append(el('h4', {}, 'Power wires'));
+  if (!wires.length) body.append(el('p', {}, el('small', {}, 'No power wires on the floor. Wires from a generator or a transformer wear out as they carry power, faster the more they carry, and snap when worn through.')));
+  E.wires = [];
+  for (const w of wires) {
+    const a = S.mounts.get(w.from.m), b = S.mounts.get(w.to.m), bar = el('div', { class: 'pbar' }, el('i', {})), pct = el('b', {}, '');
+    E.wires.push([w, bar, pct]);
+    body.append(el('div', { class: 'wrow' }, el('div', { class: 'wname' }, el('span', {}, `${MOUNTS[a.type].label} → ${MOUNTS[b.type].label}`), pct), bar,
+      el('button', { class: 'cbtn', onclick: () => { if (careerRepairWire(w)) careerPanelRender(); } }, `Replace $${WIRE_REPAIR}`)));
+  }
+  if (wires.length > 1) body.append(el('div', { class: 'btn-row', style: 'margin-top:6px' }, el('button', { class: 'cbtn', onclick: () => {
+    const worn = wires.filter((w) => w.hp < 0.5);
+    if (!worn.length) { toast('No wire is below half its life.'); return; }
+    let n = 0; for (const w of worn) if (careerRepairWire(w)) n++;
+    toast(`Replaced ${n} worn wire${n === 1 ? '' : 's'}.`); careerPanelRender();
+  } }, 'Replace every wire below 50%')));
+  if (career.snapped) body.append(el('p', {}, el('small', {}, `${career.snapped} wire${career.snapped === 1 ? ' has' : 's have'} snapped so far.`)));
+  body.append(el('h4', {}, 'Fuel tank'), row('Fuel', 'tank'), el('p', {}, el('small', {}, 'The tank is part of the engine: it gets bigger only with Fuel tank upgrades from the store.')),
+    el('div', { class: 'btn-row' }, el('button', { class: 'cbtn primary', onclick: () => { careerRefill(); careerPanelRender(); } }, 'Refill fuel tank')));
+  function row(label, key) { const b = el('b', {}, '—'); E[key] = b; return el('div', { class: 'row' }, el('span', { class: 'm' }, label), b); }
+  body.append(el('h4', {}, 'Fluids this hour'), row('Water', 'uw'), row('Motor oil', 'uo'), row('Gasoline from taps', 'ug'), row('Bill so far', 'ubill'),
+    el('p', {}, el('small', {}, 'Liquid from taps is billed every in-game hour. A tap that pours 100 L a second gets very expensive.')));
 }
 function careerChart(cv) {
   const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
   const css = getComputedStyle(document.documentElement);
   ctx.clearRect(0, 0, w, h);
   const pts = [{ t: 0, d: careerDemandAt(0) }, ...career.history, { t: career.t, d: careerDemand() }]; // only what has happened
-  const tmax = Math.max(24, career.t), lo = 0.65, hi = 1.35;
-  const X = (t) => 8 + (t / tmax) * (w - 16), Y = (d) => h - 8 - ((d - lo) / (hi - lo)) * (h - 16);
-  ctx.strokeStyle = css.getPropertyValue('--line') || '#888'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(8, Y(1)); ctx.lineTo(w - 8, Y(1)); ctx.stroke();
+  const tmax = Math.max(24, career.t), lo = 0.55, hi = 1.45;
+  const X = (t) => 10 + (t / tmax) * (w - 20), Y = (d) => h - 10 - ((d - lo) / (hi - lo)) * (h - 20);
+  ctx.strokeStyle = css.getPropertyValue('--line').trim() || '#888'; ctx.lineWidth = 1;
+  ctx.fillStyle = css.getPropertyValue('--muted').trim() || '#888'; ctx.font = '11px sans-serif';
+  for (let d = 24; d < tmax; d += 24) { ctx.beginPath(); ctx.moveTo(X(d), 6); ctx.lineTo(X(d), h - 6); ctx.stroke(); ctx.fillText(`day ${d / 24 + 1}`, X(d) + 3, 16); }
+  ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(10, Y(1)); ctx.lineTo(w - 10, Y(1)); ctx.stroke(); ctx.setLineDash([]);
   ctx.strokeStyle = css.getPropertyValue('--accent').trim() || '#d4382a'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
   ctx.beginPath(); pts.forEach((q, i) => (i ? ctx.lineTo(X(q.t), Y(q.d)) : ctx.moveTo(X(q.t), Y(q.d)))); ctx.stroke();
   const last = pts[pts.length - 1];
   ctx.fillStyle = ctx.strokeStyle; ctx.beginPath(); ctx.arc(X(last.t), Y(last.d), 3.5, 0, TAU); ctx.fill();
 }
+// The electrical picture: what the generators make, and what reaches the grid
+function careerPower() {
+  let gw = 0, gv = 0, ga = 0, sw = 0, sv = 0;
+  for (const m of S.mounts.values()) {
+    if (m.type === 'generator') { gw += m.out.watts ?? 0; gv = Math.max(gv, m.out.volts ?? 0); ga += m.out.amps ?? 0; }
+    else if (m.type === 'pylon') { sw += m.st.sold ?? 0; sv = Math.max(sv, m.st.volts ?? 0); }
+  }
+  return { gw, gv, ga, sw, sv, sa: sv > 0 ? sw / sv : 0 };
+}
+const WIRE_WORN = new THREE.Color('#9a5b2a');
 function careerHudUpdate() {
   if (!career.active) return;
-  const gen = career.ref ? S.mounts.get(career.ref.gen) : null, o = gen ? gen.out : {};
-  const e = careerHudEls;
+  const A = acct(), pw = careerPower(), e = careerHudEls, cap = tankCap(A);
   if (e) {
-    e.money.textContent = `$${career.money.toFixed(2)}`;
-    e.fuel.textContent = `${career.fuel.toFixed(1)}/${career.tankCap} L`;
-    e.bar.firstChild.style.width = `${clamp((career.fuel / career.tankCap) * 100, 0, 100)}%`;
-    e.bar.classList.toggle('low', career.fuel < career.tankCap * 0.2);
-    e.out.textContent = `${(o.watts ?? 0).toFixed(0)} W`;
-    e.refill.textContent = `Refill $${((career.tankCap - career.fuel) * FUEL_PRICE).toFixed(2)}`;
+    e.money.textContent = money$(A.money);
+    e.money.classList.toggle('neg', A.money < 0);
+    e.fuel.textContent = `${A.fuel.toFixed(1)}/${cap} L`;
+    e.bar.firstChild.style.width = `${clamp((A.fuel / cap) * 100, 0, 100)}%`;
+    e.bar.classList.toggle('low', A.fuel < cap * 0.2);
+    e.out.textContent = `${pw.sw.toFixed(0)} W`;
+    e.refill.textContent = `Refill $${((cap - A.fuel) * FUEL_PRICE).toFixed(2)}`;
+    if (e.goal) e.goal.textContent = career.challenge.result === 'won' ? 'Complete!' : career.challenge.result === 'lost' ? 'Failed' : `${Math.min(100, challengeProgress(career.challenge).f * 100).toFixed(0)}%`;
   }
+  // worn power wires turn rusty brown
+  for (const w of S.wires.values()) if (isPowerWire(w) && w.mat) w.mat.color.set('#4aa3ff').lerp(WIRE_WORN, clamp(1 - w.hp, 0, 1));
+  careerApplyUpgrades();
+  railRefresh();
   const P = careerPanelEls;
   if (!careerUI.open || !P) return;
-  if (careerUI.dirty) { careerUI.dirty = false; if (careerUI.tab === 'store') { careerPanelRender(); return; } }
+  if (careerUI.dirty && careerUI.tab !== 'stats') { careerPanelRender(); return; }
   const d = careerDemand(), day = Math.floor(career.t / 24) + 1, hr = Math.floor(career.t % 24);
   if (P.w) {
-    P.w.textContent = `${(o.watts ?? 0).toFixed(0)} W`; P.v.textContent = `${(o.volts ?? 0).toFixed(0)} V`; P.a.textContent = `${(o.amps ?? 0).toFixed(1)} A`;
+    P.w.textContent = `${pw.gw.toFixed(0)} W`; P.v.textContent = `${pw.gv.toFixed(0)} V`; P.a.textContent = `${pw.ga.toFixed(2)} A`;
+    P.gw.textContent = `${pw.sw.toFixed(0)} W`; P.gv.textContent = pw.sv ? `${(pw.sv / 1000).toFixed(pw.sv < 1000 ? 2 : 1)} kV` : '—'; P.ga.textContent = `${pw.sa.toFixed(3)} A`;
     const rows = [...career.ledger, career.cur], use = careerUI.period ? rows.slice(-careerUI.period) : rows;
-    const rev = use.reduce((a, r) => a + r.rev, 0), cost = use.reduce((a, r) => a + r.fuel, 0);
-    P.rev.textContent = `$${rev.toFixed(2)}`; P.cost.textContent = `$${cost.toFixed(2)}`; P.net.textContent = `${rev - cost < 0 ? '−' : ''}$${Math.abs(rev - cost).toFixed(2)}`;
-    P.price.textContent = `$${(PRICE_PER_KWH * d).toFixed(1)}/kWh`; P.time.textContent = `Day ${day}, ${String(hr).padStart(2, '0')}:${String(Math.floor((career.t % 1) * 60)).padStart(2, '0')}`;
-    P.kwh.textContent = `${career.kWh.toFixed(2)} kWh`;
+    const sum = (k) => use.reduce((a, r) => a + (r[k] || 0), 0);
+    const rev = sum('rev'), cf = sum('fuel'), cl = sum('fluids'), cm = sum('maint'), cost = cf + cl + cm;
+    P.rev.textContent = money$(rev); P.cfuel.textContent = money$(cf); P.cfluids.textContent = money$(cl); P.cmaint.textContent = money$(cm);
+    P.cost.textContent = money$(cost); P.net.textContent = money$(rev - cost); P.net.classList.toggle('neg', rev - cost < 0);
+    P.dem.textContent = `${(d * 100).toFixed(0)}%`;
+    P.price.textContent = `$${(PRICE_PER_WH * d).toFixed(2)} per Wh`; P.time.textContent = `Day ${day}, ${String(hr).padStart(2, '0')}:${String(Math.floor((career.t % 1) * 60)).padStart(2, '0')}`;
+    P.wh.textContent = `${career.Wh.toFixed(2)} Wh`;
     careerChart(P.cv);
   }
-  if (P.cash) { P.cash.textContent = `$${career.money.toFixed(2)}`; P.bank.textContent = `$${career.bank.toFixed(2)}`; }
+  if (P.cash) { P.cash.textContent = money$(career.money); P.bank.textContent = money$(career.bank); }
   if (P.orders) for (const [o2, b] of P.orders) b.textContent = `in ${Math.max(0, o2.at - career.t).toFixed(1)} h`;
+  if (P.chBar) { const pr = challengeProgress(career.challenge); P.chBar.firstChild.style.width = `${clamp(pr.f * 100, 0, 100)}%`; P.chText.textContent = pr.text; }
+  if (P.wires) for (const [w, bar, pct] of P.wires) { const v = clamp(w.hp, 0, 1); bar.firstChild.style.width = `${v * 100}%`; bar.classList.toggle('low', v < 0.25); pct.textContent = S.wires.has(w.id) ? `${Math.round(v * 100)}%` : 'snapped'; }
+  if (P.tank) {
+    P.tank.textContent = `${A.fuel.toFixed(2)} of ${tankCap(A)} L`;
+    P.uw.textContent = `${career.use.water.toFixed(1)} L`; P.uo.textContent = `${career.use.oil.toFixed(1)} L`; P.ug.textContent = `${career.use.gasoline.toFixed(1)} L`;
+    P.ubill.textContent = money$(Object.keys(METERED).reduce((a, k) => a + career.use[k] * METERED[k].price, 0));
+  }
 }
-// The starting set: a single-cylinder engine, a clutch, a generator and a pylon, wired up
-function buildCareerStart() {
+// The starting set: a single-cylinder engine (a kit), a clutch, a generator, a transformer and a pylon, wired up
+function buildCareerStart(kit = 'lenoir') {
   const o = V();
-  const eng = buildEngine(o, { kind: 'lenoir', rate: 2.5 });
+  kitTag = `${kit}#1`;
+  let eng;
+  try { eng = KITS[kit].build(o); } finally { kitTag = null; }
   const axle = eng.spin[0];
   const toZ = Qn().setFromUnitVectors(UP, V(0, 0, 1));
   const steel = { color: '#4a5059', material: 'metal' };
@@ -9202,12 +10040,14 @@ function buildCareerStart() {
   const shaft = ex.part('axle', at(o, -1.0, 1.0, -1.43), { size: [0.12, 0.6, 0.12], quat: toZ });
   ex.glue2(shaft, ex.hub(clutch), at(o, -0.95, 1.0, -1.2));
   ex.glue2(shaft, ex.hub(gen), at(o, -0.95, 1.0, -1.66));
-  const pylon = ex.mount('pylon', 'pad', null, at(o, -3.4, 0, -2.4), UPQ(), { limit: 1000 });
-  ex.wire(gen, 'watts', pylon, 'power');
-  return { ...eng, careerRef: { gen: gen.id, pylon: pylon.id, clutch: clutch.id, engine: { spin: eng.spin.map((q) => q.id), slide: eng.slide.map((q) => q.id), centre: eng.centre.clone(), slideVel: eng.slideVel.clone() } } };
+  const xf = ex.mount('transformer', 'pad', null, at(o, -2.4, 0, -2.4), UPQ(), { limit: 25, volts: 11000 });
+  const pylon = ex.mount('pylon', 'pad', null, at(o, -3.6, 0, -2.4), UPQ(), { limit: 1000 });
+  ex.wire(gen, 'watts', xf, 'power');
+  ex.wire(xf, 'watts', pylon, 'power');
+  return eng;
 }
 
-const CAREER_DEF = { name: 'Career mode', build() { return buildCareerStart(); }, spin: 9, career: true, cam: [V(-1.5, 1, -0.8), 11, 0.9, 0.34], paused: false, note: 'Sell electricity to the grid. Press Start for the engine, I / K for the throttle, and open Career for the store and bank.' };
+const CAREER_DEF = { name: 'Career mode', build() { return buildCareerStart(); }, spin: 9, career: true, cam: [V(-1.5, 1, -0.8), 11, 0.9, 0.34], paused: false, note: 'Sell electricity to the grid. Press Start for the engine, I / K for the throttle, and open Career for the store, bank and challenges.' };
 const EXAMPLES = [
   { name: 'Workshop tour', desc: 'A cam on an axle, a double pendulum, a trampoline, a seesaw and dominoes', build() {
     buildCamFollower(V(-6, 0, -4.5)); buildDoublePendulum(V(-1.5, 0, -5)); buildTrampoline(V(5, 0, -3.5)); buildSeesaw(V(-9.5, 0, 0)); buildDominoes(V(0, 0, 2.5), 22);
@@ -9240,7 +10080,7 @@ function loadExample(exDef, first = false) {
   S.nextId = 1;
   simTime = 0;
   const extra = exDef.build();
-  careerReset(exDef.career && extra ? extra.careerRef : null);
+  if (exDef.career) careerBegin(extra); else careerSuspend();
   for (const p of S.parts.values()) { p.linvel.set(0, 0, 0); p.angvel.set(0, 0, 0); }
   if (extra?.fill) { ensureGasHash(true); for (const f of extra.fill) liqFillBox(f.min, f.max, f.kind, f.skip); }
   if (extra?.spin && exDef.spin) {
@@ -9259,7 +10099,9 @@ function loadExample(exDef, first = false) {
 //  Main loop
 // =====================================================================
 let lastFrame = performance.now();
-let liveTimer = 0;
+let liveTimer = 0, careerSavedAt = performance.now();
+addEventListener('pagehide', careerSave);
+document.addEventListener('visibilitychange', () => { if (document.hidden) careerSave(); });
 function frame(now) {
   requestAnimationFrame(frame);
   const dt = Math.min(0.1, Math.max(0, (now - lastFrame) / 1000));
@@ -9297,6 +10139,7 @@ function frame(now) {
   updateHud();
   liveTimer += dt;
   if (liveTimer > 0.15) { liveTimer = 0; inspectorLive(); careerHudUpdate(); }
+  if (career.active && now - careerSavedAt > 15000) { careerSavedAt = now; careerSave(); }
   // glue and nodes are drawn in batches that copy where each one is, so the world's matrices are updated first
   scene.updateMatrixWorld();
   updateGlueBatch();
@@ -9325,7 +10168,7 @@ if (!seenHelp) toast('New: select several things and copy, cut, paste or duplica
 if (new URLSearchParams(location.search).has('debug')) {
   // Handles for automated tests: open the page with ?debug to use them from the console.
   window.__sandbox = {
-    S, settings, camera, rig, gas, EXAMPLES, career, careerRefill, careerStartEngine, loadExample, serialize, loadScene, setRunning, setTimeScale, setTool,
+    S, settings, camera, rig, gas, EXAMPLES, career, wasm: WASM_STATUS, careerRefill, careerStartEngine, careerUI, careerPanelRender, careerOrder, cartSet, placedCounts, acct, challengeStart, challengeEnd, careerContinue, careerSave, careerSuspend, placeKit, KITS, STORE, careerPower, CAREER_DEF, CHALLENGES, buildCareerStart, careerApplyUpgrades, loadExample, serialize, loadScene, setRunning, setTimeScale, setTool,
     get follow() { return follow; }, get world() { return world; }, get simTime() { return simTime; }, get running() { return running; }, get couplings() { return couplings; },
     advance(sec, h = BASE_DT) { ensureWorld(); const n = Math.round(sec / h); for (let i = 0; i < n; i++) physicsStep(h); syncFromBodies(); updateAttachments(); cullFallen(); },
     rebuild() { needsRebuild = true; ensureWorld(); },
