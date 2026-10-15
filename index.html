@@ -288,6 +288,9 @@ button { cursor: pointer; }
 .menu hr { border: 0; border-top: 1px solid var(--line); margin: 4px 2px; }
 .settings-menu { padding: 14px; gap: 14px; min-width: 270px; }
 .settings-menu .seg button { flex: 1; }
+.numrow { display: flex; gap: 10px; }
+.numfield { flex: 1; }
+.numfield input { width: 100%; padding: 5px 7px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-solid); }
 .wasm-sec { display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
 .wasm-sum { font-weight: 600; font-size: 13px; }
 .wasm-sum.ok { color: var(--ok); } .wasm-sum.warn { color: var(--warn); } .wasm-sum.bad { color: var(--accent); }
@@ -329,7 +332,8 @@ button { cursor: pointer; }
 }
 .tool:hover { background: var(--chip-strong); }
 .tool svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
-.tool .lbl { font-family: var(--font-display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.03em; text-transform: uppercase; line-height: 1.05; text-align: center; }
+.tool .lbl { font-family: var(--font-display); font-weight: 600; font-size: 10.5px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.05; text-align: center; max-width: 100%; padding: 0 1px; }
+.tool .lbl.long { font-size: 9.5px; letter-spacing: 0; hyphens: manual; }
 .tool .key { position: absolute; top: 3px; right: 4px; font: 500 9px var(--font-mono); color: var(--muted); opacity: 0.85; }
 .tool[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); }
 .tool[aria-pressed="true"] .key { color: var(--accent-fg); }
@@ -696,7 +700,8 @@ kbd {
         <kbd>0</kbd><span>Back to real time</span>
         <kbd>.</kbd><span>Step forward while paused</span>
         <span class="combo"><kbd>1</kbd>–<kbd>6</kbd></span><span>Select, Grabber, Move, Rotate, Size, Delete</span>
-        <kbd>G</kbd><span>Glue tool</span>
+        <kbd>V</kbd><span>Glue tool</span>
+        <kbd>G</kbd><span>Snap to grid on / off (Shift + G: grid size)</span>
         <kbd>T</kbd><span>Auto glue on / off</span>
         <kbd>C</kbd><span>Wire tool</span>
         <kbd>L</kbd><span>Logic view</span>
@@ -716,7 +721,7 @@ kbd {
     <h3>Moving things</h3>
     <p>The <b>Grabber</b> pulls parts around while time runs, presses buttons and drags levers. While paused it moves whole assemblies. <b>Move</b>, <b>Rotate</b> and <b>Size</b> put a gizmo on the selected part. Drag an arrow, a ring or a box handle.</p>
     <h3>Career mode</h3>
-    <p>Press <b>Career</b> in the top bar to run an electricity business: an engine turns a generator, a <b>Transformer</b> steps its power up to grid voltage and a <b>Pylon</b> sells it. Only parts you own show in the build menu; buy more (and engines, upgrades and fuel) in the full-screen <b>Store</b>, where orders arrive after an in-game delivery time. One real minute at 1× is one in-game hour. Power wires wear out and snap unless you replace them under <b>Upkeep</b>, liquid from taps is billed every hour, the <b>Bank</b> pays interest (even while you are away), and <b>Challenges</b> give you a budget and a goal. Your career is saved in this browser.</p>
+    <p>Press <b>Career</b> in the top bar to run an electricity business: an engine turns a generator, a <b>Transformer</b> steps its power up to grid voltage and a <b>Pylon</b> sells it. Only parts you own show in the build menu; buy more (and engines, upgrades and fuel) in the full-screen <b>Store</b>, where orders arrive after an in-game delivery time. An in-game hour is 4 seconds at 1× speed and half a second at 8×. Power wires wear out and snap unless you replace them under <b>Upkeep</b>, liquid from taps is billed every hour, the <b>Bank</b> pays interest (even while you are away), and <b>Challenges</b> give you a budget and a goal. Your career is saved in this browser.</p>
     <h3>Panels</h3>
     <p>Drag the edge or corner of a panel to resize it (double-click the edge for its original size), and press <b>−</b> in its header to fold it away. The time controls and the career strip fold away with the arrow at their end.</p>
     <h3>Copy and paste</h3>
@@ -1328,6 +1333,17 @@ const MOUNTS = {
       return { base: k.base, nodes: { y: 0.04, w: 0.5 } };
     },
   },
+  rpmgauge: {
+    label: 'RPM meter', cat: 'device', modes: ['dial'], modeLabels: { dial: 'Dial' }, params: { min: 0, max: 400, unit: 'rpm' }, nozzle: false,
+    io: { in: [N('speed', 'Speed (rpm)')], out: [N('value', 'Reading')] },
+    desc: 'An analog rotation meter. Wire any rpm output to Speed (an angle sensor, a generator, a pump or a turbo) and the needle shows it, in revolutions per minute or per second. Below its minimum the needle rests on the stop; past its maximum it keeps going round the dial until it is just short of the stop again.',
+    layout() {
+      const k = kit();
+      k.cyl(0.2, 0.06, 0, 0.03, 0, JCOL.dark);
+      k.ring(0.19, 0.015, 0, 0.065, 0, '#9aa3ad', Q_Z2Y);
+      return { base: k.base, nodes: { y: 0.03, w: 0.4 } };
+    },
+  },
   pressure: {
     label: 'Pressure sensor', cat: 'device', modes: ['wall'], modeLabels: { wall: 'Through wall' }, params: { threshold: 1.5 }, nozzle: true,
     io: { in: [], out: [N('pressure', 'Pressure'), B('over', 'Over limit')] },
@@ -1476,6 +1492,7 @@ for (const [k, d] of Object.entries(MOUNTS)) toolSettings[k] = { mode: d.modes[0
 toolSettings.glue = { radius: 0.1 };
 toolSettings.spring = { kind: 'coil', k: 60, c: 1 };
 toolSettings.belt = { width: 0.12, grip: 300 };
+toolSettings.shaftlink = { ratio: 1, grip: 2000 };
 const mountParamsFrom = (type, src = toolSettings[type]) => Object.fromEntries(Object.keys(MOUNTS[type].params).map((k) => [k, src[k]]));
 
 // =====================================================================
@@ -1491,7 +1508,7 @@ let needsRebuild = true, syncNeeded = true;
 let running = true, timeScale = 1, simTime = 0, accum = 0, pendingSteps = 0, stepCount = 0;
 let checkpoint = null, dirtySinceCheckpoint = true;
 const undoStack = [], redoStack = [];
-const settings = { gravity: 9.81, snap: true, autoGlue: false, gasXray: false, gasPower: 1, sound: true, logicView: false, performance: false };
+const settings = { gravity: 9.81, snap: true, snapScale: 1, autoGlue: false, gasXray: false, gasPower: 1, sound: true, logicView: false, performance: false };
 let currentTool = 'grabber';
 let selection = null;
 let placeRot = 0;
@@ -1582,6 +1599,33 @@ const TEX = {
   }),
 };
 const labelTextures = new Map();
+// The RPM meter's face: 270° of scale from its minimum (lower left) to its maximum (lower right), with its unit
+const dialTextures = new Map();
+function dialTexture(P) {
+  const key = `${P.min}|${P.max}|${P.unit}`;
+  if (dialTextures.has(key)) return dialTextures.get(key);
+  const t = canvasTexture(256, 256, (g, w) => {
+    const c = w / 2, R = w / 2 - 6;
+    g.fillStyle = '#f4f1e8'; g.beginPath(); g.arc(c, c, R, 0, TAU); g.fill();
+    g.lineWidth = 5; g.strokeStyle = '#2b3038'; g.stroke();
+    const at = (deg, r) => [c + r * Math.sin(deg * DEG), c - r * Math.cos(deg * DEG)]; // clockwise from 12 o'clock
+    // the top tenth of the scale is red
+    g.strokeStyle = '#d4382a'; g.lineWidth = 10; g.beginPath(); g.arc(c, c, R - 16, (-90 + 108) * DEG, (-90 + 135) * DEG); g.stroke();
+    g.strokeStyle = '#2b3038'; g.fillStyle = '#2b3038'; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = '600 22px "Barlow Condensed", "Arial Narrow", sans-serif';
+    for (let i = 0; i <= 50; i++) {
+      const deg = -135 + (270 * i) / 50, major = i % 10 === 0, mid = i % 5 === 0;
+      const [x0, y0] = at(deg, R - 6), [x1, y1] = at(deg, R - (major ? 28 : mid ? 20 : 14));
+      g.lineWidth = major ? 4 : 2; g.beginPath(); g.moveTo(x0, y0); g.lineTo(x1, y1); g.stroke();
+      if (major) { const v = P.min + ((P.max - P.min) * i) / 50, [tx, ty] = at(deg, R - 48); g.fillText(Math.abs(v) >= 1000 ? `${+(v / 1000).toFixed(1)}k` : `${+v.toFixed(v % 1 ? 1 : 0)}`, tx, ty); }
+    }
+    g.font = '700 30px "Barlow Condensed", "Arial Narrow", sans-serif';
+    g.fillText(P.unit === 'rps' ? 'RPS' : 'RPM', c, c + 62);
+    g.fillStyle = '#d4382a'; g.beginPath(); const [sx, sy] = at(-140, R - 18); g.arc(sx, sy, 5, 0, TAU); g.fill(); // the stop pin
+  });
+  dialTextures.set(key, t);
+  return t;
+}
 function labelTexture(text) {
   if (labelTextures.has(text)) return labelTextures.get(text);
   const t = canvasTexture(128, 128, (g, w) => {
@@ -1792,7 +1836,8 @@ function partColliderSpecs(p) {
       const f = cylForm(p);
       if (f === 'solid') return [{ kind: 'cyl', r: s[0] / 2, h: s[1] }];
       // a ring of wall pieces, plus the ends it has
-      const R = s[0] / 2, t = s[1] / 2, w = p.params.wall, K = 16, out = [];
+      // (more pieces for a wider bore, so its inside is round enough for a piston to slide in it with a small gap)
+      const R = s[0] / 2, t = s[1] / 2, w = p.params.wall, K = clamp(Math.round((TAU * (R - w)) / 0.04), 16, 32), out = [];
       for (let k = 0; k < K; k++) {
         const a0 = (TAU * k) / K, a1 = (TAU * (k + 1)) / K, pts = [];
         for (const a of [a0, a1]) for (const r of [R - w, R]) pts.push(r * Math.cos(a), t, r * Math.sin(a), r * Math.cos(a), -t, r * Math.sin(a));
@@ -1982,6 +2027,22 @@ function buildMountObject(m, layout, ghost = false) {
       pivot.add(stick, knob);
       g.add(pivot);
       named.pivot = pivot;
+    } else if (m.type === 'rpmgauge') {
+      const fm = new THREE.MeshStandardMaterial({ map: dialTexture(m.params), roughness: 0.5 });
+      const nm = new THREE.MeshBasicMaterial({ color: JCOL.red });
+      mats.push(fm, nm);
+      const face = new THREE.Mesh(new THREE.CircleGeometry(0.18, 40), fm);
+      face.rotation.x = -Math.PI / 2;
+      face.position.y = 0.061;
+      const pivot = new THREE.Group();
+      pivot.position.set(0, 0.066, 0);
+      const needle = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.006, 0.012), nm);
+      needle.position.x = 0.06;
+      const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.012, 16), nm);
+      pivot.add(needle, cap);
+      g.add(face, pivot);
+      named.pivot = pivot;
+      pivot.rotation.y = (225 - (m.st.needle ?? 0)) * DEG;
     } else if (m.type === 'pressure') {
       const pivot = new THREE.Group();
       pivot.position.set(0, 0.085, 0);
@@ -2368,7 +2429,26 @@ function beltRadius(p) {
   if (p.type === 'pulley') return p.size[0] / 2 - pulleyGroove(p.size) * 0.6;
   return p.size[0] / 2;
 }
+// A shaft link: a rotation connector between two parts (placed like a structure, end to end). It makes the
+// second part turn about its own axis (its length, for an axle) at `ratio` times the first's speed about its own,
+// whichever way the two point and however far apart they are; it slips past `grip` (N·m). It is kept with the
+// belts (a belt of two parts that couples their spins instead of their rims) and drawn as a thin rod.
+const LINK_GEO = new THREE.CylinderGeometry(1, 1, 1, 10);
+function createLink(d) {
+  const b = { id: d.id ?? newId(), kind: 'link', parts: d.parts.slice(0, 2), ratio: d.ratio ?? 1, grip: d.grip ?? 2000, width: d.width ?? 0.035, kit: d.kit ?? kitTag,
+    ends: (d.ends || [[0, 0, 0], [0, 0, 0]]).map((e) => (Array.isArray(e) ? V().fromArray(e) : e.clone())) };
+  const mat = new THREE.MeshStandardMaterial({ color: '#c9a227', roughness: 0.35, metalness: 0.7 });
+  b.mesh = new THREE.Mesh(LINK_GEO, mat);
+  b.mesh.castShadow = true;
+  b.mesh.userData.pick = { kind: 'belt', belt: b };
+  b.mesh.userData.mats = [mat];
+  worldGroup.add(b.mesh);
+  S.belts.set(b.id, b);
+  updateBeltVisual(b);
+  return b;
+}
 function createBelt(d) {
+  if (d.kind === 'link') return createLink(d);
   const b = { id: d.id ?? newId(), parts: d.parts.slice(), width: d.width ?? 0.12, grip: d.grip ?? 300, kit: d.kit ?? kitTag };
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(BELT_PTS * 4 * 3), 3));
@@ -2426,6 +2506,17 @@ function beltPath(b) {
   return { n, o, e1, e2, pts, ok: true };
 }
 function updateBeltVisual(b) {
+  if (b.kind === 'link') { // a rod from one end to the other
+    const [pa, pb] = b.parts.map((id) => S.parts.get(id));
+    if (!pa || !pb) return;
+    const qa = partNow(pa), qb = partNow(pb);
+    const a = b.ends[0].clone().applyQuaternion(qa.quat).add(qa.pos), c = b.ends[1].clone().applyQuaternion(qb.quat).add(qb.pos), dv = c.clone().sub(a);
+    const L = Math.max(0.001, dv.length());
+    b.mesh.position.copy(a).add(c).multiplyScalar(0.5);
+    b.mesh.quaternion.setFromUnitVectors(UP, dv.multiplyScalar(1 / L));
+    b.mesh.scale.set(b.width, L, b.width);
+    return;
+  }
   // the belt's shape depends only on where the pulleys are and which way their axles point, not on how far
   // they have turned: skip rebuilding it while that stays the same
   let key = b.width + ':';
@@ -2758,6 +2849,31 @@ function motorSpeed(m) {
   const th = m.st.throttle ?? 1;
   return m.params.speed * en * th;
 }
+// Oil on a joint: a hinge, slider, bearing or torsion spring that touches an oiled part (the part it sits on, its
+// hub, or the shaft running in it) keeps only this much of its friction
+const OIL_JOINT = 0.25;
+// (oil on a part glued straight to the joint's hub runs onto it too: a crosshead oils the slide carrying it)
+const jointParts = (m) => {
+  const ids = [m.parent, m.hub, ...(m.bound || [])].filter((id) => id != null);
+  if (m.hub != null) for (const g of S.glues.values()) if (g.targets.has(m.hub)) for (const t of g.targets) if (t !== 'floor') ids.push(t);
+  return ids;
+};
+// A joint can also be fed by an oil pump through a gallery (params.oilFeed, the pump's id), as an engine's bearings
+// are: it is oiled while that pump is moving oil
+const oilFedNow = (m) => m.params.oilFeed != null && (S.mounts.get(m.params.oilFeed)?.st.flow ?? 0) > 0.1;
+const jointOiled = (m) => oilFedNow(m) || jointParts(m).some((id) => S.parts.get(id)?.oiled);
+function refreshJointFriction(m) {
+  if (!(m.params.damping > 0)) return;
+  if (m.rj) applyJointDrive(m);
+  for (const rj of m.rjs || []) rj.configureMotorVelocity(0, jointFriction(m) * 0.05);
+}
+const jointFriction = (m) => (m.params.damping || 0) * (jointOiled(m) ? OIL_JOINT : 1);
+// a part has just been oiled: the joints on it run easier from now on
+function oilJoints(p) {
+  for (const m of S.mounts.values()) {
+    if (jointParts(m).includes(p.id)) refreshJointFriction(m);
+  }
+}
 function applyJointDrive(m) {
   const rj = m.rj;
   if (!rj || typeof rj.configureMotorVelocity !== 'function') return;
@@ -2792,7 +2908,7 @@ function applyJointDrive(m) {
     rj.setMotorMaxForce(m.solverClutch ? 1e-6 : Math.max(1e-6, grip)); // (or solved with a gearbox, see findShaftCouplings)
     m.motorOn = true;
   } else {
-    const friction = m.params.damping || 0;
+    const friction = jointFriction(m);
     if (friction <= 0) {
       // A motor with zero force locks the joint solid, and Rapier cannot switch a motor off,
       // so a free joint simply gets rebuilt without one.
@@ -2837,7 +2953,7 @@ function bindBearings() {
       const data = RAPIER.JointData.revolute(toR(c.clone().sub(bodyOrigin(parent))), toR(onAxis.sub(x.bodyInfo.origin)), toR(a));
       const rj = world.createImpulseJoint(data, b1, x.body, true);
       rj.setContactsEnabled(false);
-      if (m.params.damping > 0) { rj.configureMotorModel(RAPIER.MotorModel.ForceBased); rj.configureMotorVelocity(0, m.params.damping * 0.05); }
+      if (m.params.damping > 0) { rj.configureMotorModel(RAPIER.MotorModel.ForceBased); rj.configureMotorVelocity(0, jointFriction(m) * 0.05); }
       if (MOUNTS[m.type].socketed) m.inputAxle = x;
       m.rjs.push(rj);
     }
@@ -3130,6 +3246,15 @@ function solveAllCouplings(h) {
 }
 function prepShaft(c, h) {
   c.ok = false;
+  if (c.belt && c.belt.kind === 'link') {
+    // the second part's spin about its own axis is `ratio` times the first's about its own
+    const r = c.belt.ratio || 0;
+    if (!r) return;
+    _ja.set(0, 1, 0).applyQuaternion(partNow(c.pa).quat).normalize().multiplyScalar(r);
+    _jb.set(0, 1, 0).applyQuaternion(partNow(c.pb).quat).normalize().negate();
+    _jh.set(0, 0, 0);
+    return finishShaft(c, c.belt.grip * h, 0);
+  }
   if (c.belt) {
     // rim speed of one pulley (spin about the belt's axis times its radius) equals the next one's
     const n = V(0, 1, 0).applyQuaternion(partNow(c.belt.parts.length && S.parts.get(c.belt.parts[0])).quat).normalize();
@@ -4004,6 +4129,23 @@ function fluidDevicesStep(h) {
       if (c >= 0) { const v = m.params.tapRate * h; liqPour(c, { water: 0, oil: 0, gasoline: 0, [m.params.tap]: v, total: v }); m.st.flow = m.params.tapRate; if (career.active) careerMeter(m.params.tap, v); } // a tap's liquid is billed in a career
     }
   }
+  // an oil pump that has just started (or stopped) moving oil: the joints it feeds gain (or lose) their oil
+  for (const m of S.mounts.values()) {
+    if (m.type !== 'oilpump' && m.type !== 'moilpump') continue;
+    const feeding = (m.st.flow ?? 0) > 0.1;
+    if (feeding === !!m.st.feeding) continue;
+    m.st.feeding = feeding;
+    for (const j of S.mounts.values()) {
+      if (j.params.oilFeed !== m.id) continue;
+      refreshJointFriction(j);
+      // the first time the oil arrives it wets the joint's moving parts and whatever is glued to them (a crosshead's
+      // piston, a crank throw's rods), as the oil thrown off a real crank does
+      if (feeding) for (const id of jointParts(j)) {
+        oilPart(S.parts.get(id));
+        for (const g of S.glues.values()) if (g.targets.has(id)) for (const t of g.targets) if (t !== 'floor' && !S.parts.get(t)?.body?.isFixed()) oilPart(S.parts.get(t));
+      }
+    }
+  }
 }
 // Smoke puffs for gas a valve blows out into the open air
 const PUFF_MAX = 400;
@@ -4097,6 +4239,7 @@ function oilPart(p) {
   // made afresh next step (rebuilding the whole world would jolt a running machine)
   for (const col of p.colliders || []) { oilCollider(col); col.setEnabled(false); }
   oilRefresh.push(...(p.colliders || []));
+  oilJoints(p);
 }
 // Droplets fly until they hit something, then become liquid in the cell they were in
 const DROP_MAX = 1500;
@@ -4861,6 +5004,8 @@ function depthPrepass(target, always = false) {
   const vis = [sky.visible, fxGroup.visible];
   sky.visible = false; fxGroup.visible = false;
   for (const t in nodeBatch) if (nodeBatch[t].mesh && nodeBatch[t].mesh.visible) { nodeBatch[t].mesh.visible = false; hiddenForDepth.push(nodeBatch[t].mesh); }
+  // tubes, bends and tube pumps never hide what flows inside them
+  for (const p of S.parts.values()) if (p.mesh && p.mesh.visible && isTubePart(p)) { p.mesh.visible = false; hiddenForDepth.push(p.mesh); }
   scene.overrideMaterial = depthOnlyMat;
   renderer.render(scene, camera);
   scene.overrideMaterial = null;
@@ -5187,6 +5332,13 @@ const DEVICE_TICK = {
   outlet(m, I) { const o = I('open'); m.st.open = o === undefined || o ? 1 : 0; return { flow: m.st.flow ?? 0 }; },
   pump(m, I) { const v = I('speed'); m.st.speed = clamp(v === undefined ? m.params.speed : v, 0, 1); m.st.spin = ((m.st.spin ?? 0) + m.st.speed * 0.4) % TAU; return { flow: m.st.flow ?? 0 }; },
   oilpump(m, I) { const v = I('speed'); m.st.speed = clamp(v === undefined ? m.params.speed : v, 0, 1); m.st.spin = ((m.st.spin ?? 0) + m.st.speed * 0.4) % TAU; return { flow: m.st.flow ?? 0 }; },
+  rpmgauge(m, I) {
+    const v = I('speed') ?? 0, value = m.params.unit === 'rps' ? v / 60 : v;
+    // the needle: from the stop at the minimum, 270° round to the maximum; past that it goes on round the dial,
+    // but never all the way back to the stop
+    m.st.needle = clamp(((value - m.params.min) / Math.max(1e-9, m.params.max - m.params.min)) * 270, 0, 355);
+    return { value };
+  },
   sprayer(m, I) { const v = I('spray'); m.st.on = v === undefined || !!v; return {}; },
   turbo(m, I, h) {
     const r = I('rpm');
@@ -5403,6 +5555,7 @@ function updateDeviceVisual(m, F) {
     case 'turbo': for (const f of [named.fan, named.fan2]) if (f) f.rotation.z = -(m.st.spin ?? 0); break;
     case 'exhturbo': for (const f of [named.fan, named.fan2]) if (f) f.rotation.x = -(m.st.spin ?? 0); break;
     case 'pressure': if (named.pivot) named.pivot.rotation.y = -clamp(((m.out.pressure ?? 1) - 1) * 0.5, -1.2, 2.6); break;
+    case 'rpmgauge': if (named.pivot) named.pivot.rotation.y = (225 - (m.st.needle ?? 0)) * DEG; break;
     case 'distance': {
       if (!m.laser) {
         m.laser = new THREE.Line(new THREE.BufferGeometry().setFromPoints([V(), V()]), laserMat);
@@ -5483,7 +5636,7 @@ function serialize() {
     glues: [...S.glues.values()].map((g) => ({ id: g.id, radius: g.radius, targets: [...g.targets], anchor: g.anchor, local: g.local.toArray(), struct: g.struct ? { a: { part: g.struct.a.part, local: g.struct.a.local.toArray() }, b: { part: g.struct.b.part, local: g.struct.b.local.toArray() } } : null, kit: g.kit || undefined })),
     springs: [...S.springs.values()].map((s) => ({ id: s.id, kind: s.kind, a: { part: s.a.part, local: s.a.local.toArray() }, b: { part: s.b.part, local: s.b.local.toArray() }, k: s.k, c: s.c, rest: s.rest, coilR: s.coilR, wire: s.wire, kit: s.kit || undefined })),
     wires: [...S.wires.values()].map((w) => ({ id: w.id, from: { ...w.from }, to: { ...w.to }, type: w.type, kit: w.kit || undefined, hp: w.hp < 1 ? w.hp : undefined })),
-    belts: [...S.belts.values()].map((b) => ({ id: b.id, parts: b.parts.slice(), width: b.width, grip: b.grip, kit: b.kit || undefined })),
+    belts: [...S.belts.values()].map((b) => ({ id: b.id, parts: b.parts.slice(), width: b.width, grip: b.grip, kit: b.kit || undefined, ...(b.kind === 'link' ? { kind: 'link', ratio: b.ratio, ends: b.ends.map((e) => e.toArray()) } : {}) })),
   };
 }
 const SHAPES = ['box', 'sphere', 'cylinder', 'wedge', 'cam', 'gear', 'rack', 'bend'];
@@ -5691,10 +5844,22 @@ function surfaceTarget(info) {
   if (info.kind === 'mount') return info.mount.parent != null ? S.parts.get(info.mount.parent) : null;
   return null;
 }
+// Snapping: every grid step is a base size times settings.snapScale (G turns snapping on and off, Shift+G
+// steps through the sizes). The floor grid is 25 cm at 1×.
+const SNAP_SCALES = [0.25, 0.5, 1, 2, 4];
+const snapTo = (v, base) => { const st = base * settings.snapScale; return Math.round(v / st) * st; };
+const snapLabel = () => { const cm = 25 * settings.snapScale; return cm >= 100 ? `${cm / 100} m` : `${cm % 1 ? cm.toFixed(2) : cm} cm`; };
+function toggleSnap() { settings.snap = !settings.snap; savePrefs(); toast(settings.snap ? `Snap to grid on: ${snapLabel()} (Shift+G changes the size)` : 'Snap to grid off'); if (!$('menu-settings').hidden) renderSettingsMenu(); }
+function cycleSnapSize() {
+  settings.snapScale = SNAP_SCALES[(SNAP_SCALES.indexOf(settings.snapScale) + 1) % SNAP_SCALES.length];
+  settings.snap = true; savePrefs();
+  toast(`Snap grid: ${snapLabel()}`);
+  if (!$('menu-settings').hidden) renderSettingsMenu();
+}
 function snapPoint(p, n, info) {
   if (!settings.snap) return;
   if (info.kind === 'floor') {
-    if (n.y > 0.99) { p.x = Math.round(p.x / 0.25) * 0.25; p.z = Math.round(p.z / 0.25) * 0.25; }
+    if (n.y > 0.99) { p.x = snapTo(p.x, 0.25); p.z = snapTo(p.z, 0.25); }
     return;
   }
   if (info.kind !== 'part') return;
@@ -5707,7 +5872,7 @@ function snapPoint(p, n, info) {
   for (let i = 1; i < 3; i++) if (Math.abs(ln.getComponent(i)) > Math.abs(ln.getComponent(ai))) ai = i;
   if (Math.abs(ln.getComponent(ai)) < 0.98) return;
   if (part.shape === 'cylinder' && ai !== 1) return;
-  const step = 0.125;
+  const step = 0.125 * settings.snapScale;
   for (let i = 0; i < 3; i++) {
     if (i === ai) continue;
     const half = part.size[i] / 2;
@@ -5752,9 +5917,46 @@ function partPlacement(tool, f) {
   return { pos: f.point.clone().addScaledVector(f.normal, off), quat };
 }
 // Smart placements: axles into bearings and hubs, wheels/gears/cams onto axles and hubs, racks against gears.
+// The open ends of tube parts (tubes, open cylinders, bends, tube pumps), in the part's own frame: where the
+// end's centre is, which way it opens and how wide it is. Tube parts placed against an open end snap onto it.
+const isTubePart = (p) => p.shape === 'bend' || p.type === 'tubepump' || ['tube', 'cup'].includes(cylForm(p));
+function tubePorts(p) {
+  if (p.shape === 'bend') {
+    const b = p.params, R = b.bend, h = (b.angle * Math.PI) / 360;
+    return [-1, 1].map((sg) => ({ p: V(R * Math.cos(h) - R, 0, sg * R * Math.sin(h)), d: V(-Math.sin(h), 0, sg * Math.cos(h)), r: b.d / 2, wall: Math.min(b.wall, b.d / 2 - 0.02) }));
+  }
+  if (p.shape !== 'cylinder') return [];
+  const form = p.type === 'tubepump' ? 'tube' : cylForm(p), r = p.size[0] / 2, hh = p.size[1] / 2, wall = p.params?.wall ?? 0.1;
+  if (form === 'tube') return [{ p: V(0, -hh, 0), d: V(0, -1, 0), r, wall }, { p: V(0, hh, 0), d: V(0, 1, 0), r, wall }];
+  if (form === 'cup') return [{ p: V(0, hh, 0), d: V(0, 1, 0), r, wall }];
+  return [];
+}
+function tubeSnap(tool, hit) {
+  const ts = toolSettings[tool], d = PART_TYPES[tool], x = hit.info.part;
+  const proxy = { type: tool, shape: d.shape, size: ts.size.slice(), params: ts.params ? { ...ts.params } : null };
+  if (!isTubePart(proxy) && !(d.shape === 'bend')) return null;
+  let best = null;
+  for (const port of tubePorts(x)) {
+    const wp = port.p.clone().applyQuaternion(x.quat).add(x.pos), wd = port.d.clone().applyQuaternion(x.quat).normalize();
+    const dist = wp.distanceTo(hit.point);
+    if (dist < port.r * 1.5 + 0.08 && (!best || dist < best.dist)) best = { ...port, wp, wd, dist };
+  }
+  if (!best) return null;
+  if (d.shape === 'cylinder') proxy.size[0] = proxy.size[2] = best.r * 2; // the same bore as the tube it joins
+  deriveSize(proxy);
+  const own = tubePorts(proxy)[0];
+  const q = qAxis(best.wd, placeRot * 15 * DEG).multiply(Qn().setFromUnitVectors(own.d, best.wd.clone().negate()));
+  const pos = best.wp.clone().sub(own.p.clone().applyQuaternion(q));
+  const gluePos = best.wp.clone().addScaledVector(anyPerp(best.wd), best.r - Math.min(best.wall, own.wall) / 2);
+  return { pos, quat: q, size: proxy.size, glueTo: x, gluePos, label: 'onto the open end' };
+}
 function snapPlacement(tool, hit, f) {
   const info = hit.info;
   const ts = toolSettings[tool];
+  if (info.kind === 'part' && (PART_TYPES[tool]?.shape === 'bend' || tool === 'tubepump' || tool === 'cylinder') && isTubePart(info.part)) {
+    const tsn = tubeSnap(tool, hit);
+    if (tsn) return tsn;
+  }
   if (tool === 'axle') {
     if (info.kind === 'mount' && MOUNTS[info.mount.type].socketed) {
       // into the gearbox from behind: the axle ends just inside the housing
@@ -5796,7 +5998,7 @@ function snapPlacement(tool, hit, f) {
     if (x.type === 'axle') {
       const ax = V(0, 1, 0).applyQuaternion(x.quat);
       let along = hit.point.clone().sub(x.pos).dot(ax);
-      if (settings.snap) along = Math.round(along / 0.05) * 0.05;
+      if (settings.snap) along = snapTo(along, 0.05);
       const lim = Math.max(0, x.size[1] / 2 - thick / 2);
       along = clamp(along, -lim, lim);
       const pos = x.pos.clone().addScaledVector(ax, along);
@@ -5913,8 +6115,9 @@ const TOOL_INFO = {
   rotate: { label: 'Rotate', key: '4', desc: 'Click a part to select it, then drag a ring to turn its assembly. Snaps to 15° steps while Snap to grid is on.' },
   size: { label: 'Size', key: '5', desc: 'Click a part to select it, then drag a box handle to stretch that face. Gears change their tooth count, axles their length.' },
   delete: { label: 'Delete', key: '6', desc: 'Click a part, mechanism, device, glue ball, spring or wire to remove it.' },
-  glue: { label: 'Glue', key: 'G', desc: 'A small ball of glue. Drop it on the seam where parts touch and every part it touches becomes one rigid piece. If it also touches the floor, the piece is anchored.' },
+  glue: { label: 'Glue', key: 'V', desc: 'A small ball of glue. Drop it on the seam where parts touch and every part it touches becomes one rigid piece. If it also touches the floor, the piece is anchored.' },
   autoglue: { label: 'Auto glue', key: 'T', toggle: true, desc: 'When on, every part you place is glued to the part you place it on, or anchored to the floor if you place it on the ground.' },
+  shaftlink: { label: 'Shaft link', key: '', desc: 'A rotation connector. Click one part, then another, as you would place a structure: the second part turns about its own axis (along its length, for an axle) as fast as the first turns about its own, however they point and however far apart they are. Set a ratio to gear it up or down, or reverse it. It slips if the twist on it is more than its grip.' },
   structure: { label: 'Structure', key: '', desc: 'A solid bar between two points. Click one end, then the other; each end can be on a part or on the floor. The two things become one rigid piece, and a structure to the floor locks the part in place. It has no weight and nothing collides with it: a physics cheat for when you just need it to hold.' },
   belt: { label: 'Belt', key: '', desc: 'Click two or more pulleys in the order the belt goes round them, then click the first again (or press Enter). The belt makes their rims turn together, so a small pulley spins faster than a big one, and slips if it is asked for more than its grip.' },
   spring: { label: 'Spring', key: '', desc: 'Click one end, then the other. Each end can be on a part or on the floor. Pick a coil spring, a shock absorber or a rope.' },
@@ -5965,7 +6168,7 @@ function bearingSnap(hit) {
   if (mode === 'through') params.depth = 0.3;
   const ax = V(0, 1, 0).applyQuaternion(x.quat).normalize();
   let along = hit.point.clone().sub(x.pos).dot(ax);
-  if (settings.snap) along = Math.round(along / 0.05) * 0.05;
+  if (settings.snap) along = snapTo(along, 0.05);
   along = clamp(along, -x.size[1] / 2, x.size[1] / 2);
   const c = x.pos.clone().addScaledVector(ax, along);
   const L = MOUNTS.bearing.layout(mode, params);
@@ -5979,8 +6182,38 @@ function bearingSnap(hit) {
   const pos = c.clone().sub(L.socket.pos.clone().applyQuaternion(quat));
   return { pos, quat, params, mode };
 }
+// A generator either stands on what you click (its hub facing away), or faces it: hub against the end of an axle,
+// a flywheel or a hub, glued to it, with its housing held in place where it is. Auto faces spinning things.
+const GEN_FACING = { auto: 'Auto', away: 'Facing away', towards: 'Facing towards' };
+const SPINNERS = new Set(['axle', 'gear', 'wheel', 'pulley', 'cam']);
+function generatorPlacement(f) {
+  const fac = toolSettings.generator.facing || 'auto', x = f.target;
+  let axis = f.normal.clone(), centre = f.point.clone(), endOn = false;
+  if (x && x.shape === 'cylinder') { // line up with the shaft or disc when the click is on its end
+    const ax = V(0, 1, 0).applyQuaternion(x.quat).normalize();
+    if (Math.abs(ax.dot(f.normal)) > 0.7) { endOn = true; axis = ax.multiplyScalar(Math.sign(ax.dot(f.normal))); centre = x.pos.clone().addScaledVector(axis, x.size[1] / 2); }
+  }
+  const towards = fac === 'towards' || (fac === 'auto' && !!x && endOn && (SPINNERS.has(x.type) || x.hubOf != null));
+  if (!towards) return null;
+  const L = MOUNTS.generator.layout('axle', mountParamsFrom('generator'));
+  const reach = L.hub.pos.y + L.hub.size[1] / 2 + 0.004; // from the base to the face of the hub
+  const back = axis.clone().negate();
+  const quat = qAxis(back, placeRot * 15 * DEG).multiply(frameQuat(back, anyPerp(back)));
+  return { pos: centre.clone().addScaledVector(axis, reach), quat, glueTo: x, gluePos: centre.clone().addScaledVector(axis, 0.002), label: x ? `facing the ${partName(x)}, hub glued to it` : 'facing the floor' };
+}
 function placeMount(type, f, hit) {
   if (!careerAllow(type)) return;
+  if (type === 'generator') {
+    const gp = generatorPlacement(f);
+    if (gp) {
+      pushUndo();
+      const m = createMount(type, 'axle', mountParamsFrom(type), null, gp.pos, gp.quat);
+      if (gp.glueTo) glueBetween(S.parts.get(m.hub), gp.glueTo, gp.gluePos);
+      markEdited();
+      toast(gp.glueTo ? 'Generator placed facing it, with its hub glued on. Its housing stays where it is.' : 'Generator placed facing down.');
+      return;
+    }
+  }
   if (type === 'bearing') {
     const bs = bearingSnap(hit);
     if (bs) { // wrap it around the axle under the pointer
@@ -6002,6 +6235,20 @@ function placeMount(type, f, hit) {
   const m = createMount(type, ts.mode, params, f.target, f.point, f.quat);
   markEdited();
   if (m.hub != null) absorbIntoGlues([S.parts.get(m.hub)]);
+}
+function linkClick(f) {
+  if (!f.target) { toast('A shaft link joins two parts: click a part.'); return; }
+  const ep = { part: f.target.id, local: worldToLocal(f.target, f.point) };
+  if (!springStart || springStart.part == null || !S.parts.has(springStart.part)) { springStart = ep; refreshHint(); return; }
+  if (springStart.part === ep.part) { toast('Click a different part for the other end.'); return; }
+  if (!careerAllow('shaftlink')) return;
+  pushUndo();
+  const ts = toolSettings.shaftlink;
+  createLink({ parts: [springStart.part, ep.part], ratio: ts.ratio, grip: ts.grip, ends: [springStart.local, ep.local] });
+  springStart = null;
+  markEdited();
+  refreshHint();
+  toast('Shaft link placed: the second part now turns with the first.');
 }
 function structureClick(f) {
   const ep = { part: f.target ? f.target.id : null, local: f.target ? worldToLocal(f.target, f.point) : f.point.clone() };
@@ -6249,7 +6496,7 @@ function pasteClipboard(data = clipboard, atPointer = true) {
     if (hit) target = hit.point.clone();
   }
   if (!target) target = base.clone().add(V(data.width + 0.5, 0, 0));
-  if (settings.snap) { target.x = Math.round(target.x / 0.125) * 0.125; target.z = Math.round(target.z / 0.125) * 0.125; }
+  if (settings.snap) { target.x = snapTo(target.x, 0.125); target.z = snapTo(target.z, 0.125); }
   const off = target.sub(base).add(V(0, 0.002, 0));
   if (!careerAllowPaste(data)) return;
   // a copy of a kit's pieces is not the kit: in a career every piece of it comes out of the inventory
@@ -6327,6 +6574,7 @@ function onToolClick(additive = false) {
   else if (t === 'spring') springClick(f);
   else if (t === 'belt') beltClick(hit);
   else if (t === 'structure') structureClick(f);
+  else if (t === 'shaftlink') linkClick(f);
 }
 
 // ----- Assemblies: everything joined by glue, joints and bearings -----
@@ -6463,7 +6711,7 @@ function updateGrabberMove() {
   }
   move.offset.x = clamp(move.offset.x, -80, 80);
   move.offset.z = clamp(move.offset.z, -80, 80);
-  if (settings.snap) { move.offset.x = Math.round(move.offset.x / 0.25) * 0.25; move.offset.z = Math.round(move.offset.z / 0.25) * 0.25; move.offset.y = Math.round(move.offset.y / 0.125) * 0.125; }
+  if (settings.snap) { move.offset.x = snapTo(move.offset.x, 0.25); move.offset.z = snapTo(move.offset.z, 0.25); move.offset.y = snapTo(move.offset.y, 0.125); }
   move.offset.y = Math.max(move.offset.y, -move.minY);
   applyTransform();
 }
@@ -6612,7 +6860,7 @@ function updateGizmoDrag() {
     const s = closestParam(ray, g.pivot, g.dir);
     if (s == null) return;
     let d = clamp(s - g.s0, -60, 60);
-    if (snap) d = Math.round(d / 0.125) * 0.125;
+    if (snap) d = snapTo(d, 0.125);
     move.offset.copy(g.dir).multiplyScalar(d);
   } else if (g.handle.type === 'plane') {
     const h = ray.intersectPlane(g.plane, V());
@@ -6643,7 +6891,7 @@ function resizePart(g, delta) {
   const p = g.part, ax = g.handle.axis, sgn = g.handle.sign;
   const old = g.size0[ax];
   let want = Math.max(0.05, old + sgn * delta);
-  if (settings.snap) want = Math.max(0.05, Math.round(want / 0.05) * 0.05);
+  if (settings.snap) want = Math.max(0.01, snapTo(want, 0.05));
   p.size = g.size0.slice();
   if (g.params0) p.params = { ...g.params0 };
   if (p.shape === 'sphere') p.size = [want, want, want];
@@ -6778,7 +7026,7 @@ canvas.addEventListener('pointerleave', () => { if (!gesture) pointer.inside = f
 canvas.addEventListener('wheel', (e) => { e.preventDefault(); rig.zoom(Math.exp(clamp(e.deltaY, -200, 200) * 0.0012)); }, { passive: false });
 canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 
-const TOOL_KEYS = { 1: 'select', 2: 'grabber', 3: 'move', 4: 'rotate', 5: 'size', 6: 'delete', g: 'glue', c: 'wire', p: 'pipe' };
+const TOOL_KEYS = { 1: 'select', 2: 'grabber', 3: 'move', 4: 'rotate', 5: 'size', 6: 'delete', v: 'glue', c: 'wire', p: 'pipe' };
 const MOVE_KEYS = new Set(['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright']);
 let keyCapture = null; // set by the inspector while it waits for a key to bind
 // Ctrl+W closes the tab in most browsers and a page cannot block it, so ask before leaving while Ctrl is held.
@@ -6852,6 +7100,7 @@ window.addEventListener('keydown', (e) => {
   }
   if (k === 'l') { toggleLogicView(); return; }
   if (k === 't') { toggleAutoGlue(); return; }
+  if (k === 'g') { if (e.shiftKey) cycleSnapSize(); else toggleSnap(); return; }
   if (TOOL_KEYS[k]) setTool(TOOL_KEYS[k]);
 });
 // Copy, cut and paste: the build travels through the system clipboard as text, so it can go to another tab.
@@ -6904,6 +7153,7 @@ function flyCamera(dt) {
 function flipTool() {
   const t = currentTool;
   if (PART_TYPES[t]) { toolSettings[t].flip = ((toolSettings[t].flip || 0) + 1) % 3; renderInspector(); }
+  else if (t === 'generator') { const F = ['auto', 'away', 'towards'], ts = toolSettings.generator; ts.facing = F[(F.indexOf(ts.facing || 'auto') + 1) % 3]; renderInspector(); }
   else if (MOUNTS[t]) {
     const modes = MOUNTS[t].modes;
     toolSettings[t].mode = modes[(modes.indexOf(toolSettings[t].mode) + 1) % modes.length];
@@ -7006,7 +7256,7 @@ function ensureGhost(sizeOverride) {
     const m = new THREE.Mesh(GLUE_GEO, ghost.glueMat);
     m.scale.setScalar(ts.radius);
     ghost.root.add(m);
-  } else if (t === 'spring' || t === 'structure') {
+  } else if (t === 'spring' || t === 'structure' || t === 'shaftlink') {
     ghost.root.add(new THREE.Mesh(CAP_GEO, ghostMaterial('#ffffff')));
   }
 }
@@ -7100,8 +7350,14 @@ function updateHover() {
           if (snap) hint = `Snap <b>${snap.label}</b>${snap.glueTo ? ' and glue it' : ''}`;
           else hint = `Place on <b>${onWhat}</b>${settings.autoGlue && f.target ? ' and glue it' : ''} · <kbd>Q</kbd>/<kbd>E</kbd> rotate · <kbd>R</kbd> tip over`;
         } else if (MOUNTS[t]) {
-          const bs = t === 'bearing' ? bearingSnap(hit) : null;
-          if (bs) {
+          const bs = t === 'bearing' ? bearingSnap(hit) : null, gp = t === 'generator' ? generatorPlacement(f) : null;
+          if (gp) {
+            ensureGhost();
+            ghost.root.position.copy(gp.pos);
+            ghost.root.quaternion.copy(gp.quat);
+            ghost.root.visible = true;
+            hint = `Generator <b>${gp.label}</b> · <kbd>R</kbd> facing: ${GEN_FACING[toolSettings.generator.facing || 'auto']}`;
+          } else if (bs) {
             if (bs.mode === 'through' && ghost.depth !== 0.3) { ghost.depth = 0.3; ghost.key = ''; }
             ensureGhost();
             ghost.root.position.copy(bs.pos);
@@ -7117,7 +7373,7 @@ function updateHover() {
           ghost.root.position.copy(f.point);
           ghost.root.quaternion.copy(f.quat);
           ghost.root.visible = true;
-          hint = `Mount on <b>${onWhat}</b>${MOUNTS[t].modes.length > 1 ? ` · <kbd>R</kbd> mode: ${MOUNTS[t].modeLabels[toolSettings[t].mode]}` : ''} · <kbd>Q</kbd>/<kbd>E</kbd> rotate`;
+          hint = `Mount on <b>${onWhat}</b>${MOUNTS[t].modes.length > 1 ? ` · <kbd>R</kbd> mode: ${MOUNTS[t].modeLabels[toolSettings[t].mode]}` : ''}${t === 'generator' ? ` · <kbd>R</kbd> facing: ${GEN_FACING[toolSettings.generator.facing || 'auto']}` : ''} · <kbd>Q</kbd>/<kbd>E</kbd> rotate`;
           }
         } else if (t === 'glue') {
           ensureGhost();
@@ -7130,7 +7386,7 @@ function updateHover() {
           const names = [...tg].map((id) => (id === 'floor' ? 'floor' : partName(S.parts.get(id))));
           if (ghost.glueMat) ghost.glueMat.color.set(tg.size >= 2 ? '#3ed38e' : tg.size === 1 ? '#ffb547' : '#ff5646');
           hint = tg.size >= 2 ? `Glues <b>${names.join(' + ')}</b>` : tg.size === 1 ? `Only touches <b>${names[0]}</b>. Move it onto a seam.` : 'Touches nothing';
-        } else if (t === 'spring' || t === 'structure') {
+        } else if (t === 'spring' || t === 'structure' || t === 'shaftlink') {
           ensureGhost();
           ghost.root.position.copy(f.point);
           ghost.root.visible = true;
@@ -7143,6 +7399,7 @@ function updateHover() {
             hint = `Click the other end on <b>${onWhat}</b> · <kbd>Esc</kbd> cancels`;
           } else hint = `Click the first end on <b>${onWhat}</b>`;
           if (t === 'structure') hint = (springStart ? 'Click the other end of the structure' : 'Click one end of the structure') + ` on <b>${onWhat}</b>${springStart ? ' · <kbd>Esc</kbd> cancels' : ''}`;
+          if (t === 'shaftlink') hint = (springStart ? 'Click the part it drives' : 'Click the part that drives it') + ` (<b>${onWhat}</b>)${springStart ? ' · <kbd>Esc</kbd> cancels' : ''}`;
         } else if (t === 'belt') {
           const tp = surfaceTarget(hit.info);
           const ok = beltRound(tp);
@@ -7254,6 +7511,7 @@ const ICONS = {
   solenoid: '<rect x="4" y="8" width="10" height="10" rx="1"/><path d="M14 13h7M7 8v10M9.5 8v10M12 8v10"/>',
   glue: '<path d="M12 3c3.2 4.3 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 2.8-6.7 6-11z"/><path d="M9.4 14.6A2.6 2.6 0 0 0 12 17.2"/>',
   autoglue: '<path d="M12 3c3.2 4.3 6 7.6 6 11a6 6 0 0 1-12 0c0-3.4 2.8-6.7 6-11z"/><path d="M12.6 9.5l-2.3 4.2h3.4l-2.3 4.2"/>',
+  shaftlink: '<circle cx="5" cy="18" r="3"/><circle cx="19" cy="6" r="3"/><path d="M7.5 15.5l9-7"/><path d="M3.5 15.5l3 5M17.5 3.5l3 5"/>',
   structure: '<path d="M4 20L20 4M4 20h4M4 20v-4M20 4h-4M20 4v4"/><circle cx="4.5" cy="19.5" r="1.6"/><circle cx="19.5" cy="4.5" r="1.6"/>',
   spring: '<path d="M12 2.5V5l-5 2 10 2.5-10 2.5 10 2.5-10 2.5 5 2v2.5"/>',
   bend90: '<path d="M4 20V13a9 9 0 0 1 9-9h7"/><path d="M9 20v-7a4 4 0 0 1 4-4h7"/>',
@@ -7290,6 +7548,7 @@ const ICONS = {
   pipe: '<path d="M3 7h8a3 3 0 0 1 3 3v4a3 3 0 0 0 3 3h4"/><path d="M3 4.5v5M21 14.5v5"/>',
   generator: '<circle cx="12" cy="12" r="7"/><path d="M8 13l2-3 2 3 2-3 2 3M12 2v3M12 19v3"/>',
   pylon: '<path d="M12 2v20M6 22l6-16 6 16M7 9h10M8.5 14h7"/>',
+  rpmgauge: '<circle cx="12" cy="13" r="8"/><path d="M12 13l4-4M6.8 18.5l1.4-1.4M17.2 18.5l-1.4-1.4M12 5v2"/>',
   transformer: '<rect x="5" y="7" width="14" height="13" rx="1.5"/><path d="M9 7V4M12 7V3M15 7V4M8.5 11v6M12 11v6M15.5 11v6"/>',
   kit: '<rect x="3" y="9" width="11" height="9" rx="1.5"/><path d="M14 12h3l3-2v8l-3-2h-3M6 9V6h5v3M7.5 13.5h4"/>',
   lamp: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/>',
@@ -7297,13 +7556,13 @@ const ICONS = {
 const RAIL = [
   ['Tools', ['select', 'grabber', 'move', 'rotate', 'size', 'delete']],
   ['Parts', ['block', 'plank', 'beam', 'domino', 'ball', 'cylinder', 'wheel', 'ramp']],
-  ['Drivetrain', ['axle', 'bearing', 'gear', 'rack', 'cam', 'pulley', 'belt', 'motor', 'gearbox', 'clutch', 'uvjoint']],
+  ['Drivetrain', ['axle', 'bearing', 'gear', 'rack', 'cam', 'pulley', 'belt', 'shaftlink', 'motor', 'gearbox', 'clutch', 'uvjoint']],
   ['Power', ['generator', 'transformer', 'pylon']],
   ['Joints', ['hinge', 'balljoint', 'slider', 'torsion', 'solenoid']],
   ['Connect', ['glue', 'autoglue', 'structure', 'spring']],
   ['Gas', ['injector', 'igniter', 'valve', 'turbo', 'mturbo', 'exhturbo', 'intake', 'pipe', 'pressure']],
   ['Fluids', ['inlet', 'outlet', 'pump', 'oilpump', 'mpump', 'moilpump', 'sprayer', 'bend90', 'bend45', 'tubepump']],
-  ['Signals', ['wire', 'button', 'lever', 'distance', 'angle', 'touch', 'gate', 'logic', 'lamp']],
+  ['Signals', ['wire', 'button', 'lever', 'distance', 'angle', 'touch', 'gate', 'logic', 'lamp', 'rpmgauge']],
 ];
 // ----- Panels: a header with a retract button, and grips on the edges to resize them; remembered in this browser -----
 const PANEL_ICONS = {
@@ -7423,7 +7682,7 @@ function buildRail(groups = railGroups()) {
       const key = toolKey(t), cnt = counts && counts[t] != null ? counts[t] : null;
       b.title = `${toolLabel(t)}${key ? ` (${key})` : ''}${cnt != null ? ` · ${cnt} left` : ''}`;
       b.setAttribute('aria-pressed', String(toggle ? settings.autoGlue : t === currentTool));
-      b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[t] || ''}</svg><span class="lbl">${toolLabel(t)}</span>${key ? `<span class="key">${key}</span>` : ''}${cnt != null ? `<span class="cnt">${cnt}</span>` : ''}${toggle ? `<span class="state">${settings.autoGlue ? 'on' : 'off'}</span>` : ''}`;
+      b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[t] || ''}</svg><span class="lbl${toolLabel(t).split(' ').some((w) => w.length > 8) ? ' long' : ''}">${toolLabel(t).split(' ').map((w) => (w.length > 8 ? w.slice(0, Math.ceil(w.length / 2)) + '\u00ad' + w.slice(Math.ceil(w.length / 2)) : w)).join(' ')}</span>${key ? `<span class="key">${key}</span>` : ''}${cnt != null ? `<span class="cnt">${cnt}</span>` : ''}${toggle ? `<span class="state">${settings.autoGlue ? 'on' : 'off'}</span>` : ''}`;
       b.addEventListener('click', () => (toggle ? toggleAutoGlue() : setTool(t)));
       grp.appendChild(b);
     }
@@ -7510,7 +7769,7 @@ function keyField(label, current, onSet) {
       if (k === null) { btn.textContent = keyLabel(current); return; }
       onSet(k);
       btn.textContent = keyLabel(k);
-      if (k && (MOVE_KEYS.has(k) || TOOL_KEYS[k] || 'qerftl'.includes(k) || k === 'space')) toast(`${keyLabel(k)} also has a sandbox shortcut. This device takes it over while it is bound.`);
+      if (k && (MOVE_KEYS.has(k) || TOOL_KEYS[k] || 'qerftlg'.includes(k) || k === 'space')) toast(`${keyLabel(k)} also has a sandbox shortcut. This device takes it over while it is bound.`);
     };
   });
   return el('div', { class: 'list' }, el('div', {}, el('span', {}, label), btn));
@@ -7703,6 +7962,25 @@ function mountFields(type, P, m, live) {
     case 'button':
       f.push(keyField('Key', P.key, (k) => { if (live) pushUndo(); P.key = k; }));
       break;
+    case 'rpmgauge': {
+      const redraw = () => { if (live && m) rebuildMountMesh(m); };
+      f.push(segField('Unit', [['rpm', 'RPM'], ['rps', 'RPS']], P.unit, (v) => { if (live) pushUndo(); P.unit = v; redraw(); renderInspector(); }));
+      const num = (key, label) => {
+        const inp = el('input', { type: 'number', step: 'any', value: P[key], 'aria-label': label, class: 'numin' });
+        inp.addEventListener('change', () => {
+          const v = parseFloat(inp.value);
+          if (!Number.isFinite(v)) { inp.value = P[key]; return; }
+          if (live) pushUndo();
+          P[key] = v;
+          if (P.max <= P.min) { if (key === 'min') P.max = P.min + 1; else P.min = P.max - 1; }
+          redraw(); renderInspector();
+        });
+        return el('label', { class: 'field numfield' }, el('span', {}, label), inp);
+      };
+      f.push(el('div', { class: 'numrow' }, num('min', 'Minimum'), num('max', 'Maximum')));
+      if (live && m) f.push(el('div', { class: 'insp-desc' }, `Reading now: ${(m.out.value ?? 0).toFixed(P.unit === 'rps' ? 2 : 0)} ${P.unit === 'rps' ? 'RPS' : 'RPM'}`));
+      break;
+    }
     case 'lamp':
       f.push(swatchField('Light colour', P.color, (c) => { P.color = c; if (live) dirtySinceCheckpoint = true; }));
       break;
@@ -7804,6 +8082,8 @@ function renderTool(body) {
   if (MOUNTS[t]) {
     const d = MOUNTS[t];
     if (d.modes.length > 1) body.append(segField('Mode', d.modes.map((m) => [m, d.modeLabels[m]]), ts.mode, (v) => { ts.mode = v; renderInspector(); }));
+    if (t === 'generator') body.append(segField('Facing (R)', Object.entries(GEN_FACING), ts.facing || 'auto', (v) => { ts.facing = v; renderInspector(); }),
+      el('div', { class: 'insp-desc' }, 'Away: it stands on what you click, hub outwards. Towards: its hub faces what you click and is glued to it, the housing held where it is: click the end of an axle or a flywheel. Auto faces axles, wheels, pulleys and hubs.'));
     body.append(...mountFields(t, ts, null, false));
     body.append(el('div', { class: 'insp-desc' }, d.cat === 'device' ? `Mounts on whatever you click. Wire it up with the Wire tool (C)${d.io?.fl ? ' and pipe it with the Pipe tool (P)' : ''}.` : 'Mounts on whatever you click, part or floor.'));
     return head(FLUID_DEVICES.has(t) ? 'Fluids' : GAS_DEVICES.has(t) ? 'Gas' : d.cat === 'device' ? 'Signals' : d.cat === 'bearing' ? 'Drivetrain' : 'Mechanism', d.label, d.desc);
@@ -7830,6 +8110,10 @@ function renderTool(body) {
     );
     return head('Connect', 'Spring', TOOL_INFO.spring.desc);
   }
+  if (t === 'shaftlink') {
+    body.append(...linkFields(ts, false));
+    return head('Drivetrain', 'Shaft link', TOOL_INFO.shaftlink.desc);
+  }
   const info = TOOL_INFO[t];
   body.append(el('div', { class: 'keys' },
     el('kbd', {}, 'Click'), el('span', {}, 'use the tool'),
@@ -7840,6 +8124,15 @@ function renderTool(body) {
     el('kbd', {}, 'L'), el('span', {}, 'logic view'),
   ));
   return head('Tool', info.label, info.desc);
+}
+// The settings of a shaft link (or of the tool that places one)
+function linkFields(o, undoable) {
+  const mag = Math.abs(o.ratio) || 1, rev = o.ratio < 0;
+  return [
+    sliderField('link-ratio', 'Speed ratio (second : first)', { min: 0.1, max: 10, log: true, value: mag, fmt: (v) => `${v.toFixed(2)} : 1`, undoable, onInput: (v) => { o.ratio = (o.ratio < 0 ? -1 : 1) * v; } }),
+    checkField('link-rev', 'Reverse (the second turns the other way)', rev, (v) => { if (undoable) pushUndo(); o.ratio = (v ? -1 : 1) * Math.abs(o.ratio || 1); }),
+    sliderField('link-grip', 'Grip', { min: 10, max: 20000, log: true, value: o.grip, fmt: (v) => `${Math.round(v)} N·m`, undoable, onInput: (v) => { o.grip = v; } }),
+  ];
 }
 function clipRow() {
   return el('div', { class: 'btn-row' },
@@ -7973,6 +8266,15 @@ function renderSelection(sel, body) {
     );
     return head('Signal', 'Wire', null);
   }
+  if (sel.kind === 'belt' && S.belts.get(sel.id).kind === 'link') {
+    const b = S.belts.get(sel.id), [pa, pb] = b.parts.map((id) => S.parts.get(id));
+    body.append(
+      el('div', { class: 'chips' }, el('span', { class: 'chip' }, `${partName(pa)} → ${partName(pb)}`)),
+      ...linkFields(b, true),
+      el('div', { class: 'btn-row' }, focus, del),
+    );
+    return head('Drivetrain', 'Shaft link', TOOL_INFO.shaftlink.desc);
+  }
   if (sel.kind === 'belt') {
     const b = S.belts.get(sel.id);
     const list = el('div', { class: 'list' });
@@ -8077,7 +8379,7 @@ function toggleMenu(btn, menu) {
 const PREFS_KEY = 'red-sandbox-prefs';
 const prefs = { theme: 'auto', brightness: 1, wasm: true };
 function savePrefs() {
-  try { localStorage.setItem(PREFS_KEY, JSON.stringify({ ...prefs, gasXray: settings.gasXray, sound: settings.sound, performance: settings.performance })); } catch { /* storage blocked */ }
+  try { localStorage.setItem(PREFS_KEY, JSON.stringify({ ...prefs, gasXray: settings.gasXray, sound: settings.sound, performance: settings.performance, snap: settings.snap, snapScale: settings.snapScale })); } catch { /* storage blocked */ }
 }
 function applyPrefs() {
   if (prefs.theme === 'auto') document.documentElement.removeAttribute('data-theme');
@@ -8092,6 +8394,8 @@ try {
   if (typeof p.gasXray === 'boolean') settings.gasXray = p.gasXray;
   if (typeof p.sound === 'boolean') settings.sound = p.sound;
   if (typeof p.performance === 'boolean') settings.performance = p.performance;
+  if (typeof p.snap === 'boolean') settings.snap = p.snap;
+  if (SNAP_SCALES.includes(p.snapScale)) settings.snapScale = p.snapScale;
 } catch { /* storage blocked or damaged */ }
 applyPrefs();
 function renderSettingsMenu() {
@@ -8126,7 +8430,8 @@ function worldSection() {
       sliderField('w-gravity', 'Gravity', { min: 0, max: 25, step: 0.05, value: settings.gravity, fmt: (v) => `${v.toFixed(2)} m/s²`, onInput: setGravity }),
       sliderField('w-gas', 'Explosion strength', { min: 0.1, max: 4, step: 0.05, value: settings.gasPower, fmt: (v) => `${v.toFixed(2)}×`, onInput: (v) => { settings.gasPower = v; } }));
   }
-  sec.append(checkField('w-snap', 'Snap to grid', settings.snap, (v) => { settings.snap = v; }));
+  sec.append(checkField('w-snap', 'Snap to grid (G)', settings.snap, (v) => { settings.snap = v; savePrefs(); }),
+    segField('Grid size (Shift+G)', SNAP_SCALES.map((k) => [k, `${25 * k >= 100 ? 25 * k / 100 + ' m' : 25 * k + ' cm'}`]), settings.snapScale, (v) => { settings.snapScale = v; settings.snap = true; savePrefs(); renderSettingsMenu(); }));
   return sec;
 }
 // Which WebAssembly modules are running, and why any that are not fell back to JavaScript
@@ -9139,6 +9444,348 @@ function buildI2(o, tune = {}) {
     ],
   };
 }
+// A 90° V4 four-stroke after the Ducati Granturismo: two banks of two cylinders leaning 45° each side of
+// upright, with the intake trumpets and throttle bodies in the vee. Each cylinder is a round piston (a solid
+// cylinder) sliding in a sleeve (a tube) closed by the head, guided by a crosshead on its own rail. The front and
+// rear cylinder of each pair share one crank pin, and the two pins are 180° apart.
+//  * Two exhaust-driven turbochargers, one per bank, blow into the inlet valves.
+//  * Water cooling through small passages: reservoir → belt-driven water pump → block passage of the right bank →
+//    its head passage → the left bank's block and head passages → the radiator (with an electric fan) → reservoir.
+//  * Oil: a belt-driven oil pump draws from the pan and pushes it through an oil gallery in each bank and back:
+//    while it moves oil, every bearing, pin and slide is fed and keeps only a quarter of its friction.
+//  * VTEC: over its switch-over speed a second valve and spark profile takes over (the yellow lamp).
+//  * A belt-driven alternator lights the charge lamp once it is turning fast enough.
+//  * A camshaft pulley at half crank speed tells each cylinder which turn is its power stroke; a starter on the
+//    flywheel's ring gear cranks it (hold B), I / K is the throttle.
+// Everything that does not move is fixed in place, so the castings can sit wherever they look right.
+function buildV4(o, tune = {}) {
+  const T = {
+    bore: 0.36, rate: 3.5, throttle: 0.6, valve: 5, gain: 1.4, limit: 470, wallT: 0.2, dry: 1, dryPin: 0.4, waterRate: 0.8,
+    // (a lean mixture: richer than this the cylinders misfire and the engine surges)
+    // valve, injector and spark windows in crank degrees from the cylinder's own firing top dead centre, over
+    // the whole 720° cycle: the spark a little before the top, the exhaust opening before the bottom of the power
+    // stroke and closing after the top, the intake overlapping it and closing well after the bottom
+    spark: [-40, 5], exhaust: [190, 385], intake: [320, 550], inj: [375, 540],
+    // VTEC: over this many rpm a second, high-speed profile takes over: the intake opens earlier and the exhaust
+    // closes later (more overlap, so the cylinder fills better at speed) and the spark comes earlier
+    vtec: 220, hi: { spark: [-62, -12], exhaust: [190, 410], intake: [292, 550] },
+    turns: [0, 1, 1, 0], // which turn each cylinder fires on: spreads the bangs out (90°, 180°, 270°, 180°)
+    ...tune,
+  };
+  const P = (x, y, z) => at(o, x, y, z);
+  const Z = V(0, 0, 1), X = V(1, 0, 0), Y = V(0, 1, 0);
+  const R = ENGINE_R, ROD = ENGINE_ROD, XL = ENGINE_XL, YC = 1.85, C = P(0, YC, 0);
+  const bronze = { color: '#a3905f', material: 'metal' }, alu = { color: '#bcc1c8', material: 'metal' }, steel = { color: '#4a5059', material: 'metal' };
+  const black = { color: '#202328', material: 'plastic' }, dark = { color: '#33373e', material: 'metal' }, red = { color: '#b8312a', material: 'metal' };
+  const toZ = Qn().setFromUnitVectors(UP, Z), toX = Qn().setFromUnitVectors(UP, X);
+  const faceUp = UPQ(), faceBack = frameQuat(V(0, 0, -1), X), faceFront = frameQuat(Z, X), faceDown = frameQuat(V(0, -1, 0), X);
+  // a fixed part: anchored where it is (the anchor sits at `at`, inside the part, out of sight)
+  const fixed = (p, atPos = p.pos) => { ex.anchor(p, atPos.clone(), 0.03); return p; };
+  const block = (pos, size, mat, quat) => fixed(ex.part('block', pos, { size, ...mat, quat }));
+  const box = (x0, x1, y0, y1, z0, z1, mat) => block(P((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2), [x1 - x0, y1 - y0, z1 - z0], mat);
+  const cyl = (pos, d, L, quat, mat, params) => ex.part('cylinder', pos, { size: [d, L, d], quat, ...mat, params });
+  // a closed can (for water and oil), fixed, anchored inside its wall
+  const can = (pos, d, L, quat, mat, wall = 0.15) => {
+    const c = cyl(pos, d, L, quat, mat, { form: 'hollow', wall });
+    const ax = V(0, 1, 0).applyQuaternion(quat);
+    return fixed(c, pos.clone().addScaledVector(anyPerp(ax), d / 2 - wall / 2));
+  };
+  const base = box(-3.8, 6.0, 0, 0.2, -3.0, 5.8, { color: '#2f343c', material: 'metal' });
+  // ---- crankshaft: main bearings, the throws, the flywheel (a ring gear) and the front pulley ----
+  const PZ = -2.36, FLY = 1.95, flyT = 0.36;
+  const FD = 2.45, ZEND = FD + 0.2;
+  const ZFRONT = PZ - 0.12, crank = ex.part('axle', P(0, YC, (ZFRONT + ZEND) / 2), { size: [0.12, ZEND - ZFRONT, 0.12], quat: toZ });
+  // the joints run dry and stiff until the oil pump feeds them; oiled they keep a quarter of their friction
+  const fedJoints = [];
+  for (const z of [-1.55, 0, 1.55]) {
+    const y0 = z === 0 ? 0.4 : 0.2;
+    const b = box(-0.25, 0.25, y0, YC - 0.32, z - 0.15, z + 0.15, alu);
+    fedJoints.push(ex.mount('bearing', 'pillow', b, P(0, YC - 0.32, z), UPQ(Z), { damping: T.dry }));
+  }
+  const fly = ex.part('gear', P(0, YC, FLY), { params: { teeth: 22, module: 1 / 16 }, size: [0, flyT, 0], quat: toZ, color: '#8a94a6' });
+  ex.glue2(fly, crank, P(0.06, YC, FLY - 0.15));
+  // a heavy flywheel disc behind the ring gear carries the crank through the compression strokes
+  // (the timing sensors sit on its back face)
+  const discFly = ex.part('cylinder', P(0, YC, FD), { size: [1.5, 0.3, 1.5], quat: toZ, color: '#8a94a6', material: 'metal' });
+  ex.glue2(discFly, crank, P(0.06, YC, FD - 0.1));
+  const crankPulley = ex.part('pulley', P(0, YC, PZ), { size: [0.6, 0.18, 0.6], quat: toZ });
+  ex.glue2(crankPulley, crank, P(0.06, YC, PZ));
+  // ---- the four cylinders ----
+  const B = T.bore, inner = B / 2 + 0.01, tw = T.wallT, SD = 2 * (inner + tw), X0 = 1.8, X1 = 3.05, rodL = Math.sqrt(ROD * ROD - R * R);
+  // One cylinder along direction `aDeg` from the crank, in the plane z = zc. Its crank pin starts straight up
+  // (pin = 1) or down (-1). `mz` puts its wrist pin and rod on one face of the throw or the other; `sy` puts its
+  // crosshead rail on the outside of the vee.
+  const cylinder = (aDeg, pin, zc, mz, sy) => {
+    const a = aDeg * DEG, u = V(Math.cos(a), Math.sin(a), 0), w = V(-Math.sin(a), Math.cos(a), 0);
+    const pt = (x, y, z = 0) => C.clone().addScaledVector(u, x).addScaledVector(w, y * sy).add(V(0, 0, zc + z * mz));
+    const cb = pin * u.y, d = R * cb + Math.sqrt(ROD * ROD - R * R * (1 - cb * cb)); // crank to wrist pin, as it starts
+    const qU = qAxis(Z, a), qAx = Qn().setFromUnitVectors(UP, u), out = w.clone().multiplyScalar(sy);
+    const cross = ex.part('beam', pt(d - 0.08 + XL / 2, 0), { size: [XL, 0.16, 0.12], color: '#9aa3ad', quat: qU });
+    const pinB = ex.mount('hinge', 'axle', cross, pt(d, 0, 0.06), frameQuat(V(0, 0, mz), u), { damping: T.dryPin });
+    const face = d - 0.08 + XL;
+    // a round piston, a little narrower than the bore so it never rubs the inside of the sleeve
+    const PD = T.pd ?? 2 * inner - 0.01; // 5 mm short of the bore all round: a tight seal
+    const piston = ex.part('cylinder', pt(face + 0.2, 0), { size: [PD, 0.4, PD], quat: qAx, color: '#c9a227', material: T.pistonMat ?? 'metal' });
+    ex.glue2(cross, piston, pt(face, 0.08, 0.06));
+    const rail = block(pt(1.12, -0.56), [1.2, 0.48, 0.4], steel, qU);
+    const slide = ex.mount('slider', 'flat', rail, pt(1.12, -0.32), frameQuat(out, u), { length: 1.2, damping: T.dryPin });
+    fedJoints.push(pinB, slide);
+    const carriage = ex.hub(slide);
+    carriage.pos.addScaledVector(u, d - rodL); // the carriage rides with the crosshead
+    ex.glue2(carriage, cross, pt(1.25 + d - rodL, -0.08));
+    // the sleeve: a tube the piston slides in, closed by the head
+    const sleeve = fixed(cyl(pt((X0 + X1) / 2, 0), SD, X1 - X0, qAx, alu, { form: 'tube', wall: tw }), pt((X0 + X1) / 2, inner + tw / 2));
+    const head = fixed(cyl(pt(X1 + 0.075, 0), SD, 0.15, qAx, bronze));
+    const hq = frameQuat(u, Z.clone().multiplyScalar(mz));
+    // four valves (two inlet, two exhaust), the injector and the plug, all inside the bore's circle
+    const four = T.valves !== 2, vy = four ? 0.1 : 0, vz = four ? 0.1 : 0.17;
+    // (with four valves the injector and the plug sit in the middle, where the charge burns from)
+    const inj = ex.mount('injector', 'wall', head, pt(X1 + 0.15, four ? (T.injY ?? 0.03) : 0.12, four ? (T.injZ ?? 0) : 0), hq, { rate: T.rate });
+    const ign = ex.mount('igniter', 'wall', head, pt(X1 + 0.15, four ? (T.ignY ?? -0.03) : -0.12, 0), hq);
+    const inlet = ex.mount('valve', 'wall', head, pt(X1 + 0.15, -vy, -vz), hq, { open: 1, size: T.valve });
+    const outlet = ex.mount('valve', 'wall', head, pt(X1 + 0.15, -vy, vz), hq, { open: 1, size: T.valve });
+    const inlet2 = four ? ex.mount('valve', 'wall', head, pt(X1 + 0.15, vy, -vz), hq, { open: 1, size: T.valve }) : null;
+    const outlet2 = four ? ex.mount('valve', 'wall', head, pt(X1 + 0.15, vy, vz), hq, { open: 1, size: T.valve }) : null;
+    // cooling fins round the outside of the sleeve (decoration)
+    for (const x of [2.0, 2.3, 2.6]) fixed(cyl(pt(x, 0), SD + 0.14, 0.05, qAx, alu, { form: 'tube', wall: 0.08 }), pt(x, SD / 2 + 0.03));
+    return { cross, pinB, piston, carriage, inj, ign, inlet, outlet, inlet2, outlet2, sleeve, head, pinWorld: pt(d, 0), u, w, out, pt, aDeg, pin, zc, mz };
+  };
+  // pair A (front, z < 0) has its pin up, pair B its pin down; banks at 45° (right) and 135° (left)
+  const pairs = [{ zc: -0.85, pin: 1 }, { zc: 0.85, pin: -1 }];
+  const cyls = [];
+  for (const pr of pairs) {
+    const thr = ex.part('beam', P(0, YC + 0.15 * pr.pin, pr.zc), { size: [0.16, 0.5, 0.12], color: '#d4382a' });
+    ex.glue2(thr, crank, P(0.06, YC, pr.zc + 0.06));
+    for (const [aDeg, mz, sy] of [[45, 1, 1], [135, -1, -1]]) {
+      const c = cylinder(aDeg, pr.pin, pr.zc, mz, sy);
+      const pinA = ex.mount('hinge', 'axle', thr, P(0, YC + R * pr.pin, pr.zc + 0.06 * mz), ZQ(mz), { damping: T.dryPin });
+      fedJoints.push(pinA);
+      const pin = P(0, YC + R * pr.pin, pr.zc), dv = c.pinWorld.clone().sub(pin);
+      const mid = pin.clone().add(c.pinWorld).multiplyScalar(0.5).setZ(o.z + pr.zc + 0.36 * mz);
+      const rod = ex.part('beam', mid, { size: [ROD + 0.2, 0.16, 0.12], color: '#f08a24', quat: qAxis(Z, Math.atan2(dv.y, dv.x)) });
+      ex.glue2(rod, ex.hub(pinA), pin.clone().setZ(o.z + pr.zc + 0.3 * mz));
+      ex.glue2(rod, ex.hub(c.pinB), c.pinWorld.clone().setZ(o.z + pr.zc + 0.3 * mz));
+      cyls.push(c);
+    }
+  }
+  const banks = [cyls.filter((c) => c.aDeg === 45), cyls.filter((c) => c.aDeg === 135)];
+  // ---- per bank: the block's water passage (outside of the vee), the head's water passage and the oil gallery
+  // (inside of the vee), a bronze cam cover with ignition coils, and the exhaust turbo with its headers ----
+  const bankBits = banks.map((bk) => {
+    const c = bk[0], at2 = (x, y, z) => c.pt(x, y, 0).setZ(o.z + z);
+    const qz = toZ;
+    const blockW = can(at2(2.45, -0.72, 0), 0.6, 2.9, qz, bronze);
+    const headW = can(at2(3.0, 0.72, 0), 0.6, 2.9, qz, bronze);
+    const oilG = can(at2(2.25, 0.72, 0), 0.6, 2.6, qz, dark);
+    // the cam cover sits over the head, its valves and plugs
+    const coverQ = qAxis(Z, c.aDeg * DEG);
+    const cover = block(at2(3.62, 0, 0), [0.16, 1.5, 3.2], bronze, coverQ);
+    for (const z of [-1.0, 0, 1.0]) block(at2(3.73, 0, z), [0.06, 1.3, 0.08], bronze, coverQ); // ribs
+    for (const end of [-1, 1]) fixed(cyl(at2(3.62, 0, end * 1.62), 1.2, 0.16, coverQ.clone().multiply(Qn().setFromUnitVectors(UP, X)), bronze));
+    for (const cc of bk) {
+      block(at2(3.86, 0.18, cc.zc), [0.22, 0.26, 0.3], black, coverQ); // ignition coil
+      fixed(cyl(at2(3.86, -0.12, cc.zc), 0.16, 0.24, Qn().setFromUnitVectors(UP, c.u), red));
+    }
+    return { blockW, headW, oilG, cover };
+  });
+  // the exhaust turbos stand outside each bank, with a header from each head
+  const turbos = banks.map((bk, i) => {
+    const sx = i ? -1 : 1;
+    const stand = box(sx * 3.3 - 0.35, sx * 3.3 + 0.35, 0.2, 1.3, -0.45, 0.45, steel);
+    const turbo = ex.mount('exhturbo', 'pad', stand, P(sx * 3.3, 1.3, 0), UPQ(V(sx, 0, 0)), { gain: T.gain, wastegate: 1 });
+    bk.forEach((c, k) => {
+      if (T.turbo === false) { // breathing without the turbos: an intake on each inlet, the exhaust straight out
+        ex.pipe(ex.mount('intake', 'pad', stand, P(sx * 3.3 + (k ? 0.2 : -0.2), 1.3, (k ? 1 : -1) * 0.25), UPQ(V(sx, 0, 0))), 'out', c.inlet, 'inlet');
+      } else {
+        ex.pipe(c.outlet, 'inlet', turbo, 'ex' + (k + 1));
+        ex.pipe(c.inlet, 'inlet', turbo, 'out' + (k + 1));
+      }
+      // a header pipe from under the head down towards the turbo (it is the pipe drawn alongside that carries the gas)
+      const from = c.pt(3.2, -0.5), to = P(sx * 3.05, 1.55, c.zc * 0.35), dv = to.clone().sub(from);
+      fixed(cyl(from.clone().add(to).multiplyScalar(0.5), 0.2, dv.length(), Qn().setFromUnitVectors(UP, dv.clone().normalize()), steel, { form: 'tube', wall: 0.05 }), from.clone().add(to).multiplyScalar(0.5).addScaledVector(anyPerp(dv.clone().normalize()), 0.075));
+    });
+    fixed(cyl(P(sx * 3.3, 2.15, 0), 0.34, 0.5, Qn(), dark, { form: 'tube', wall: 0.06 }), P(sx * 3.3 + 0.14, 2.15, 0)); // downpipe
+    return turbo;
+  });
+  // ---- in the vee: four intake trumpets on throttle bodies, and the fuel rail ----
+  const trumpetTop = new Map();
+  for (const pr of pairs) for (const sx of [-1, 1]) {
+    const x = sx * 0.34;
+    trumpetTop.set(`${pr.zc},${sx}`, P(x, YC + 2.9, pr.zc));
+    block(P(x, YC + 2.0, pr.zc), [0.36, 0.34, 0.36], black);
+    block(P(x - sx * 0.22, YC + 2.0, pr.zc), [0.1, 0.22, 0.22], dark); // throttle position sensor
+    fixed(cyl(P(x, YC + 2.5, pr.zc), 0.3, 0.66, Qn(), black, { form: 'tube', wall: 0.05 }), P(x + 0.125, YC + 2.5, pr.zc));
+    fixed(cyl(P(x, YC + 2.86, pr.zc), 0.42, 0.07, Qn(), black, { form: 'tube', wall: 0.1 }), P(x + 0.16, YC + 2.86, pr.zc)); // the flared lip
+  }
+  for (const sx of [-1, 1]) {
+    fixed(ex.part('axle', P(sx * 0.12, YC + 3.05, 0), { size: [0.07, 2.6, 0.07], quat: toZ, ...black }));
+    for (const pr of pairs) block(P(sx * 0.12, YC + 2.96, pr.zc), [0.09, 0.18, 0.09], alu); // injectors on the rail
+  }
+  for (const z of [-1.3, 1.3]) fixed(ex.part('axle', P(0, YC + 3.05, z), { size: [0.07, 0.24, 0.07], quat: toX, ...black }));
+  // ---- crankcase castings (bronze) round the outside of the moving parts, with a hole for the crankshaft ----
+  for (const [z0, z1] of [[-1.82, -1.7], [1.6, 1.72]]) {
+    box(-1.05, 1.05, YC - 0.7, YC - 0.1, z0, z1, bronze); box(-1.05, 1.05, YC + 0.1, YC + 0.75, z0, z1, bronze);
+    box(-1.05, -0.1, YC - 0.1, YC + 0.1, z0, z1, bronze); box(0.1, 1.05, YC - 0.1, YC + 0.1, z0, z1, bronze);
+    if (z0 < 0) for (const [x0, x1] of [[-0.8, -0.74], [0.74, 0.8]]) box(x0, x1, YC - 0.6, YC + 0.65, z0 - 0.04, z0, bronze); // ribs
+  }
+  // ---- oil: an open pan under the crank, the pump on the front belt, and a gallery in each bank feeding the
+  // joints under pressure (while the pump moves oil they keep a quarter of their friction), back into the pan ----
+  const PX = 0.6, PZN = 1.0, PT = 0.4, PW = 0.2, PTOP = YC - 0.65;
+  const panFloor = box(-PX - PW, PX + PW, 0.2, PT, -PZN - PW, PZN + PW, bronze);
+  const panWalls = [box(-PX - PW, -PX, PT, PTOP, -PZN - PW, PZN + PW, bronze), box(PX, PX + PW, PT, PTOP, -PZN - PW, PZN + PW, bronze),
+    box(-PX, PX, PT, PTOP, -PZN - PW, -PZN, bronze), box(-PX, PX, PT, PTOP, PZN, PZN + PW, bronze)];
+  ex.mount('outlet', 'wall', panFloor, P(0.3, PT, 0.6), faceUp, { tap: 'oil', fill: T.oil ?? 300 }); // the oil filler
+  fixed(cyl(P(-PX - PW - 0.17, 0.75, -0.5), 0.34, 0.44, Qn(), { color: '#2d5fa8', material: 'metal' })); // the oil filter
+  // ---- the front belt: crank, alternator, camshaft pulley (2 : 1), water pump and oil pump ----
+  const bracket = (x, y) => box(x - 0.18, x + 0.18, y - 0.18, y + 0.18, -1.95, -1.8, alu);
+  const onBelt = (type, x, y, d, params) => {
+    const br = bracket(x, y);
+    const m = ex.mount(type, 'axle', br, P(x, y, -1.95), faceBack, params);
+    const pul = ex.part('pulley', P(x, y, PZ), { size: [d, 0.18, d], quat: toZ });
+    ex.glue2(pul, ex.hub(m), P(x + 0.1, y, PZ + 0.09));
+    return { m, pul };
+  };
+  // (the brackets reach back from the belt to the front casting)
+  const water = onBelt('mpump', -1.15, YC + 0.75, 0.5, { rate: T.waterRate, rpm: 300, load: 0.01 });
+  const oil = onBelt('moilpump', -0.85, YC - 0.55, 0.5, { rate: T.oilRate ?? 2, rpm: 300, load: 0.01 });
+  const alt = onBelt('generator', 1.15, YC + 0.75, 0.4, { ratedW: 40, ratedRpm: 600, ratedV: 14 });
+  const beltOn = { alt: alt.pul, water: water.pul, oil: oil.pul };
+  if (T.belt !== false) createBelt({ parts: [crankPulley.id, ...['alt', 'water', 'oil'].filter((k) => !(T.beltSkip || []).includes(k)).map((k) => beltOn[k].id)], width: 0.1, grip: T.grip ?? 600 });
+  // oil: pick-up low in the pan → pump → right bank gallery → left bank gallery → back into the pan
+  const pickup = ex.mount('inlet', 'wall', panWalls[2], P(0, PT + 0.05, -PZN - PW), faceBack);
+  ex.pipe(pickup, 'pipe', oil.m, 'in');
+  const gal = bankBits.map((b) => ({ feed: ex.mount('outlet', 'wall', b.oilG, b.oilG.pos.clone().setZ(o.z - 1.3), faceBack, { size: 2 }), drain: ex.mount('inlet', 'wall', b.oilG, b.oilG.pos.clone().setZ(o.z + 1.3), faceFront, { size: 2 }) }));
+  for (const b of bankBits) ex.mount('outlet', 'wall', b.oilG, b.oilG.pos.clone().add(V(0, 0.3, 0.4)), faceUp, { tap: 'oil', fill: 600, size: 1 }); // the galleries start full
+  ex.pipe(oil.m, 'out', gal[0].feed, 'pipe');
+  ex.pipe(gal[0].drain, 'pipe', gal[1].feed, 'pipe');
+  // the oil comes back into the pan; on the way it has fed every bearing, crank pin, wrist pin and slide
+  const oilBack = ex.mount('outlet', 'wall', panWalls[3], P(0, PT + 0.5, PZN + PW), faceFront, { size: 3 });
+  ex.pipe(gal[1].drain, 'pipe', oilBack, 'pipe');
+  for (const m of fedJoints) m.params.oilFeed = oil.m.id;
+  // ---- water: reservoir → pump → each bank's block then head passage → radiator (with its fan) → reservoir ----
+  const RX = 4.6;
+  const radCore = can(P(RX, 1.75, 0), 0.7, 2.3, Qn(), alu);
+  for (let i = 0; i < 9; i++) for (const sx of [-1, 1]) block(P(RX + sx * 0.5, 0.85 + i * 0.22, 0), [0.24, 0.04, 2.0], { color: '#8d939b', material: 'metal' }); // fins
+  for (const z of [-1.05, 1.05]) box(RX - 0.66, RX + 0.66, 0.2, 3.25, z - 0.05, z + 0.05, dark); // the radiator's frame
+  box(RX - 0.66, RX + 0.66, 3.15, 3.25, -1.1, 1.1, dark);
+  const fanPost = box(RX + 1.05, RX + 1.25, 0.2, 2.1, -0.15, 0.15, dark);
+  const fan = ex.mount('motor', 'axle', fanPost, P(RX + 1.05, 1.75, 0), XQ(-1), { speed: 240, strength: 40 });
+  const fanHub = ex.hub(fan);
+  for (let k = 0; k < 4; k++) {
+    const ang = k * 90 * DEG, dir = V(0, Math.cos(ang), Math.sin(ang));
+    const blade = ex.part('plank', fanHub.pos.clone().addScaledVector(dir, 0.33), { size: [0.03, 0.46, 0.17], ...black, quat: qAxis(X, ang).multiply(qAxis(Y, 25 * DEG)) });
+    ex.glue2(blade, fanHub, fanHub.pos.clone().addScaledVector(dir, 0.13));
+  }
+  box(RX - 1.42, RX - 1.24, 0.2, 3.2, 1.26, 1.44, dark); // the reservoir's bracket
+  box(RX - 1.42, RX - 1.24, 3.0, 3.2, 1.26, 1.44, dark);
+  const reservoir = can(P(RX - 0.95, 3.45, 1.35), 0.6, 0.9, Qn(), { color: '#dfe6ec', material: 'plastic' });
+  fixed(cyl(P(RX - 0.95, 3.95, 1.35), 0.3, 0.1, Qn(), black)); // its cap
+  // the filler taps fill every passage, the radiator and the reservoir with coolant when you press Play
+  const fills = [radCore, reservoir, ...bankBits.flatMap((b) => [b.blockW, b.headW])];
+  for (const c of fills) {
+    const ax = V(0, 1, 0).applyQuaternion(c.quat), top = Math.abs(ax.y) > 0.9 ? c.pos.clone().add(V(0.12, c.size[1] / 2, 0)) : c.pos.clone().add(V(0, c.size[0] / 2, 0.4));
+    ex.mount('outlet', 'wall', c, top, faceUp, { tap: 'water', fill: 600, size: 1 });
+  }
+  const end = (c, s) => c.pos.clone().setZ(o.z + s * (c.size[1] / 2));
+  const resDrain = ex.mount('inlet', 'wall', reservoir, P(RX - 0.95, 3.0, 1.35), faceDown, { size: 3 });
+  ex.pipe(resDrain, 'pipe', water.m, 'in');
+  let prev = water.m, prevPort = 'out';
+  for (const b of bankBits) for (const [c, from] of [[b.blockW, -1], [b.headW, 1]]) {
+    const feed = ex.mount('outlet', 'wall', c, end(c, from), from < 0 ? faceBack : faceFront, { size: 3 });
+    ex.pipe(prev, prevPort, feed, 'pipe');
+    prev = ex.mount('inlet', 'wall', c, end(c, -from), from < 0 ? faceFront : faceBack, { size: 3 });
+    prevPort = 'pipe';
+  }
+  const radIn = ex.mount('outlet', 'wall', radCore, P(RX - 0.35, 2.6, 0), XQ(-1), { size: 3 });
+  ex.pipe(prev, prevPort, radIn, 'pipe');
+  const radOut = ex.mount('inlet', 'wall', radCore, P(RX - 0.35, 0.9, 0), XQ(-1), { size: 3 });
+  const resIn = ex.mount('outlet', 'wall', reservoir, P(RX - 0.65, 3.6, 1.35), XQ(1), { size: 3 });
+  ex.pipe(radOut, 'pipe', resIn, 'pipe');
+  // ---- the starter: a motor on a sled that a solenoid pushes sideways, its pinion into the ring gear ----
+  const SX = 0.25;
+  const swall = box(2.9, 3.1, 0.2, YC + 0.4, FLY + 0.42, FLY + 0.82, steel);
+  const shift = ex.mount('solenoid', 'out', swall, P(2.9, YC, FLY + 0.62), frameQuat(V(-1, 0, 0), Z), { stroke: SX, force: 150 });
+  const carrier = ex.part('block', P((1.0 + SX + 1.92) / 2, YC, FLY + 0.62), { size: [1.92 - 1.0 - SX, 0.5, 0.2], ...steel }); // rides on the solenoid: not fixed
+  ex.glue2(carrier, ex.hub(shift), P(1.9, YC, FLY + 0.62));
+  const starter = ex.mount('motor', 'axle', carrier, P(1.0 + SX, YC, FLY + 0.52), ZQ(-1), { speed: 400, strength: 2400 });
+  const sClutch = ex.mount('clutch', 'axle', ex.hub(starter), P(1.0 + SX, YC, FLY + 0.28), ZQ(-1), { torque: 900, engage: 0, oneWay: true });
+  const pinion = ex.part('gear', P(1.0 + SX, YC, FLY), { params: { teeth: 10, module: 1 / 16 }, size: [0, flyT, 0], quat: toZ, color: '#d4382a' });
+  ex.glue2(pinion, ex.hub(sClutch), P(1.06 + SX, YC, FLY + 0.1));
+  // ---- the dash: throttle, start button, charge lamp ----
+  const dash = box(3.4, 4.2, 0.2, 0.45, 2.5, 3.2, { color: '#2b3038', material: 'metal' });
+  const throttle = ex.mount('lever', 'stay', dash, P(3.6, 0.45, 2.85), UPQ(Z), { keyUp: 'i', keyDown: 'k', min: 0 });
+  throttle.st.value = T.throttle;
+  const startBtn = ex.mount('button', 'push', dash, P(3.95, 0.45, 2.7), faceUp, { key: 'b' });
+  ex.wire(startBtn, 'on', shift, 'extend'); ex.wire(shift, 'pos', starter, 'throttle'); ex.wire(shift, 'pos', sClutch, 'engage');
+  const charging = ex.mount('logic', 'threshold', dash, P(3.95, 0.45, 3.0), faceUp, { value: 6 });
+  const lamp = ex.mount('lamp', 'dome', dash, P(3.6, 0.45, 3.05), faceUp, { color: '#3ed38e' });
+  ex.wire(alt.m, 'volts', charging, 'a'); ex.wire(charging, 'out', lamp, 'on');
+  // ---- timing. Sensors on the back of the flywheel disc read the crank's angle. Each cylinder counts its own turns
+  // with a toggle that flips once a turn, as its exhaust valves open; it only counts while the crank turns forwards,
+  // so a crank rocking to a stop can never lose count. The toggle is on for the exhaust and intake turn and off
+  // for compression and power. Every window is set round that cylinder's own firing top dead centre; the toggle
+  // trims the exhaust's start and the intake's end. A tachometer cuts the fuel over the rev limit. ----
+  const DFACE = FD + 0.15;
+  let si = 0;
+  const RINGS = [[0.24, 6], [0.39, 9], [0.54, 12], [0.69, 14]];
+  const senseAt = () => {
+    let i = si++, ring = 0;
+    while (i >= RINGS[ring][1]) i -= RINGS[ring++][1];
+    const [r, n] = RINGS[ring], a = (i * 360 / n + ring * 11) * DEG;
+    return P(r * Math.sin(a), YC + r * Math.cos(a), DFACE);
+  };
+  const sense = (from, to) => ex.mount('angle', 'dial', discFly, senseAt(), frameQuat(Z, Y), { from: ((from % 360) + 360) % 360, to: ((to % 360) + 360) % 360 });
+  const tach = sense(0, 10);
+  const over = ex.mount('logic', 'threshold', base, P(-3.4, 0.2, 2.2), faceUp, { value: T.limit });
+  const fuelOk = ex.mount('logic', 'not', base, P(-3.0, 0.2, 2.2), faceUp);
+  const forward = ex.mount('logic', 'threshold', base, P(-2.6, 0.2, 2.2), faceUp, { value: 5 });
+  ex.wire(tach, 'rpm', over, 'a'); ex.wire(over, 'out', fuelOk, 'a'); ex.wire(tach, 'rpm', forward, 'a');
+  // (it switches on at T.vtec and back off 50 rpm lower, so it does not flicker between the two at its edge)
+  const vtecOn = ex.mount('logic', 'adc', base, P(-2.2, 0.2, 2.2), faceUp, { value: T.vtec, off: T.vtec - 50 });
+  const vtecOff = ex.mount('logic', 'not', base, P(-1.8, 0.2, 2.2), faceUp);
+  ex.wire(tach, 'rpm', vtecOn, 'a'); ex.wire(vtecOn, 'out', vtecOff, 'a');
+  ex.wire(vtecOn, 'out', ex.mount('lamp', 'dome', dash, P(3.6, 0.45, 2.62), faceUp, { color: '#ffd23f' }), 'on');
+  cyls.forEach((c, k) => {
+    const fire = 270 + c.aDeg + (c.pin < 0 ? 180 : 0) + 360 * T.turns[k]; // where in the 720° cycle it fires
+    const row = (i) => P(-3.4 + (i % 9) * 0.4, 0.2, 2.6 + k * 0.8 + Math.floor(i / 9) * 0.4);
+    const rel0 = (((-fire) % 720) + 720) % 720; // where this cylinder is in its own cycle as it starts
+    const flip = sense(fire + 190, fire + 200), flipFwd = ex.mount('gate', 'and', base, row(0), faceUp);
+    ex.wire(flip, 'window', flipFwd, 'a'); ex.wire(forward, 'out', flipFwd, 'b');
+    const breathe = ex.mount('logic', 'toggle', base, row(1), faceUp);
+    breathe.st.q = rel0 >= 190 && rel0 < 550; // the exhaust and intake turn
+    breathe.st.prev = (rel0 % 360) >= 190 && (rel0 % 360) <= 200; // already in the flip window: no flip for it
+    const power = ex.mount('logic', 'not', base, row(2), faceUp);
+    ex.wire(flipFwd, 'out', breathe, 'a'); ex.wire(breathe, 'out', power, 'a');
+    let ri = 3;
+    const and = (a, ao, b, bo) => { const g = ex.mount('gate', 'and', base, row(ri++), faceUp); ex.wire(a, ao, g, 'a'); ex.wire(b, bo, g, 'b'); return g; };
+    const gated = (w, gate) => and(sense(fire + w[0], fire + w[1]), 'window', gate, 'out');
+    // a valve or the spark with two profiles: the low-speed one while VTEC is off, the high-speed one while it is on
+    const profiled = (lo, hi, gate) => {
+      const either = ex.mount('gate', 'or', base, row(ri++), faceUp);
+      ex.wire(and(sense(fire + lo[0], fire + lo[1]), 'window', vtecOff, 'out'), 'out', either, 'a');
+      ex.wire(and(sense(fire + hi[0], fire + hi[1]), 'window', vtecOn, 'out'), 'out', either, 'b');
+      return and(either, 'out', gate, 'out');
+    };
+    const H = T.hi;
+    // (the toggle closes the intake at the bottom of the stroke and opens the exhaust there)
+    const gIn = profiled([T.intake[0], T.intake[1] + 30], [H.intake[0], H.intake[1] + 30], breathe);
+    const gExh = profiled([T.exhaust[0] - 30, T.exhaust[1]], [H.exhaust[0] - 30, H.exhaust[1]], breathe);
+    const gSpk = profiled(T.spark, H.spark, power), gInj = gated(T.inj, breathe);
+    ex.wire(gIn, 'out', c.inlet, 'trigger'); ex.wire(gExh, 'out', c.outlet, 'trigger'); ex.wire(gSpk, 'out', c.ign, 'spark');
+    const inject = ex.mount('gate', 'and', base, row(ri++), faceUp);
+    ex.wire(gInj, 'out', inject, 'a'); ex.wire(fuelOk, 'out', inject, 'b'); ex.wire(inject, 'out', c.inj, 'inject');
+    ex.wire(throttle, 'value', c.inj, 'rate');
+    if (c.inlet2) {
+      ex.wire(gIn, 'out', c.inlet2, 'trigger'); ex.wire(gExh, 'out', c.outlet2, 'trigger');
+      // the second inlet breathes through this cylinder's trumpet in the vee (a throttle body on the lever);
+      // the second exhaust blows straight out
+      const filter = ex.mount('intake', 'pad', null, trumpetTop.get(`${c.zc},${c.aDeg === 45 ? 1 : -1}`), UPQ());
+      ex.pipe(filter, 'out', c.inlet2, 'inlet');
+      ex.wire(throttle, 'value', filter, 'throttle');
+    }
+  });
+  return { crank, fly, starter: startBtn, turbos, alternator: alt.m, water: water.m, oil: oil.m, cyls };
+}
 function buildQuad(o, tune = {}) {
   const T = {
     bore: 0.36, head: 2.05, flyT: 0.36, rate: 3, throttle: 0.6, valve: 3,
@@ -9299,14 +9946,14 @@ function buildQuad(o, tune = {}) {
 //  screen), Bank, Challenges and Upkeep. Only parts you own show in the build menu, and each placed part
 //  comes out of the inventory (deleting it puts it back). A career is kept in this browser.
 // =====================================================================
-const SIM_SEC_PER_HOUR = 60;       // one second of simulated time is one in-game minute
-const PRICE_PER_WH = 2;            // $ per watt-hour at average demand (sandbox engines make watts, not kilowatts)
+const SIM_SEC_PER_HOUR = 4;        // an in-game hour is 4 s of simulated time: 4 s at 1×, 0.5 s at 8× (time speed counts)
+const PRICE_PER_WH = 0.14;         // $ per watt-hour at average demand (sandbox engines make watts, not kilowatts)
 const FUEL_PRICE = 3;              // $ per litre of gasoline
 const FUEL_L_PER_UNIT = 0.002;     // litres burned for one unit of injected fuel
 const INTEREST_PER_HOUR = 0.01;    // the bank pays 1.0% every in-game hour
 const OFFLINE_MAX_H = 48;          // while you are away the bank keeps paying, for up to this many in-game hours
-const HIST_STEP = 0.25;            // demand is recorded every quarter of an in-game hour
-const WIRE_LIFE_H = 60;            // a power wire carrying 20 W lasts about this many in-game hours
+const HIST_STEP = 0.5;             // demand is recorded every half in-game hour
+const WIRE_LIFE_H = 300;           // a power wire carrying 20 W lasts about this many in-game hours
 const WIRE_REPAIR = 8;             // $ to replace one worn wire on the spot
 const CAREER_KEY = 'red-sandbox-career';
 const CAREER_WORLD = { gravity: 9.81, gasPower: 1.5 }; // gravity and explosion strength in every career
@@ -9326,13 +9973,13 @@ const METERED = { water: { price: 0.02 }, oil: { price: 3 }, gasoline: { price: 
 // What each loose part costs. Electric motors are not sold: they would turn a generator for free.
 const PART_PRICE = {
   block: 8, plank: 6, beam: 6, domino: 2, ball: 5, cylinder: 10, wheel: 14, ramp: 8,
-  axle: 10, bearing: 18, gear: 22, rack: 20, cam: 18, pulley: 15, belt: 12, gearbox: 70, clutch: 40, uvjoint: 25,
+  axle: 10, bearing: 18, gear: 22, rack: 20, cam: 18, pulley: 15, belt: 12, shaftlink: 30, gearbox: 70, clutch: 40, uvjoint: 25,
   generator: 120, transformer: 90, pylon: 60,
   hinge: 15, balljoint: 15, slider: 20, torsion: 20, solenoid: 35,
   structure: 6, spring: 10,
   injector: 30, igniter: 25, valve: 28, turbo: 80, mturbo: 70, exhturbo: 110, intake: 20, pipe: 5, pressure: 15,
   inlet: 15, outlet: 15, pump: 60, oilpump: 60, mpump: 45, moilpump: 45, sprayer: 25, bend90: 8, bend45: 8, tubepump: 50,
-  wire: 5, button: 8, lever: 10, distance: 18, angle: 18, touch: 12, gate: 10, logic: 10, lamp: 6,
+  wire: 5, rpmgauge: 20, button: 8, lever: 10, distance: 18, angle: 18, touch: 12, gate: 10, logic: 10, lamp: 6,
 };
 const RAIL_CAT = { Parts: 'Mechanical', Drivetrain: 'Mechanical', Joints: 'Mechanical', Connect: 'Mechanical', Power: 'Electrical', Signals: 'Electrical', Gas: 'Other Parts', Fluids: 'Other Parts' };
 const CAREER_FREE = new Set(['select', 'grabber', 'move', 'rotate', 'size', 'delete', 'glue', 'autoglue']);
@@ -9344,6 +9991,7 @@ const KITS = {
   four: { name: 'Turbo four-stroke single', price: 1200, spin: 11, desc: 'Intake, compression, power, exhaust over two turns, with timed valves and a turbo.', build: (o) => buildEngine(o, { kind: 'four' }) },
   vtwin: { name: 'V-twin', price: 2200, spin: 11, desc: 'A 90° twin: one cylinder flat, one upright, both rods on one crank pin.', build: (o) => buildVTwin(o) },
   i2: { name: 'Inline twin', price: 3200, desc: 'A two-cylinder four-stroke with a water-cooled block, oil pump and a starter (hold B to crank it).', build: (o) => buildI2(o) },
+  v4: { name: 'V4 Granturismo', price: 9500, starter: true, desc: 'A 90° V4 with two exhaust turbos, water cooling, an oil pump and an alternator (hold B to crank it, or press Start).', build: (o) => buildV4(o) },
   i2t: { name: 'Inline twin turbo', price: 4800, desc: 'The inline twin with an exhaust-driven turbocharger (hold B to crank it).', build: (o) => buildI2(o, { turbo: true, rate: 4.5 }) },
 };
 for (const [k, d] of Object.entries(KITS)) { TOOL_INFO['kit:' + k] = { label: d.name, desc: `${d.desc} Click the floor to put it down.` }; ICONS['kit:' + k] = ICONS.kit; }
@@ -9429,7 +10077,7 @@ function careerTick(h) { // called every physics step while a career runs
     career.hourDone++;
     career.bank *= 1 + INTEREST_PER_HOUR;
     const bill = Object.keys(METERED).reduce((a, k) => a + career.use[k] * METERED[k].price, 0);
-    if (bill > 0.005) { careerCharge(bill, 'fluids'); toast(`Fluid bill for the last hour: $${bill.toFixed(2)}.`); }
+    if (bill > 0.005) careerCharge(bill, 'fluids');
     career.use = { water: 0, oil: 0, gasoline: 0 };
     career.ledger.push(career.cur); career.cur = { rev: 0, fuel: 0, fluids: 0, maint: 0 };
   }
@@ -9469,7 +10117,7 @@ function placedCounts() {
   for (const m of S.mounts.values()) item(m, m.type);
   for (const g of S.glues.values()) item(g, g.struct ? 'structure' : null);
   for (const sp of S.springs.values()) item(sp, 'spring');
-  for (const b of S.belts.values()) item(b, 'belt');
+  for (const b of S.belts.values()) item(b, b.kind === 'link' ? 'shaftlink' : 'belt');
   for (const w of S.wires.values()) item(w, w.type === 'fluid' ? 'pipe' : 'wire');
   for (const k of kits) add('kit:' + k.split('#')[0]);
   return n;
@@ -9489,7 +10137,7 @@ function careerAllowPaste(data) {
   for (const d of data.mounts) add(d.type);
   for (const d of data.glues) if (d.struct) add('structure');
   for (const d of data.springs) add('spring');
-  for (const d of data.belts || []) add('belt');
+  for (const d of data.belts || []) add(d.kind === 'link' ? 'shaftlink' : 'belt');
   for (const d of data.wires) add(d.type === 'fluid' ? 'pipe' : 'wire');
   const n = placedCounts(), short = Object.entries(need).filter(([t, q]) => available(t, n) < q);
   if (!short.length) return true;
@@ -9524,6 +10172,7 @@ function placeKit(k, f) {
   toast(`${KITS[k].name} placed. Couple its crank to a generator with a clutch, then press Start.`);
 }
 function careerRegisterEngine(tag, extra, w) {
+  if (extra?.starter) { career.engines[tag] = { starter: extra.starter.id }; return; } // it has its own starter: Start holds it down
   if (!extra?.spin || !w) return;
   career.engines[tag] = { spin: extra.spin.map((q) => q.id), slide: (extra.slide || []).map((q) => q.id), centre: extra.centre.toArray(), slideVel: (extra.slideVel || V()).toArray(), w };
 }
@@ -9541,6 +10190,11 @@ function careerStartEngine() { // a starter's worth of spin on each engine's cra
   ensureWorld();
   let n = 0;
   for (const e of Object.values(career.engines)) {
+    if (e.starter != null) {
+      const btn = S.mounts.get(e.starter);
+      if (btn) { pressButton(btn, true); setTimeout(() => pressButton(btn, false), 2500); n++; }
+      continue;
+    }
     if (!e.spin.every((id) => S.parts.has(id))) continue;
     const c = V().fromArray(e.centre), sv = V().fromArray(e.slideVel), w = e.w;
     const setBody = (id, lin, ang) => { const b = S.parts.get(id)?.body; if (b && !b.isFixed()) { if (ang) b.setAngvel({ x: 0, y: 0, z: w }, true); b.setLinvel({ x: lin.x, y: lin.y, z: lin.z }, true); } };
@@ -9612,15 +10266,15 @@ function careerRepairWire(w) {
 }
 // ----- Challenges: a fixed budget and a goal; what you do not spend goes into your career account -----
 const CHALLENGES = {
-  first: { name: 'First light', desc: 'Sell 4 Wh of electricity to the grid.', budget: 700, reward: 200, goal: { Wh: 4 } },
-  steady: { name: 'Steady hand', desc: 'Keep at least 3 W flowing into the grid for 30 in-game minutes without a break.', budget: 900, reward: 400, goal: { W: 3, hold: 0.5 } },
-  hv: { name: 'High voltage', desc: 'Sell 4 Wh to the grid through a transformer set to 33 kV.', budget: 900, reward: 350, goal: { Wh: 4, V: 33000 } },
-  profit: { name: 'Quick profit', desc: 'Make $15 of profit (sales minus fuel and running costs) within 6 in-game hours.', budget: 800, reward: 500, goal: { profit: 15, hours: 6 } },
-  big: { name: 'Big iron', desc: 'Keep 40 W flowing into the grid for 20 in-game minutes. You will need a bigger engine and a better transformer.', budget: 5000, reward: 1500, goal: { W: 40, hold: 1 / 3 } },
+  first: { name: 'First light', desc: 'Sell 60 Wh of electricity to the grid.', budget: 700, reward: 200, goal: { Wh: 60 } },
+  steady: { name: 'Steady hand', desc: 'Keep at least 3 W flowing into the grid for 12 in-game hours without a break.', budget: 900, reward: 400, goal: { W: 3, hold: 12 } },
+  hv: { name: 'High voltage', desc: 'Sell 60 Wh to the grid through a transformer set to 33 kV.', budget: 900, reward: 350, goal: { Wh: 60, V: 33000 } },
+  profit: { name: 'Quick profit', desc: 'Make $15 of profit (sales minus fuel and running costs) within 90 in-game hours.', budget: 800, reward: 500, goal: { profit: 15, hours: 90 } },
+  big: { name: 'Big iron', desc: 'Keep 40 W flowing into the grid for 5 in-game hours. You will need a bigger engine and a better transformer.', budget: 5000, reward: 1500, goal: { W: 40, hold: 5 } },
 };
 function challengeProgress(ch) {
   const g = CHALLENGES[ch.id].goal;
-  if (g.hold) return { f: ch.held / g.hold, text: `${Math.round(ch.held * 60)} of ${Math.round(g.hold * 60)} min at ${g.W} W or more (now ${Math.round(career.lastW)} W)` };
+  if (g.hold) return { f: ch.held / g.hold, text: `${ch.held.toFixed(1)} of ${g.hold} h at ${g.W} W or more (now ${Math.round(career.lastW)} W)` };
   if (g.profit) { const p = ch.rev - ch.cost; return { f: p / g.profit, text: `$${p.toFixed(2)} of $${g.profit} profit · ${Math.max(0, g.hours - (career.t - ch.t0)).toFixed(1)} h left` }; }
   return { f: ch.goalWh / g.Wh, text: `${ch.goalWh.toFixed(2)} of ${g.Wh} Wh${g.V ? ` at ${g.V / 1000} kV` : ''}` };
 }
@@ -9802,7 +10456,7 @@ function careerPanelRender() {
     grid.append(el('section', {}, el('h4', {}, 'Electrical'), row('Power output', 'w'), row('Voltage', 'v'), row('Current', 'a'),
       el('h4', {}, 'Into the grid'), row('Power sold', 'gw'), row('Line voltage', 'gv'), row('Line current', 'ga')));
     const seg = el('div', { class: 'seg' });
-    for (const [h, label] of [[1, 'Last hour'], [6, 'Last 6 h'], [24, 'Last 24 h'], [0, 'All time']]) seg.append(el('button', { 'aria-pressed': String(careerUI.period === h), onclick: () => { careerUI.period = h; careerPanelRender(); } }, label));
+    for (const [h, label] of [[6, 'Last 6 h'], [24, 'Last day'], [168, 'Last week'], [0, 'All time']]) seg.append(el('button', { 'aria-pressed': String(careerUI.period === h), onclick: () => { careerUI.period = h; careerPanelRender(); } }, label));
     grid.append(el('section', {}, el('h4', {}, 'Finance'), seg, row('Profit (electricity sales)', 'rev'), row('Fuel', 'cfuel'), row('Fluids', 'cfluids'), row('Maintenance', 'cmaint'), row('Operating costs', 'cost'), row('Net earnings', 'net')));
     const cv = el('canvas', { width: 600, height: 140 });
     E.cv = cv;
@@ -9816,7 +10470,7 @@ function careerPanelRender() {
     body.append(el('h4', {}, 'Move money'), el('div', { class: 'qty' }, inp,
       el('button', { class: 'cbtn', onclick: () => bankMove(1, false) }, 'Deposit'), el('button', { class: 'cbtn', onclick: () => bankMove(-1, false) }, 'Withdraw')),
     el('div', { class: 'qty', style: 'margin-top:6px' }, el('button', { class: 'cbtn', onclick: () => bankMove(1, true) }, 'Deposit all'), el('button', { class: 'cbtn', onclick: () => bankMove(-1, true) }, 'Withdraw all')),
-    el('p', {}, el('small', {}, `Interest keeps adding up while you are away: one in-game hour for every real minute, for up to ${OFFLINE_MAX_H} in-game hours. Money in the bank cannot be spent in the store until you withdraw it.`)));
+    el('p', {}, el('small', {}, `Interest keeps adding up while you are away: one in-game hour for every 4 real seconds, for up to ${OFFLINE_MAX_H} in-game hours. Money in the bank cannot be spent in the store until you withdraw it.`)));
   } else if (careerUI.tab === 'challenges') {
     renderChallenges(body, E);
   } else {
@@ -10059,6 +10713,7 @@ const EXAMPLES = [
   { name: 'V2 four-stroke (V-twin)', desc: 'A 90° motorcycle twin: one cylinder flat, one upright, both rods on one crank pin, firing 270° and 450° apart', build(tune) { return buildVTwin(V(), tune); }, spin: 11, cam: [V(0.2, 1.9, 0), 11, 0.75, 0.32], note: 'Like a motorcycle L-twin: the flat and the upright cylinder share one crank pin and fire 270° then 450° apart, which gives the lumpy V-twin beat. The flat cylinder is timed from sensors on the flywheel, the upright one from the gold timing disc. Throttle with I / K, Logic view (L) shows the wiring.' },
   { name: 'Quad with an inline-3', desc: 'A four-wheeler: three-cylinder four-stroke, clutch, five-speed gearbox, final drive and a starter', build(tune) { return buildQuad(V(-1.5, 0, 0.6), tune); }, cam: [V(0.5, 1.4, 0.2), 15, 0.75, 0.42], paused: false, note: 'Hold B to crank the engine until it fires. Press U for first gear (J shifts down; R is below N), then I / K for the throttle. Hold H to press the clutch, N / M to steer.' },
   { name: 'Inline twin', desc: 'A two-cylinder four-stroke built like a real one: block, water jacket, head cover, oil pan and belt-driven pumps', build(tune) { return buildI2(V(-0.6, 0, -0.4), tune); }, cam: [V(0, 2.4, 0), 12, 0.75, 0.32], paused: false, note: 'Hold B to crank it until it runs (a freewheel lets the starter go as the engine outruns it), I / K for the throttle. The belt turns the water pump (radiator → water jacket in the block → radiator), the oil pump (oil pan → squirter on the crank → back to the pan) and the camshaft pulley, whose sensor times the four strokes.' },
+  { name: 'V4 Granturismo', desc: 'A 90° V4 four-stroke with round pistons in tube sleeves, two exhaust turbos, water cooling through small passages, an oil pump and an alternator', build(tune) { return buildV4(V(), tune); }, gasPower: 3, cam: [V(0.6, 2.6, 0.3), 15, 0.85, 0.3], paused: false, note: 'Hold B to crank it until it fires, then I / K for the throttle. Explosion strength is set to 3× for this engine; it settles at about 350 rpm (the yellow lamp is VTEC, on above 220 rpm). The belt drives the alternator, the camshaft pulley, the water pump and the oil pump; the green lamp lights when the alternator charges.' },
   { name: 'Inline twin turbo', desc: 'The inline twin with an exhaust-driven turbocharger', build(tune) { return buildI2(V(-0.6, 0, -0.4), { turbo: true, rate: 4.5, ...tune }); }, cam: [V(-0.5, 2.6, 0), 12, -0.9, 0.3], paused: false, note: 'Hold B to crank it until it fires, then open the throttle (I) and watch the turbo spool up: its boost builds a moment after the engine speeds up.' },
   { name: 'Turbo four-stroke single', desc: 'One cylinder: intake, compression, power, exhaust over two turns, with timed valves, a turn-counting toggle and a turbo', build(tune) { return buildEngine(V(), { kind: 'four', ...tune }); }, spin: 11, cam: [V(0.7, 0.8, 0.45), 8.5, 0.6, 0.42], note: 'A Toggle on the bottom row flips just after bottom dead centre every turn, so the valves, fuel and spark know which of the two turns they are in. Turn A: exhaust, then intake with fuel. Turn B: compression, spark just after the top, power. Throttle with I / K, Logic view (L) shows the wiring.' },
   { name: 'Fluids lab', desc: 'A tap, two tanks and a pump; a block that floats; an oil sprayer that makes a block slide', build() { buildFluids(V()); }, cam: [V(0.3, 0.6, -0.9), 8.5, 0.5, 0.45], note: 'B turns the water tap on and off; I / K set the pump speed. Hold N to spray oil on the ramp: once the yellow block is oiled it slides.' },
@@ -10074,13 +10729,18 @@ const EXAMPLES = [
   { name: 'Domino run', desc: 'A ball rolls off a ramp into a curve of dominoes', build() { buildDominoes(V(-4, 0, 0)); }, cam: [V(0, 0.5, 0), 14, 0.15, 0.55] },
   { name: 'Empty floor', desc: 'Start from scratch', build() {}, cam: [V(0, 0.5, 0), 14, 0.6, 0.45], paused: true },
 ];
+let exampleGas = null;
 function loadExample(exDef, first = false) {
+  if (!exDef.career) careerSuspend(); // saved with its own floor, before that floor is cleared away
+  // an example can ask for its own explosion strength; the one you had comes back with the next example
+  if (exDef.gasPower) { if (exampleGas == null) exampleGas = settings.gasPower; settings.gasPower = exDef.gasPower; }
+  else if (exampleGas != null) { settings.gasPower = exampleGas; exampleGas = null; }
   if (!first) pushUndo();
   clearScene();
   S.nextId = 1;
   simTime = 0;
   const extra = exDef.build();
-  if (exDef.career) careerBegin(extra); else careerSuspend();
+  if (exDef.career) careerBegin(extra);
   for (const p of S.parts.values()) { p.linvel.set(0, 0, 0); p.angvel.set(0, 0, 0); }
   if (extra?.fill) { ensureGasHash(true); for (const f of extra.fill) liqFillBox(f.min, f.max, f.kind, f.skip); }
   if (extra?.spin && exDef.spin) {
@@ -10174,7 +10834,7 @@ if (new URLSearchParams(location.search).has('debug')) {
     rebuild() { needsRebuild = true; ensureWorld(); },
     glueTargets: (p, r) => { ensureWorld(); return glueTargets(p, r); },
     pressButton,
-    meshError, createBelt, containerAt, markEdited, ex, oilPart, gasLinks, liqLinks, nozzleNow, gasInject, gasSpark, gasCellAt, V, renderer, scene, physicsStep, gasStep, updateGasVisual,
+    meshError, createBelt, createLink, containerAt, gasPressureAt, markEdited, ex, oilPart, gasLinks, liqLinks, nozzleNow, gasInject, gasSpark, gasCellAt, V, renderer, scene, physicsStep, gasStep, updateGasVisual,
     setSelection, selectedList, selectAll, boxSelect, copySelection, pasteClipboard, duplicateSelection, deleteItems, undo, redo,
     get clipboard() { return clipboard; }, get selection() { return selection; }, get multi() { return multi; },
   };
