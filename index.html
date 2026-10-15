@@ -85,6 +85,47 @@ body {
   -webkit-user-select: none;
 }
 [hidden] { display: none !important; }
+#career-hud {
+  position: fixed; z-index: 19; left: 50%; transform: translateX(-50%);
+  top: calc(64px + env(safe-area-inset-top, 0px));
+  display: flex; gap: 14px; align-items: center; padding: 6px 10px; max-width: calc(100vw - 20px); font-size: 13px;
+}
+#career-hud .cs { display: flex; flex-direction: column; line-height: 1.15; }
+#career-hud .cs small { font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+#career-hud .cs b { font: 600 14px var(--font-mono); }
+#career-hud .bar { width: 70px; height: 5px; border-radius: 3px; background: var(--chip-strong); overflow: hidden; margin-top: 3px; }
+#career-hud .bar i { display: block; height: 100%; background: var(--ok); }
+#career-hud .bar.low i { background: var(--accent); }
+.cbtn { border: 1px solid var(--line); background: var(--chip); border-radius: 8px; padding: 5px 10px; font-weight: 600; font-size: 13px; white-space: nowrap; }
+.cbtn:hover { background: var(--chip-strong); }
+.cbtn.primary { background: var(--accent); color: var(--accent-fg); border-color: transparent; }
+.cbtn:disabled { opacity: 0.45; cursor: default; }
+@media (max-width: 760px) { #career-hud .opt { display: none; } }
+#career-panel {
+  position: fixed; z-index: 30; left: 50%; transform: translateX(-50%);
+  top: calc(112px + env(safe-area-inset-top, 0px)); width: min(400px, calc(100vw - 20px));
+  max-height: calc(100vh - 190px); overflow-y: auto; padding: 12px 14px 14px; font-size: 13px;
+}
+#career-panel h3 { margin: 0; font: 600 18px var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; }
+#career-panel .ph { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+#career-panel .x { border: 0; background: transparent; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+#career-panel .x:hover { background: var(--chip-strong); }
+#career-panel .tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+#career-panel .tabs button { flex: 1; border: 0; background: var(--chip); border-radius: 8px; padding: 6px; font-weight: 600; }
+#career-panel .tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); }
+#career-panel .row { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 4px 0; border-bottom: 1px solid var(--line); }
+#career-panel .row:last-child { border-bottom: 0; }
+#career-panel .row span.m, #career-panel small { color: var(--muted); }
+#career-panel .row b { font-family: var(--font-mono); font-weight: 600; }
+#career-panel h4 { margin: 12px 0 4px; font: 600 12px var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+#career-panel canvas { width: 100%; height: 100px; display: block; border-radius: 8px; background: var(--chip); }
+#career-panel input[type=number] { width: 70px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface-solid); }
+#career-panel .qty { display: flex; gap: 4px; align-items: center; }
+#career-panel .qty .cbtn { padding: 2px 8px; }
+#career-panel .seg { display: flex; gap: 4px; margin: 6px 0; }
+#career-panel .seg button { flex: 1; border: 1px solid var(--line); background: var(--chip); border-radius: 8px; padding: 5px 4px; font-size: 12px; }
+#career-panel .seg button[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+#career-panel .tot { display: flex; justify-content: space-between; font-weight: 600; margin: 8px 0; }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -434,6 +475,7 @@ kbd {
     <button class="tbtn" id="btn-undo" title="Undo (Ctrl+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg><span class="lbl-text">Undo</span></button>
     <button class="tbtn" id="btn-redo" title="Redo (Ctrl+Shift+Z)" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg><span class="lbl-text">Redo</span></button>
     <button class="tbtn" id="btn-logic" title="Logic view: show signal nodes and wires through everything (L)" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17c4 0 4-10 8-10s4 10 8 10"/><circle cx="4" cy="17" r="2"/><circle cx="20" cy="17" r="2"/><circle cx="12" cy="7" r="2"/></svg><span class="lbl-text">Logic</span></button>
+    <button class="tbtn" id="btn-career" title="Career mode: power business, store and bank" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg><span class="lbl-text">Career</span></button>
     <div class="menu-wrap">
       <button class="tbtn" id="btn-examples" aria-haspopup="true" aria-expanded="false" title="Example builds"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><circle cx="16.5" cy="16.5" r="3.5"/></svg><span class="lbl-text">Examples ▾</span></button>
       <div class="menu panel" id="menu-examples" hidden></div>
@@ -474,6 +516,8 @@ kbd {
 
 <nav id="rail" class="panel" aria-label="Tools"></nav>
 <aside id="inspector" class="panel" aria-label="Inspector"></aside>
+<div id="career-hud" class="panel" hidden aria-label="Career mode"></div>
+<div id="career-panel" class="panel" hidden aria-label="Career"></div>
 
 <div id="hint" class="panel"></div>
 <div id="marquee" hidden></div>
@@ -1050,6 +1094,33 @@ const MOUNTS = {
       k.cyl(0.07, 0.3, 0.3, 0.14, 0, PIPE_COLOR, false, Q_X2Y);
       k.cyl(0.05, 0.1, 0, 0.27, 0, JCOL.pin, false);
       return { base: k.base, hub: disc(JCOL.red, V(0, 0.34, 0), Q_ID), axis: V(0, 1, 0), nodes: { y: 0.08, w: 0.42 } };
+    },
+  },
+  generator: {
+    label: 'Generator', cat: 'joint', modes: ['axle'], modeLabels: { axle: 'Axle' }, params: { ratedW: 200, ratedRpm: 240, ratedV: 48 }, nozzle: false,
+    io: { in: [], out: [N('watts', 'Watts'), N('volts', 'Volts'), N('amps', 'Amps'), N('rpm', 'RPM')] },
+    desc: 'Turns shaft power into electricity: point an axle at its hub, or glue a clutch plate to it. Wire Watts to a Pylon to sell power to the grid. The more load the grid puts on it, the harder it is to turn (the drag grows with the load), so a weak engine slows down and its output falls. Volts follow the shaft speed.',
+    layout() {
+      const k = kit();
+      k.box(0.46, 0.26, 0.46, 0, 0.13, 0, JCOL.dark);
+      k.cyl(0.2, 0.16, 0, 0.14, 0, '#e0a526', true, Q_Z2Y);
+      k.cyl(0.14, 0.12, 0, 0.12, 0, '#2b3038', false, Q_Z2Y);
+      k.cyl(0.05, 0.1, 0, 0.27, 0, JCOL.pin, false);
+      return { base: k.base, hub: disc('#e0a526', V(0, 0.34, 0), Q_ID), axis: V(0, 1, 0), nodes: { y: 0.08, w: 0.46 } };
+    },
+  },
+  pylon: {
+    label: 'Pylon', cat: 'device', modes: ['pad'], modeLabels: { pad: 'Stand' }, params: { limit: 1000 }, nozzle: false,
+    io: { in: [N('power', 'Power'), B('enable', 'Sell')], out: [N('sold', 'Sold W')] },
+    desc: 'Your connection to the power grid. Wire a Generator\'s Watts to Power and the grid buys what it produces, at a price that moves with demand through the day. Sell (optional) switches the connection on and off; the limit below caps the power it will take.',
+    layout() {
+      const k = kit();
+      k.box(0.4, 0.08, 0.4, 0, 0.04, 0, JCOL.dark);
+      k.box(0.1, 2.2, 0.1, 0, 1.14, 0, '#7b858f');
+      k.box(0.7, 0.06, 0.06, 0, 2.0, 0, '#7b858f', false);
+      k.box(0.5, 0.06, 0.06, 0, 1.6, 0, '#7b858f', false);
+      for (const x of [-0.32, 0.32]) k.box(0.08, 0.08, 0.08, x, 2.06, 0, JCOL.copper, false);
+      return { base: k.base, nodes: { y: 0.1, w: 0.4 } };
     },
   },
   sprayer: {
@@ -2539,6 +2610,11 @@ function applyJointDrive(m) {
     rj.configureMotorModel(RAPIER.MotorModel.ForceBased);
     rj.configureMotorPosition(m.st.target ?? 0, m.params.force * 12, m.params.force * 0.9);
     m.motorOn = true;
+  } else if (t === 'generator') {
+    // electrical load as drag: torque = k * speed, so the power taken is k * speed squared
+    rj.configureMotorModel(RAPIER.MotorModel.ForceBased);
+    rj.configureMotorVelocity(0, Math.max(0.004, m.st.k ?? 0));
+    m.motorOn = true;
   } else if (t === 'mpump' || t === 'moilpump' || t === 'mturbo') {
     // the work of pumping: a drag that grows with speed
     rj.configureMotorModel(RAPIER.MotorModel.ForceBased);
@@ -3037,6 +3113,7 @@ function physicsStep(h) {
   for (let i = 0; i < sub; i++) { solveAllCouplings(h / sub); world.step(); }
   if (oilRefresh.length) { for (const col of oilRefresh) if (world.getCollider(col.handle)) col.setEnabled(true); oilRefresh.length = 0; }
   simTime += h;
+  if (career.active) careerTick(h);
   stepCount++;
 }
 function syncFromBodies() {
@@ -4962,6 +5039,30 @@ const DEVICE_TICK = {
     m.st.boost = Math.min(3, m.params.gain * (rpm / 300) ** 2);
     return { rpm, boost: m.st.boost };
   },
+  generator(m, I, h) {
+    const rpm = hubRpm(m);
+    m.st.rpm = rpm;
+    const w = (rpm * Math.PI) / 30, wr = Math.max(1, (m.params.ratedRpm * Math.PI) / 30);
+    const k = (m.params.ratedW * clamp(m.st.load ?? 0, 0, 1)) / (wr * wr);
+    if (Math.abs(k - (m.st.k ?? -1)) > 1e-5) { m.st.k = k; applyJointDrive(m); }
+    const watts = k * w * w;
+    const volts = m.params.ratedV * Math.min(1.5, rpm / Math.max(1, m.params.ratedRpm));
+    return { watts, volts, amps: volts > 1 ? watts / volts : 0, rpm };
+  },
+  pylon(m, I, h) {
+    const wire = wireInto(m, 'power'), src = wire ? S.mounts.get(wire.from.m) : null;
+    const en = I('enable'), on = en === undefined ? true : !!en;
+    let sold = 0;
+    if (src && src.type === 'generator') {
+      const d = careerDemand();
+      const L = on ? Math.min(clamp(0.5 * d + 0.35, 0, 1), m.params.limit / Math.max(1, src.params.ratedW)) : 0;
+      src.st.load = L;
+      sold = on ? Math.min(src.out.watts ?? 0, m.params.limit) : 0;
+      if (sold > 0 && career.active) careerEarn(sold, h);
+    }
+    m.st.sold = sold;
+    return { sold };
+  },
   clutch(m, I) {
     const v = I('engage'), e = clamp(v === undefined ? m.params.engage : +v, 0, 1);
     let free = false;
@@ -4995,7 +5096,10 @@ const DEVICE_TICK = {
     const r = I('rate');
     const rate = (r === undefined ? 1 : clamp(r, 0, 4)) * m.params.rate;
     m.st.on = on && rate > 0;
-    if (m.st.on) gasInject(nozzleNow(m), rate * h * INJECT_RATE);
+    if (m.st.on) {
+      const amount = career.active ? careerBurn(rate * h * INJECT_RATE) : rate * h * INJECT_RATE; // a career engine only burns what is in its tank
+      if (amount > 0) gasInject(nozzleNow(m), amount); else m.st.on = false;
+    }
     return {};
   },
   igniter(m, I, h) {
@@ -6978,12 +7082,15 @@ const ICONS = {
   intake: '<path d="M5 9h10v10H5zM15 12h5M7 9V6h6v3M8 12v5M12 12v5"/>',
   turbo: '<circle cx="11" cy="13" r="7"/><path d="M11 13l4-5M11 13l-5-3M11 13l1 6M18 9h4v4"/>',
   pipe: '<path d="M3 7h8a3 3 0 0 1 3 3v4a3 3 0 0 0 3 3h4"/><path d="M3 4.5v5M21 14.5v5"/>',
+  generator: '<circle cx="12" cy="12" r="7"/><path d="M8 13l2-3 2 3 2-3 2 3M12 2v3M12 19v3"/>',
+  pylon: '<path d="M12 2v20M6 22l6-16 6 16M7 9h10M8.5 14h7"/>',
   lamp: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9V16h7v-2.1A6 6 0 0 0 12 3z"/>',
 };
 const RAIL = [
   ['Tools', ['select', 'grabber', 'move', 'rotate', 'size', 'delete']],
   ['Parts', ['block', 'plank', 'beam', 'domino', 'ball', 'cylinder', 'wheel', 'ramp']],
   ['Drivetrain', ['axle', 'bearing', 'gear', 'rack', 'cam', 'pulley', 'belt', 'motor', 'gearbox', 'clutch', 'uvjoint']],
+  ['Power', ['generator', 'pylon']],
   ['Joints', ['hinge', 'balljoint', 'slider', 'torsion', 'solenoid']],
   ['Connect', ['glue', 'autoglue', 'structure', 'spring']],
   ['Gas', ['injector', 'igniter', 'valve', 'turbo', 'mturbo', 'exhturbo', 'intake', 'pipe', 'pressure']],
@@ -7246,6 +7353,14 @@ function mountFields(type, P, m, live) {
       sl('gain', 'Boost per speed', 0.1, 4, 0.05, (v) => `${v.toFixed(2)}×`);
       sl('inertia', 'Rotor weight (lag)', 0.1, 5, 0.05, (v) => `${v.toFixed(2)}×`);
       sl('wastegate', 'Wastegate opens at', 0.1, 2.5, 0.05, (v) => `${v.toFixed(2)} atm`);
+      break;
+    case 'generator':
+      sl('ratedW', 'Power at the rated speed', 20, 5000, 1, (v) => `${Math.round(v)} W`, { log: true });
+      sl('ratedRpm', 'Rated speed', 60, 1500, 1, (v) => `${Math.round(v)} rpm`, { log: true });
+      sl('ratedV', 'Volts at the rated speed', 5, 400, 1, (v) => `${Math.round(v)} V`, { log: true });
+      break;
+    case 'pylon':
+      sl('limit', 'Most power it will take', 20, 10000, 1, (v) => `${Math.round(v)} W`, { log: true });
       break;
     case 'mturbo':
       sl('gain', 'Strength', 0.1, 4, 0.05, (v) => `${v.toFixed(2)}×`);
@@ -7684,6 +7799,8 @@ function renderSettingsMenu() {
 function buildTopbar() {
   $('btn-settings').addEventListener('click', (e) => { e.stopPropagation(); renderSettingsMenu(); toggleMenu($('btn-settings'), $('menu-settings')); });
   $('menu-settings').addEventListener('click', (e) => e.stopPropagation()); // its controls redraw themselves, which would read as a click outside
+  $('btn-career').addEventListener('click', () => careerPanelToggle());
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && careerUI.open) careerPanelToggle(false); });
   $('btn-undo').addEventListener('click', undo);
   $('btn-redo').addEventListener('click', redo);
   $('btn-help').addEventListener('click', () => showHelp(true));
@@ -8822,6 +8939,275 @@ function buildQuad(o, tune = {}) {
   });
   return { crank, frame, box, rear };
 }
+// =====================================================================
+//  Career mode: build a machine that sells electricity to the grid
+//  Engine -> clutch -> generator -> pylon. Money comes from the grid, fuel costs money.
+//  The Career button in the top bar opens the panel: Stats, Store and Bank.
+// =====================================================================
+const SIM_SEC_PER_HOUR = 60;       // one second of simulated time is one in-game minute
+const PRICE_PER_KWH = 25;          // $ per kWh at average demand
+const FUEL_PRICE = 2;              // $ per litre of gasoline
+const FUEL_L_PER_UNIT = 0.002;     // litres burned for one unit of injected fuel
+const INTEREST_PER_HOUR = 0.01;    // the bank pays 1.0% every in-game hour
+const HIST_STEP = 0.25;            // demand is recorded every quarter of an in-game hour
+const SHIPPING = { standard: { label: 'Standard', hours: 24, cost: 12 }, express: { label: 'Express', hours: 8, cost: 30 }, rocket: { label: 'Rocket', hours: 2, cost: 60 } };
+const STORE = [
+  { id: 'gasoline', cat: 'Fluids', name: 'Gasoline', unit: 'L', price: FUEL_PRICE, desc: 'Goes into your fuel tank when it arrives; what does not fit is lost.' },
+  { id: 'clutch', cat: 'Mechanical', name: 'Clutch plate upgrade', price: 60, desc: '+40 N·m of grip, so the clutch holds a heavier load.' },
+  { id: 'generator', cat: 'Electrical', name: 'Generator upgrade', price: 150, desc: '+100 W rated power (it needs more torque from the engine).' },
+  { id: 'transformer', cat: 'Electrical', name: 'Transformer upgrade', price: 120, desc: '+250 W more power the pylon will take.' },
+  { id: 'tank', cat: 'Other Parts', name: 'Fuel tank upgrade', price: 80, desc: '+5 L of tank capacity.' },
+];
+const career = { active: false, ref: null };
+const careerUI = { open: false, tab: 'stats', period: 24, bankAmt: 10 };
+function careerFresh() {
+  return { money: 100, fuel: 5, tankCap: 5, t: 0, bank: 0, kWh: 0, earned: 0, litres: 0, hourDone: 0,
+    cur: { rev: 0, fuel: 0 }, ledger: [], history: [], cart: {}, ship: 'standard', orders: [], storeSpent: 0 };
+}
+Object.assign(career, careerFresh());
+// Demand through the day: a smooth daily swing plus a small wobble. It only ever depends on the time already
+// passed, and `history` only records moments that have happened, so nobody can look ahead.
+function careerDemandAt(t) { return 1 + 0.22 * Math.sin(TAU * (t / 24 - 0.3)) + 0.06 * Math.sin(TAU * (t * 3.7 / 24) + 1); }
+function careerDemand() { return careerDemandAt(career.t); }
+function careerEarn(watts, h) {
+  const kWh = (watts * (h / SIM_SEC_PER_HOUR)) / 1000;
+  const pay = kWh * PRICE_PER_KWH * careerDemand();
+  career.kWh += kWh; career.earned += pay; career.money += pay; career.cur.rev += pay;
+}
+function careerBurn(units) { // fuel taken out of the tank for `units` of injection; returns how much can really be injected
+  if (career.fuel <= 0) return 0;
+  let litres = units * FUEL_L_PER_UNIT;
+  if (litres > career.fuel) { litres = career.fuel; units = litres / FUEL_L_PER_UNIT; }
+  career.fuel -= litres; career.litres += litres;
+  return units;
+}
+function careerTick(h) { // called every physics step while a career runs
+  career.t += h / SIM_SEC_PER_HOUR;
+  while (career.history.length < Math.floor(career.t / HIST_STEP)) { const t = (career.history.length + 1) * HIST_STEP; career.history.push({ t, d: careerDemandAt(t) }); }
+  while (career.hourDone < Math.floor(career.t)) { // an in-game hour has passed: interest, then close the books for it
+    career.hourDone++;
+    career.bank *= 1 + INTEREST_PER_HOUR;
+    career.ledger.push(career.cur); career.cur = { rev: 0, fuel: 0 };
+  }
+  if (career.orders.length && career.orders.some((o) => o.at <= career.t)) careerDeliver();
+}
+function careerDeliver() {
+  const arrived = career.orders.filter((o) => o.at <= career.t);
+  career.orders = career.orders.filter((o) => o.at > career.t);
+  const r = career.ref || {};
+  for (const o of arrived) for (const [id, q] of o.lines) {
+    if (id === 'gasoline') career.fuel = Math.min(career.tankCap, career.fuel + q);
+    else if (id === 'tank') career.tankCap += 5 * q;
+    else if (id === 'generator') { const m = S.mounts.get(r.gen); if (m) m.params.ratedW += 100 * q; }
+    else if (id === 'transformer') { const m = S.mounts.get(r.pylon); if (m) m.params.limit += 250 * q; }
+    else if (id === 'clutch') { const m = S.mounts.get(r.clutch); if (m) { m.params.torque += 40 * q; applyJointDrive(m); } }
+  }
+  toast(arrived.length > 1 ? `${arrived.length} orders arrived.` : 'Your order arrived.');
+  careerUI.dirty = true;
+}
+function careerReset(ref) {
+  Object.assign(career, careerFresh(), { active: !!ref, ref: ref || null });
+  if (!ref) careerUI.open = false;
+  careerHudBuild(); careerPanelRender();
+}
+function careerRefill() {
+  const need = career.tankCap - career.fuel;
+  if (need < 0.01) { toast('The tank is already full.'); return; }
+  const litres = Math.min(need, career.money / FUEL_PRICE);
+  if (litres < 0.01) { toast('Not enough money for fuel.'); return; }
+  const cost = litres * FUEL_PRICE;
+  career.money -= cost; career.cur.fuel += cost; career.fuel += litres;
+  toast(litres < need ? `Bought ${litres.toFixed(2)} L for $${cost.toFixed(2)}: that is all you can afford.` : `Tank filled: ${litres.toFixed(2)} L for $${cost.toFixed(2)}.`);
+}
+function careerStartEngine() { // a starter's worth of spin on the crank, the same as the examples give
+  const r = career.ref;
+  if (!r || !r.engine) return;
+  ensureWorld();
+  const w = 9, c = r.engine.centre;
+  const setBody = (id, lin, ang) => { const b = S.parts.get(id)?.body; if (b && !b.isFixed()) { if (ang) b.setAngvel({ x: 0, y: 0, z: w }, true); b.setLinvel({ x: lin.x, y: lin.y, z: lin.z }, true); } };
+  for (const id of r.engine.spin) { const q = S.parts.get(id); if (q) setBody(id, V(0, 0, w).cross(q.pos.clone().sub(c)), true); }
+  for (const id of r.engine.slide) setBody(id, r.engine.slideVel.clone().multiplyScalar(w), false);
+  if (career.fuel <= 0) toast('The tank is empty: refill it first.');
+  if (!running) setRunning(true);
+}
+// ----- Store -----
+const storeLine = (it) => it.price * (career.cart[it.id] || 0);
+const storeItemsTotal = () => STORE.reduce((a, it) => a + storeLine(it), 0);
+const storeCount = () => STORE.reduce((a, it) => a + (career.cart[it.id] || 0), 0);
+const storeTotal = () => (storeCount() ? storeItemsTotal() + SHIPPING[career.ship].cost : 0);
+function cartSet(id, q) { q = Math.max(0, Math.min(999, Math.floor(+q || 0))); if (q) career.cart[id] = q; else delete career.cart[id]; careerPanelRender(); }
+function careerOrder() {
+  const total = storeTotal();
+  if (!total) return;
+  if (total > career.money + 1e-9) { toast(`That order costs $${total.toFixed(2)}, and you have $${career.money.toFixed(2)}.`); return; }
+  const lines = STORE.filter((it) => career.cart[it.id]).map((it) => [it.id, career.cart[it.id]]);
+  const fuelCost = (career.cart.gasoline || 0) * FUEL_PRICE;
+  career.money -= total; career.cur.fuel += fuelCost; career.storeSpent += total - fuelCost;
+  const sh = SHIPPING[career.ship];
+  career.orders.push({ at: career.t + sh.hours, lines, label: lines.map(([id, q]) => `${q} × ${STORE.find((it) => it.id === id).name}`).join(', ') });
+  career.cart = {};
+  toast(`Order placed. ${sh.label} delivery: ${sh.hours} in-game hours.`);
+  careerPanelRender();
+}
+// ----- Bank -----
+function bankMove(dir, all) {
+  const amt = all ? (dir > 0 ? career.money : career.bank) : Math.max(0, +careerUI.bankAmt || 0);
+  const x = Math.min(amt, dir > 0 ? career.money : career.bank);
+  if (x < 0.005) { toast(dir > 0 ? 'No money to deposit.' : 'Nothing to withdraw.'); return; }
+  career.money -= dir * x; career.bank += dir * x;
+}
+// ----- HUD (slim) and panel -----
+let careerHudEls = null, careerPanelEls = null;
+function careerHudBuild() {
+  const hud = document.getElementById('career-hud');
+  hud.hidden = !career.active;
+  hud.textContent = '';
+  careerHudEls = null;
+  $('btn-career').setAttribute('aria-pressed', String(career.active && careerUI.open));
+  if (!career.active) return;
+  const stat = (label, cls) => { const b = el('b', {}, '—'); return { b, node: el('div', { class: 'cs ' + (cls || '') }, el('small', {}, label), b) }; };
+  const money = stat('Money'), fuel = stat('Fuel'), out = stat('Output', 'opt');
+  const bar = el('div', { class: 'bar' }, el('i', {}));
+  fuel.node.append(bar);
+  const start = el('button', { class: 'cbtn', title: 'Give the crank a starting spin', onclick: careerStartEngine }, 'Start');
+  const refill = el('button', { class: 'cbtn primary', title: 'Fill the tank at the current fuel price', onclick: careerRefill }, 'Refill');
+  hud.append(money.node, fuel.node, out.node, start, refill);
+  careerHudEls = { money: money.b, fuel: fuel.b, bar, out: out.b, refill };
+}
+function careerPanelToggle(open) {
+  careerUI.open = open ?? !careerUI.open;
+  careerPanelRender();
+}
+function careerPanelRender() {
+  const pan = document.getElementById('career-panel');
+  $('btn-career').setAttribute('aria-pressed', String(careerUI.open));
+  pan.hidden = !careerUI.open;
+  careerPanelEls = null;
+  if (!careerUI.open) return;
+  const keepScroll = pan.scrollTop;
+  pan.textContent = '';
+  const head = el('div', { class: 'ph' }, el('h3', {}, 'Career'), el('button', { class: 'x', title: 'Close', onclick: () => careerPanelToggle(false) }, '×'));
+  pan.append(head);
+  if (!career.active) {
+    pan.append(el('p', {}, 'Start with an engine, a clutch, a generator and a pylon, $100 and a small tank of fuel. Sell electricity to the grid, then spend what you earn in the store.'),
+      el('button', { class: 'cbtn primary', onclick: () => { loadExample(CAREER_DEF); careerUI.tab = 'stats'; careerPanelRender(); } }, 'Start a new career'),
+      el('p', {}, el('small', {}, 'This replaces the build on the floor. Undo brings it back.')));
+    return;
+  }
+  const tabs = el('div', { class: 'tabs', role: 'tablist' });
+  for (const [id, label] of [['stats', 'Stats'], ['store', 'Store'], ['bank', 'Bank']]) tabs.append(el('button', { role: 'tab', 'aria-selected': String(careerUI.tab === id), onclick: () => { careerUI.tab = id; careerPanelRender(); } }, label));
+  pan.append(tabs);
+  const body = el('div', {});
+  pan.append(body);
+  const E = {};
+  const row = (label, key, init = '—') => { const b = el('b', {}, init); if (key) E[key] = b; return el('div', { class: 'row' }, el('span', { class: 'm' }, label), b); };
+  if (careerUI.tab === 'stats') {
+    body.append(el('h4', {}, 'Electrical'), row('Power output', 'w'), row('Voltage', 'v'), row('Current', 'a'));
+    const seg = el('div', { class: 'seg' });
+    for (const [h, label] of [[6, 'Last 6 h'], [24, 'Last 24 h'], [0, 'All time']]) seg.append(el('button', { 'aria-pressed': String(careerUI.period === h), onclick: () => { careerUI.period = h; careerPanelRender(); } }, label));
+    body.append(el('h4', {}, 'Finance'), seg, row('Profit (electricity sales)', 'rev'), row('Operating costs (fuel)', 'cost'), row('Net earnings', 'net'));
+    const cv = el('canvas', { width: 380, height: 100 });
+    E.cv = cv;
+    body.append(el('h4', {}, 'Power demand'), cv, row('Grid price now', 'price'), row('Time', 'time'), row('Energy sold', 'kwh'));
+  } else if (careerUI.tab === 'store') {
+    for (const cat of ['Fluids', 'Mechanical', 'Electrical', 'Other Parts']) {
+      const items = STORE.filter((it) => it.cat === cat);
+      if (!items.length) continue;
+      body.append(el('h4', {}, cat));
+      for (const it of items) body.append(el('div', { class: 'row' }, el('div', {}, el('div', {}, it.name, ' ', el('small', {}, `$${it.price}${it.unit ? ' / ' + it.unit : ''}`)), el('small', {}, it.desc)), el('button', { class: 'cbtn', onclick: () => cartSet(it.id, (career.cart[it.id] || 0) + 1) }, 'Add')));
+    }
+    body.append(el('h4', {}, 'Cart'));
+    if (!storeCount()) body.append(el('small', {}, 'Your cart is empty.'));
+    for (const it of STORE) {
+      const q = career.cart[it.id];
+      if (!q) continue;
+      const inp = el('input', { type: 'number', min: 0, value: q, 'aria-label': `${it.name} quantity`, onchange: (e) => cartSet(it.id, e.target.value) });
+      body.append(el('div', { class: 'row' }, el('span', {}, it.name), el('div', { class: 'qty' },
+        el('button', { class: 'cbtn', onclick: () => cartSet(it.id, q - 1) }, '−'), inp, el('button', { class: 'cbtn', onclick: () => cartSet(it.id, q + 1) }, '+'), el('b', {}, `$${storeLine(it).toFixed(2)}`))));
+    }
+    const seg = el('div', { class: 'seg' });
+    for (const [id, sh] of Object.entries(SHIPPING)) seg.append(el('button', { 'aria-pressed': String(career.ship === id), onclick: () => { career.ship = id; careerPanelRender(); } }, `${sh.label}`, el('br'), el('small', {}, `${sh.hours} h · $${sh.cost}`)));
+    body.append(el('h4', {}, 'Delivery'), seg,
+      el('div', { class: 'tot' }, el('span', {}, 'Total'), el('span', {}, `$${storeTotal().toFixed(2)}`)),
+      el('button', { class: 'cbtn primary', disabled: storeTotal() <= 0 ? '' : null, onclick: careerOrder }, 'Place order'));
+    if (career.orders.length) {
+      body.append(el('h4', {}, 'On the way'));
+      for (const o of career.orders) { const b = el('b', {}, ''); body.append(el('div', { class: 'row' }, el('span', {}, o.label), b)); (E.orders ||= []).push([o, b]); }
+    }
+  } else {
+    body.append(el('h4', {}, 'Account'), row('Cash', 'cash'), row('In the bank', 'bank'), row('Interest', null, `${(INTEREST_PER_HOUR * 100).toFixed(1)}% every in-game hour`));
+    const inp = el('input', { type: 'number', min: 0, step: 1, value: careerUI.bankAmt, 'aria-label': 'Amount', onchange: (e) => { careerUI.bankAmt = +e.target.value || 0; } });
+    body.append(el('h4', {}, 'Move money'), el('div', { class: 'qty' }, inp,
+      el('button', { class: 'cbtn', onclick: () => bankMove(1, false) }, 'Deposit'), el('button', { class: 'cbtn', onclick: () => bankMove(-1, false) }, 'Withdraw')),
+      el('div', { class: 'qty', style: 'margin-top:6px' }, el('button', { class: 'cbtn', onclick: () => bankMove(1, true) }, 'Deposit all'), el('button', { class: 'cbtn', onclick: () => bankMove(-1, true) }, 'Withdraw all')));
+  }
+  body.append(el('div', { style: 'margin-top:12px;text-align:right' }, el('button', { class: 'cbtn', onclick: () => { if (confirm('End the career? Your machine stays, but money, orders and the bank are cleared.')) careerReset(null); } }, 'End career')));
+  careerPanelEls = E;
+  careerHudUpdate();
+  pan.scrollTop = keepScroll;
+}
+function careerChart(cv) {
+  const ctx = cv.getContext('2d'), w = cv.width, h = cv.height;
+  const css = getComputedStyle(document.documentElement);
+  ctx.clearRect(0, 0, w, h);
+  const pts = [{ t: 0, d: careerDemandAt(0) }, ...career.history, { t: career.t, d: careerDemand() }]; // only what has happened
+  const tmax = Math.max(24, career.t), lo = 0.65, hi = 1.35;
+  const X = (t) => 8 + (t / tmax) * (w - 16), Y = (d) => h - 8 - ((d - lo) / (hi - lo)) * (h - 16);
+  ctx.strokeStyle = css.getPropertyValue('--line') || '#888'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(8, Y(1)); ctx.lineTo(w - 8, Y(1)); ctx.stroke();
+  ctx.strokeStyle = css.getPropertyValue('--accent').trim() || '#d4382a'; ctx.lineWidth = 2; ctx.lineJoin = 'round';
+  ctx.beginPath(); pts.forEach((q, i) => (i ? ctx.lineTo(X(q.t), Y(q.d)) : ctx.moveTo(X(q.t), Y(q.d)))); ctx.stroke();
+  const last = pts[pts.length - 1];
+  ctx.fillStyle = ctx.strokeStyle; ctx.beginPath(); ctx.arc(X(last.t), Y(last.d), 3.5, 0, TAU); ctx.fill();
+}
+function careerHudUpdate() {
+  if (!career.active) return;
+  const gen = career.ref ? S.mounts.get(career.ref.gen) : null, o = gen ? gen.out : {};
+  const e = careerHudEls;
+  if (e) {
+    e.money.textContent = `$${career.money.toFixed(2)}`;
+    e.fuel.textContent = `${career.fuel.toFixed(1)}/${career.tankCap} L`;
+    e.bar.firstChild.style.width = `${clamp((career.fuel / career.tankCap) * 100, 0, 100)}%`;
+    e.bar.classList.toggle('low', career.fuel < career.tankCap * 0.2);
+    e.out.textContent = `${(o.watts ?? 0).toFixed(0)} W`;
+    e.refill.textContent = `Refill $${((career.tankCap - career.fuel) * FUEL_PRICE).toFixed(2)}`;
+  }
+  const P = careerPanelEls;
+  if (!careerUI.open || !P) return;
+  if (careerUI.dirty) { careerUI.dirty = false; if (careerUI.tab === 'store') { careerPanelRender(); return; } }
+  const d = careerDemand(), day = Math.floor(career.t / 24) + 1, hr = Math.floor(career.t % 24);
+  if (P.w) {
+    P.w.textContent = `${(o.watts ?? 0).toFixed(0)} W`; P.v.textContent = `${(o.volts ?? 0).toFixed(0)} V`; P.a.textContent = `${(o.amps ?? 0).toFixed(1)} A`;
+    const rows = [...career.ledger, career.cur], use = careerUI.period ? rows.slice(-careerUI.period) : rows;
+    const rev = use.reduce((a, r) => a + r.rev, 0), cost = use.reduce((a, r) => a + r.fuel, 0);
+    P.rev.textContent = `$${rev.toFixed(2)}`; P.cost.textContent = `$${cost.toFixed(2)}`; P.net.textContent = `${rev - cost < 0 ? '−' : ''}$${Math.abs(rev - cost).toFixed(2)}`;
+    P.price.textContent = `$${(PRICE_PER_KWH * d).toFixed(1)}/kWh`; P.time.textContent = `Day ${day}, ${String(hr).padStart(2, '0')}:${String(Math.floor((career.t % 1) * 60)).padStart(2, '0')}`;
+    P.kwh.textContent = `${career.kWh.toFixed(2)} kWh`;
+    careerChart(P.cv);
+  }
+  if (P.cash) { P.cash.textContent = `$${career.money.toFixed(2)}`; P.bank.textContent = `$${career.bank.toFixed(2)}`; }
+  if (P.orders) for (const [o2, b] of P.orders) b.textContent = `in ${Math.max(0, o2.at - career.t).toFixed(1)} h`;
+}
+// The starting set: a single-cylinder engine, a clutch, a generator and a pylon, wired up
+function buildCareerStart() {
+  const o = V();
+  const eng = buildEngine(o, { kind: 'lenoir', rate: 2.5 });
+  const axle = eng.spin[0];
+  const toZ = Qn().setFromUnitVectors(UP, V(0, 0, 1));
+  const steel = { color: '#4a5059', material: 'metal' };
+  const clutch = ex.mount('clutch', 'axle', axle, at(o, -1.0, 1.0, -0.9), ZQ(-1), { torque: 80, engage: 1 });
+  const wall = ex.part('block', at(o, -1.0, 0.8, -2.1), { size: [1.0, 1.6, 0.2], ...steel });
+  ex.anchor(wall, at(o, -1.0, 0, -2.1));
+  const gen = ex.mount('generator', 'axle', wall, at(o, -1.0, 1.0, -2.0), ZQ(1));
+  const shaft = ex.part('axle', at(o, -1.0, 1.0, -1.43), { size: [0.12, 0.6, 0.12], quat: toZ });
+  ex.glue2(shaft, ex.hub(clutch), at(o, -0.95, 1.0, -1.2));
+  ex.glue2(shaft, ex.hub(gen), at(o, -0.95, 1.0, -1.66));
+  const pylon = ex.mount('pylon', 'pad', null, at(o, -3.4, 0, -2.4), UPQ(), { limit: 1000 });
+  ex.wire(gen, 'watts', pylon, 'power');
+  return { ...eng, careerRef: { gen: gen.id, pylon: pylon.id, clutch: clutch.id, engine: { spin: eng.spin.map((q) => q.id), slide: eng.slide.map((q) => q.id), centre: eng.centre.clone(), slideVel: eng.slideVel.clone() } } };
+}
+
+const CAREER_DEF = { name: 'Career mode', build() { return buildCareerStart(); }, spin: 9, career: true, cam: [V(-1.5, 1, -0.8), 11, 0.9, 0.34], paused: false, note: 'Sell electricity to the grid. Press Start for the engine, I / K for the throttle, and open Career for the store and bank.' };
 const EXAMPLES = [
   { name: 'Workshop tour', desc: 'A cam on an axle, a double pendulum, a trampoline, a seesaw and dominoes', build() {
     buildCamFollower(V(-6, 0, -4.5)); buildDoublePendulum(V(-1.5, 0, -5)); buildTrampoline(V(5, 0, -3.5)); buildSeesaw(V(-9.5, 0, 0)); buildDominoes(V(0, 0, 2.5), 22);
@@ -8854,6 +9240,7 @@ function loadExample(exDef, first = false) {
   S.nextId = 1;
   simTime = 0;
   const extra = exDef.build();
+  careerReset(exDef.career && extra ? extra.careerRef : null);
   for (const p of S.parts.values()) { p.linvel.set(0, 0, 0); p.angvel.set(0, 0, 0); }
   if (extra?.fill) { ensureGasHash(true); for (const f of extra.fill) liqFillBox(f.min, f.max, f.kind, f.skip); }
   if (extra?.spin && exDef.spin) {
@@ -8909,7 +9296,7 @@ function frame(now) {
   updateGasVisual(dt);
   updateHud();
   liveTimer += dt;
-  if (liveTimer > 0.15) { liveTimer = 0; inspectorLive(); }
+  if (liveTimer > 0.15) { liveTimer = 0; inspectorLive(); careerHudUpdate(); }
   // glue and nodes are drawn in batches that copy where each one is, so the world's matrices are updated first
   scene.updateMatrixWorld();
   updateGlueBatch();
@@ -8938,7 +9325,7 @@ if (!seenHelp) toast('New: select several things and copy, cut, paste or duplica
 if (new URLSearchParams(location.search).has('debug')) {
   // Handles for automated tests: open the page with ?debug to use them from the console.
   window.__sandbox = {
-    S, settings, camera, rig, gas, EXAMPLES, loadExample, serialize, loadScene, setRunning, setTimeScale, setTool,
+    S, settings, camera, rig, gas, EXAMPLES, career, careerRefill, careerStartEngine, loadExample, serialize, loadScene, setRunning, setTimeScale, setTool,
     get follow() { return follow; }, get world() { return world; }, get simTime() { return simTime; }, get running() { return running; }, get couplings() { return couplings; },
     advance(sec, h = BASE_DT) { ensureWorld(); const n = Math.round(sec / h); for (let i = 0; i < n; i++) physicsStep(h); syncFromBodies(); updateAttachments(); cullFallen(); },
     rebuild() { needsRebuild = true; ensureWorld(); },
